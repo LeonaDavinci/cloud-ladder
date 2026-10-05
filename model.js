@@ -2480,11 +2480,14 @@ export function buildProjectorScreen(cfg){
     ve.load();                                  // 显式起一次加载，别等浏览器自己挑时机
     ve.addEventListener('canplay', swapToVideo, { once: true });
 
-    /* 有些浏览器不会触发 error，直接 canplay 也没到：5 秒后还解不出画面就回退。
+    /* 有些浏览器不会触发 error，直接 canplay 也没到：超时后还解不出画面就回退。
        ⚠ 这里只看 readyState，不要再掺入 ve.paused —— 自动播放被策略拦下时
        paused 恒为 true，拿它当判据会把「已经能播、只是还没被点开」的视频
-       误判成加载失败而退回画布（实测 night.mp4 就这样被踢回去了）。 */
-    setTimeout(()=>{ if(useVideo && ve.readyState < 2) failToCanvas('timeout'); }, 5200);
+       误判成加载失败而退回画布（实测 night.mp4 就这样被踢回去了）。
+       ⚠ 2026-10-06 从 5.2s 放宽到 8s：线上是 python http.server，**对 Range 请求
+       直接返回 200 全量、不给 206**，所以慢网下必须把整个文件抓完才谈得上解码，
+       5.2s 在移动端很容易误判成「加载失败」⇒ 用户看到的是回退的默认画面。 */
+    setTimeout(()=>{ if(useVideo && ve.readyState < 2) failToCanvas('timeout'); }, 8000);
   }
 
   /* ---- 视频声音：放大 1.5 倍（screen.volumeGain） ----
@@ -2608,32 +2611,45 @@ export function buildProjectorScreen(cfg){
     gc.height = Math.max(8, Math.round(256*gh/gw));
     const gx = gc.getContext('2d');
     const GW = gc.width, GH = gc.height;
-    gx.clearRect(0, 0, GW, GH);
 
-    /* 屏幕矩形在纹理里占正中间，四周（1/gScale）才是辉光的地盘 */
-    const mx = GW/(2*gScale), my = GH/(2*gScale);
-    const ext = Math.min(mx, my)*0.92;        // 向外延伸的带宽（纹素）
-    const N = 16;
-    for(let i=0;i<N;i++){
-      const k = i/(N-1), off = k*ext;
-      gx.strokeStyle = `rgba(255,244,226,${peak*Math.pow(1-k, 1.6)})`;
-      gx.lineWidth = (ext/N)*2 + 1;           // 环要互相搭上，不然会有同心条纹
-      const x0 = mx - off, y0 = my - off;
-      gx.strokeRect(x0, y0, GW - x0*2, GH - y0*2);
+    /* ⚠ 逐像素写，**不要**改回「N 圈 strokeRect 画同心环」（2026-10-06 用户报「bloom 的
+       条纹感觉明显」）。每一圈 stroke 的 alpha 是常数，圈与圈之间没有连续过渡，
+       屏幕上就是 N 圈同心亮暗台阶；外圈 alpha 掉到 5/255 以下还会被 8bit 量化直接
+       归零再叠一层阶梯。bloom 的多级 downsample 把这些台阶放大 ⇒ 那圈「条纹」。
+       这里改成按「到屏幕矩形的外部距离 d」算连续衰减：
+         a = peak * (1 - smoothstep(d))，smoothstep 即 d²(3-2d)
+         —— f'(0)=f'(1)=0，所以贴屏幕那条边和贴面板外边界这两头都**没有硬边**
+         （别用 (1-d)²，它的 f'(0)=-2，边缘照样一像素硬跳，实测是 39/255 的台阶）；
+         四角用 hypot ⇒ 距离更大，自然收成圆角，不用再叠一层 destination-in 渐隐。 */
+    const hw = GW/2, hh = GH/2;               // 面片半宽/半高（纹素）
+    const sw = hw/gScale, sh2 = hh/gScale;    // 屏幕矩形在半张纹理里的半宽/半高
+    const band = Math.min(hw - sw, hh - sh2); // 向外可延伸的带宽（纹素）
+    const img = gx.createImageData(GW, GH);
+    const px = img.data;
+    for(let y=0;y<GH;y++){
+      const dy = Math.abs(y + 0.5 - hh) - sh2; // >0 才在屏幕矩形之外
+      for(let x=0;x<GW;x++){
+        const dx = Math.abs(x + 0.5 - hw) - sw;
+        let a = 0;
+        if(dx > 0 || dy > 0){
+          const d = Math.hypot(dx > 0 ? dx : 0, dy > 0 ? dy : 0)/band;
+          if(d < 1){ a = peak*(1 - d*d*(3 - 2*d)); }   // 1-smoothstep：两端斜率都为 0
+        }
+        const i = (y*GW + x)*4;
+        px[i] = 255; px[i+1] = 244; px[i+2] = 226;
+        px[i+3] = (a*255 + 0.5) | 0;
+      }
     }
-    /* 再乘一层圆形渐隐（destination-in）把方板的四角磨掉，
-       否则会看见一块方辉光板的硬边。 */
-    const mask = gx.createRadialGradient(GW/2, GH/2, Math.min(GW, GH)*0.32,
-                                         GW/2, GH/2, Math.hypot(GW, GH)*0.5);
-    mask.addColorStop(0, 'rgba(255,255,255,1)');
-    mask.addColorStop(1, 'rgba(255,255,255,0)');
-    gx.globalCompositeOperation = 'destination-in';
-    gx.fillStyle = mask;
-    gx.fillRect(0, 0, GW, GH);
-    gx.globalCompositeOperation = 'source-over';
+    gx.putImageData(img, 0, 0);
 
     const gtex = new THREE.CanvasTexture(gc);
     if(gtex.colorSpace !== undefined) gtex.colorSpace = THREE.SRGBColorSpace;
+    /* 显式关 mipmap + 双线性：这张贴图贴在固定尺寸的平面上，本来就没有多级细节需求；
+       开着 mipmap 反而会在距离变化时让细环忽隐忽现（更闪）。 */
+    gtex.generateMipmaps = false;
+    gtex.minFilter = THREE.LinearFilter;
+    gtex.magFilter = THREE.LinearFilter;
+    gtex.anisotropy = 1;
     glowMat = new THREE.MeshBasicMaterial({
       map: gtex,
       color: new THREE.Color(S.glowColor || '#fff2dd'),
@@ -2725,6 +2741,11 @@ export function buildProjectorScreen(cfg){
   /* 补一次「已经 ready 但 canplay 也许已经错过」的判定 —— 此时 screen 已建好，
      swapToVideo 里那些 screen.material 赋值才是安全的。 */
   if(videoEl && videoEl.readyState >= 2) swapToVideo();
+
+  /* 诊断出口（2026-10-06）：<video> 是 createElement 出来的、没插进 DOM，
+     页面里没法用 querySelector 摸到它，而排查「手机上放不出来」必须看
+     readyState / error / networkState。挂到 userData 上，无头探针直接读。 */
+  if(videoEl) group.userData.videoEl = videoEl;
 
   group.userData.update = function(dt, now){
     if(fadeT !== fadeTo){                    // 淡入淡出驱动（Group 隐藏时也要跑）
