@@ -142,8 +142,14 @@ const DEFAULTS = {
        #1e2a4c → #131b34，#242f52 → #161e3c。雾色就是 scene.fog 的颜色、**不吃灯**，
        夜里远景的整块基调由它决定 —— 不压就永远是那层发灰的蓝雾，把月色糊掉、
        远山也泛白。压暗之后月亮和云才有对比，夜里才像夜。（near/far 不动，只改色。） */
-    fog:      { color: '#131b34', near: 18, far: 4200 },
-    fogDense: { color: '#161e3c', near: 2.5, far: 58 },
+    /* ⚠ 2026-10-06 用户要求「晚上的雾强度提高 50%」。线性雾的浓度正比于
+       1/(far−near)（near 处为 0、far 处为 1，中间线性），所以「强度 ×1.5」
+       = 把跨度压到 2/3，而不是把 far 乘 0.5：
+         默认雾 4200−18 = 4182 → 2788 ⇒ far = 18 + 2788 = **2806**
+         超大雾 58−2.5 = 55.5 → 37.0  ⇒ far = 2.5 + 37 = **39.5**
+       near 与 color 不动（near 决定「从多近开始起雾」，改了会让脚边突然发白）。 */
+    fog:      { color: '#131b34', near: 18, far: 2806 },
+    fogDense: { color: '#161e3c', near: 2.5, far: 39.5 },
     sky:     { top: '#080d24', mid: '#141f45', horizon: '#2b3a6b', glow: '#465b9c',
                glowAmp: 0.20, glowY: 0.03, noiseAmp: 0.06 },
     tint:    { bg: '#2f3860', bgMix: 0.80, cloud: '#46538c', cloudMix: 0.78 },
@@ -156,7 +162,14 @@ const DEFAULTS = {
     cloudShade: { backDark: 0.36, hinge: 0.80, backMix: 0.46 },
     /* 夜间整体暗，能超过阈值的只有月亮和星星 ⇒ 阈值可以放宽到 0.45，
        让月亮带一圈柔光；强度也不用压。 */
-    bloom:   { strength: 0.90, radius: 0.80, threshold: 0.45 },
+    /* radius 在 three 的 UnrealBloomPass 里**不是几何半径**，而是
+       `mix(factor, 1.2-factor, radius)` 的插值权重（0→1）：调大它等于把权重
+       从「近处 mip」翻向「远处 mip」，并不是把光晕摊开。真正的半径由高斯
+       kernel 决定（见 postfx.js setBloomKernel / scene.json 的 bloomKernel）。
+       这里从 0.80 提到 **1.0**（用满，再大就过界了：radius>1 会让最近那级
+       权重变成负数 ⇒ 高光被反相成黑核），strength 同步提一点补偿
+       kernel 变宽带来的能量摊开。 */
+    bloom:   { strength: 1.15, radius: 1.0, threshold: 0.45 },
     orb:     { show: true, kind: 'moon', color: '#eef3ff', size: 150, haloSize: 780,
                haloColor: '#b9caff', opacity: 1, radius: 2600 },    stars:   { show: true, count: 460, radius: 3300, size: 2.0, opacity: 0.95 }
   }

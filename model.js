@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import {
-  RT, terrainHeight, fbm2, hexToRgba, hexToRgb255, makeCloudTexture,
+  RT, RO, terrainHeight, fbm2, hexToRgba, hexToRgb255, makeCloudTexture,
   regTint, TINT_CLOUD
 } from './scene.js';
 
@@ -942,7 +942,7 @@ export function buildBedShadow(cfg, uTime, bed){
     });
     const patch = new THREE.Mesh(geo, mat);
     patch.position.set(FP.cx, base, FP.cz);
-    patch.renderOrder = 1;
+    patch.renderOrder = RO.GROUND;
     grp.add(patch);
     grp.userData.aoSize = [ +pw.toFixed(2), +pd.toFixed(2) ];
   }
@@ -1138,7 +1138,7 @@ export function buildButterflies(cfg, bed, camera){
   const mesh = new THREE.InstancedMesh(geo, mat, n);
   mesh.castShadow = false; mesh.receiveShadow = false;
   mesh.frustumCulled = false;
-  mesh.renderOrder = 2;
+  mesh.renderOrder = RO.VEG;
 
   const [rxLo, rxHi] = B.radiusX || [1.9, 3.0];
   const [rzLo, rzHi] = B.radiusZ || [2.7, 3.9];
@@ -1281,7 +1281,7 @@ export function buildFireflies(cfg, bed, camera){
   });
   const mesh = new THREE.InstancedMesh(geo, mat, n);
   mesh.frustumCulled = false;
-  mesh.renderOrder = 9;
+  mesh.renderOrder = RO.NIGHTFX;
   mesh.visible = false;                 // 白天不显示，切夜间由 main.js 打开
 
   const [rxLo, rxHi] = F.radiusX || [2.4, 3.8];
@@ -1446,7 +1446,7 @@ export function buildGlints(cfg, bed, ladder, camera){
   });
   const mesh = new THREE.InstancedMesh(geo, mat, list.length);
   mesh.frustumCulled = false;
-  mesh.renderOrder = 8;
+  mesh.renderOrder = RO.FOLIAGE;
   const [sLo, sHi] = G.size || [0.13, 0.28];
   const [spLo, spHi] = G.speed || [1.6, 4.6];
   const PAL = (G.palette && G.palette.length) ? G.palette : ['#ffe6a8','#ffd6a8','#dcd0ff','#cfeaff'];
@@ -1774,6 +1774,10 @@ export function buildCloud(scene, C, SUN_DIR){
     mat.opacity = Math.min(1, (opMin + (opMax-opMin)*yN) * OP_BOOST);
     regTint(TINT_CLOUD, mat);           // 云色烘在材质上 ⇒ 夜间整体压成冷蓝
     const sp = new THREE.Sprite(mat);
+    /* ★ 必须是 RO.CLOUD 而不是默认 0（2026-10-06 用户要求「云的渲染次序要比电视
+       后面」）。透明 pass 里 renderOrder 压过深度，而云 + 电视辉光都是
+       depthWrite:false 的加色/半透明层 —— 排错了谁后画谁盖谁。 */
+    sp.renderOrder = RO.CLOUD;
     const s = smin + Math.random()*(smax-smin);
     sp.scale.set(s*pw, s*ph, 1);   // 长方形：横向拉长
     /* 每片云装进一个「节点」：Sprite 与它那块投影圆盘都挂在节点下，
@@ -1863,7 +1867,7 @@ export function buildCloud(scene, C, SUN_DIR){
     // 标记以便在动画循环中更新朝向
     shadowPlane.userData.isBillboard = true;
     shadowPlane.userData.syncWithSprite = sp; // 可选：如果需要严格同步位置
-    shadowPlane.renderOrder = 10;
+    shadowPlane.renderOrder = RO.CLOUD_SHADOW;
     node.add(shadowPlane);
     cloudGroup.add(node);
     /* 朝向太阳要在「挂进节点之后」算：lookAt 取的是世界位置，
@@ -1911,7 +1915,7 @@ export function buildCloud(scene, C, SUN_DIR){
                                            depthTest: false, blending: THREE.AdditiveBlending,
                                            color: 0xffd9f2, opacity: 0 });
       const sp = new THREE.Sprite(m);
-      sp.visible = false; sp.renderOrder = 40;
+      sp.visible = false; sp.renderOrder = RO.SPARK;
       cloudGroup.add(sp);
       ripples.push({ sp, life: -1, max: 0.95, size: 1 });
     }
@@ -2662,7 +2666,7 @@ export function buildProjectorScreen(cfg){
     /* 局部 +Z 就是朝向床（观众）那一面；贴 3.5cm 免得跟幕布 z-fighting。
        挂在 screen 下面 ⇒ 幕布 visible=false 时辉光一起消失，不用另外管。 */
     glow.position.set(0, 0, 0.035);
-    glow.renderOrder = 2;
+    glow.renderOrder = RO.PROJ;
     screen.add(glow);
   }
 
@@ -2675,6 +2679,34 @@ export function buildProjectorScreen(cfg){
   );
   light.position.set(L.position[0], L.position[1], L.position[2]);
   group.add(light);
+
+  /* ---- 第二盏：电视机的本体光（2026-10-06「点光源位置不对，要放在电视机中间，
+     另外点光源排除照亮电视机」）----
+     ① **位置就是「排除照亮电视机」的那个开关**。three 的 WebGLRenderer 没有
+        per-object 排除光源的机制（那是 WebGPURenderer 的 NodeMaterial 才有的
+        light filtering），想不照亮某样东西只能靠几何：漫反射是 N·L，
+        **灯在屏幕正面那一侧就会照亮正面**（原来那盏在 x=-7.15、屏幕在 -8.23，
+        正好在正面，辐照度 0.55/1.08^1.7 ≈ 0.48 额外打在屏幕上）。
+        把灯挪到**屏幕背面 12cm**（x = -8.23 - 0.12 = -8.35，y/z 与屏幕中心对齐）
+        ⇒ 屏幕正面法线 (+X) 与光方向 (-X) 反向，N·L < 0，**正面一点光都收不到**，
+        而光照样往 +X 铺出去照亮床。**正好同时满足「放在电视机中间」+「别照亮它」。**
+     ② **decay 才是决定能照多远的那一个**（r15x+）：`distance` 只是软截止
+        （`1-(d/cut)^4` 的窗口，d=cut/4 时还有 0.99），26→34 在 6.5m 处只差 0.5%。
+        所以「让光覆盖到床」＝压 decay ＋重配 intensity，不是调 distance。
+        从 x=-8.35 算：床尾 (x=-6.23) 距离 2.83m、床心 (x=-2) 距离 6.62m。
+        decay 1.05 / intensity 2.0 ⇒ 床尾 ≈ 0.68、床心 ≈ 0.29 辐照度
+        （夜间环境总面光 ≈ 1.8，即局部 +38% / +16%，看得见又不刺眼）。 */
+  const SL = P.spill || {};
+  const SLpos = SL.position || [-8.35, 3.95, 1.2];
+  const spillBase = +(SL.intensity !== undefined ? SL.intensity : 2.0);
+  const spill = new THREE.PointLight(
+    new THREE.Color(SL.color || L.color || '#ffd9b8'),
+    spillBase,
+    +(SL.distance !== undefined ? SL.distance : 30),
+    +(SL.decay !== undefined ? SL.decay : 1.05)
+  );
+  spill.position.set(SLpos[0], SLpos[1], SLpos[2]);
+  group.add(spill);
 
   /* 程序化「老电影/梦境」动画 */
   let animT = 0;
@@ -2746,6 +2778,8 @@ export function buildProjectorScreen(cfg){
      页面里没法用 querySelector 摸到它，而排查「手机上放不出来」必须看
      readyState / error / networkState。挂到 userData 上，无头探针直接读。 */
   if(videoEl) group.userData.videoEl = videoEl;
+  group.userData.spill = spill;             // 无头探针读辐照度用
+  group.userData.light = light;             // 同上：主灯（幕布正面溢光）
 
   group.userData.update = function(dt, now){
     if(fadeT !== fadeTo){                    // 淡入淡出驱动（Group 隐藏时也要跑）
@@ -2783,6 +2817,7 @@ export function buildProjectorScreen(cfg){
     if(frameMat) frameMat.opacity = o;
     if(glowMat) glowMat.opacity = o;        // 辉光跟着一起淡，不然半透的布配死亮的光晕
     light.intensity = lightBase * o;
+    spill.intensity = spillBase * o;          // 补光同理：布淡了一半光也必须跟着淡
   }
   applyFade();                               // 初始：全透
   group.userData.setOn = function(on){
@@ -2791,6 +2826,7 @@ export function buildProjectorScreen(cfg){
     fadeTo = v ? 1 : 0;
     if(v){
       group.visible = true; screen.visible = true; light.visible = true;
+      /* spill 不用单独开：它是 group 的子物体，group.visible 一恢复就都在。 */
     }
     if(videoEl){
       /* 关：视频立刻停（用户 2026-10-05「关闭视频播放」），停住的那一帧陪着淡出，

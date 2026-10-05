@@ -250,8 +250,36 @@ export function createPostFX(renderer, scene, camera, cfg){
     const pick = (k, d) => num((o[k] !== undefined ? o[k] : b[k]), d);
     bloomPass.enabled   = !bloomOff;
     bloomPass.strength  = pick('strength', 0.8);
-    bloomPass.radius    = pick('radius', 0.8);
+    /* ⚠ radius 必须夹在 [0,1]（2026-10-06 加的保护）。它在 UnrealBloomPass 里是
+       `mix(factor, 1.2 − factor, radius)` 的插值权重：bloomFactors = [1,.8,.6,.4,.2]、
+       mirror = [.2,.4,.6,.8,1]，所以 radius>1 时最近那级会算成**负权重**
+       （1.6 ⇒ 1.0 + (0.2−1.0)×1.6 = −0.28），高光被反相成**黑核**。
+       「半径」要放大请调 bloomKernel（见 setBloomKernel），不是 radius。 */
+    bloomPass.radius    = Math.min(1, Math.max(0, pick('radius', 0.8)));
     bloomPass.threshold = pick('threshold', 0.6);
+  }
+
+  /* ---- bloom 半径（真正的那个）----
+     UnrealBloomPass 每一级 mip 用一个固定大小的高斯 kernel：
+     `kernelSizeArray = [3,5,7,9,11]`，系数 `0.39894·exp(−i²/2R²)/R`
+     预计算进 `gaussianCoefficients`，**完全不受 radius 影响**。
+     所以「把 bloom 半径放大一倍」要动的是这里。
+     kernel 长度 = `defines.KERNEL_RADIUS`，数组长度由它决定 ⇒ 改数值必须
+     同时改 define 与系数数组，并置 `needsUpdate` 让 three 重编译 shader。
+     最外一级是 1/32 分辨率，11 → 21 差不多就是「半径翻倍」。
+     ⚠ 能量守恒上 kernel 变宽会把峰值摊低，夜间 strength 已同步从 0.90 提到 1.15。 */
+  const BLOOM_KERNEL_BASE = [3, 5, 7, 9, 11];
+  function setBloomKernel(scale){
+    const k = Math.max(0.25, num(scale, 1));
+    bloomPass.separableBlurMaterials.forEach((m, i) => {
+      const R = Math.max(1, Math.round(BLOOM_KERNEL_BASE[i]*k));
+      const c = [];
+      for(let j = 0; j < R; j++) c.push(0.39894*Math.exp(-0.5*j*j/(R*R))/R);
+      m.defines.KERNEL_RADIUS = R;
+      m.uniforms.gaussianCoefficients.value = c;
+      m.needsUpdate = true;
+    });
+    return BLOOM_KERNEL_BASE.map((r, i) => Math.max(1, Math.round(r*k)));
   }
   function setBloomOverride(o){
     bloomOverride = (o && typeof o === 'object') ? o : null;
@@ -276,6 +304,9 @@ export function createPostFX(renderer, scene, camera, cfg){
     bloomPass.setSize(Math.max(2, s.x*bloomScale), Math.max(2, s.y*bloomScale));
   }
   setSize();
+  /* kernel 缩放要在 setSize 之后：setSize 会写各级的 invSize，但不会重建
+     separableBlurMaterials（它们是构造时建好的持久对象），所以设一次就够。 */
+  const bloomKernelRadii = setBloomKernel(num(P.bloomKernel, 1));
 
   set(num(P.default, 'dream'));
 
@@ -290,6 +321,10 @@ export function createPostFX(renderer, scene, camera, cfg){
     get names(){ return names.concat([OFF]); },
     setSize,
     setBloomScale(s){ bloomScale = s; setSize(); },
+    /* bloom 高斯 kernel 缩放（真正的「半径」）。传 1 复原。
+       实测返回每级实际半径，无头对照直接读它。 */
+    setBloomKernel,
+    get bloomKernel(){ return bloomKernelRadii.slice(); },
     /* 时相覆盖 bloom（见 applyBloom 的说明）。传 null 恢复「只用预设值」 */
     setBloomOverride,
     get bloomOverride(){ return bloomOverride ? Object.assign({}, bloomOverride) : null; },

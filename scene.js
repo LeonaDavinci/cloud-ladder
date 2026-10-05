@@ -101,6 +101,32 @@ function fbm1(x){ return noise1(x)*0.6 + noise1(x*2.7)*0.3 + noise1(x*7.1)*0.1; 
      quality / cloudQ / puffN     画质档位（手机自动降档）
      mound / ranges / micro / broad   地形剖面参数（scene.json 注入）
    ------------------------------------------------------------ */
+/* ============================================================
+   半透明渲染次序阶梯（2026-10-06）
+   ------------------------------------------------------------
+   为什么要集中成一张表、而不是各处写魔法数字：three 的透明 pass
+   先按 renderOrder 排、再按 z 排（painterSortStable: groupOrder →
+   renderOrder → z），也就是说 **renderOrder 压过深度**，不是深度优先的
+   平局判定。再叠上「半透明 + depthWrite:false 的东西什么都不写深度」，
+   谁后画谁就盖住谁 —— 哪怕它其实更近。所以顺序是唯一的正确性来源，
+   数字散落在各文件里就等于把正确性交给记忆。
+   排法：**按「这一层通常离相机多远」从远到近排**（背景先画）。
+   ⚠ renderOrder **不继承 Group**，必须逐个 mesh 设（见 model.js）。
+   ⚠ 想「修顺序」别去开 depthWrite —— 半透明写深度会在它后面的
+      云/水上戳出一个洞。要改就只改顺序。
+   ⚠ radius/kernel 之类的旋钮另算，renderOrder 只管顺序。 */
+export const RO = {
+  SKY          : -1,   // 天空球（scene.js buildSky）
+  GROUND       :  1,   // 地表贴片（床影 / 影贴地）
+  VEG          :  2,   // 草 / 花 / 薰衣草等半透 InstancedMesh
+  FOLIAGE      :  8,   // 远景/次级半透植被
+  NIGHTFX      :  9,   // 夜间发光实例（萤火一类）
+  CLOUD_SHADOW : 10,   // 云影板（colorWrite:false，不写色只写深度）
+  PROJ         : 11,   // 电视幕布辉光（加色）
+  CLOUD        : 12,   // ★ 体积云 billboard —— 用户要求排在电视**之后**
+  SPARK        : 40    // 云里的加色小光点（depthTest:false，最后画）
+};
+
 export const RT = {
   sun    : null,   // 唯一的平行光（日夜共用一盏，省一套阴影贴图）
   quality: 1,      // 植被实例数倍率
@@ -255,7 +281,7 @@ export function buildSky(scene, S){
   });
   const sky = new THREE.Mesh(new THREE.SphereGeometry(S.radius || 3600, 48, 32), mat);
   sky.frustumCulled = false;
-  sky.renderOrder = -1;
+  sky.renderOrder = RO.SKY;
   scene.add(sky);
   return sky;
 }
