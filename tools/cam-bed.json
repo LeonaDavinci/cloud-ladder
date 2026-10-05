@@ -1,0 +1,11 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__rig)"},
+  {"op":"wait","ms":2200},
+  {"op":"eval","js":"(function(){function r(s){var e=document.querySelector(s);if(!e)return null;var b=e.getBoundingClientRect();return [Math.round(b.x),Math.round(b.y),Math.round(b.right),Math.round(b.bottom)];}var k=__rig.rig.ladder;var B=__rig.rig.bed;var mid=[k.foot[0]+k.up[0]*k.length*0.5,k.foot[1]+k.up[1]*k.length*0.5,k.foot[2]+k.up[2]*k.length*0.5];var top=[k.foot[0]+k.up[0]*k.length,k.foot[1]+k.up[1]*k.length,k.foot[2]+k.up[2]*k.length];var c=__dbg.camera.position,t=__dbg.controls.target;return JSON.stringify({w:innerWidth,h:innerHeight,ladder:{foot:k.foot.map(function(v){return +v.toFixed(3);}),up:k.up.map(function(v){return +v.toFixed(4);}),len:k.length,mid:mid.map(function(v){return +v.toFixed(3);}),top:top.map(function(v){return +v.toFixed(3);})},bed:{x:B.x,z:B.z,top:+B.top.toFixed(3),rx:+B.rx.toFixed(3),rz:+B.rz.toFixed(3)},cam:[c.x,c.y,c.z].map(function(v){return +v.toFixed(2);}),tgt:[t.x,t.y,t.z].map(function(v){return +v.toFixed(2);}),dist:+c.distanceTo(t).toFixed(2),ui:r('#scene-ui'),hint:r('#mode-hint'),jump:r('#jump-btn'),overlay:r('.overlay'),bgm:r('#bgm')});})()"},
+  {"op":"shot","file":"cam-bed-free.png"},
+  {"op":"eval","js":"(function(){__rig.setMode('roam');window.__fc=0;(function f(){window.__fc++;requestAnimationFrame(f);})();return 'roam';})()"},
+  {"op":"waitFor","js":"window.__fc>3"},
+  {"op":"shot","file":"cam-bed-roam-0.png"},
+  {"op":"eval","js":"JSON.stringify({step:__rig.step,state:__rig.P.state,ls:+__rig.P.ls.toFixed(2),foot:+__rig.P.foot.toFixed(2),x:+__rig.P.x.toFixed(2),z:+__rig.P.z.toFixed(2)})"},
+  {"op":"eval","js":"JSON.stringify(window.__errs||[])"}
+]

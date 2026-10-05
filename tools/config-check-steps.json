@@ -1,0 +1,12 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.config && window.__dbg.config.sunPosition)"},
+  {"op":"wait","ms":2500},
+  {"op":"eval","js":"(()=>{const c=window.__dbg.config;return {sunAz:c.sunAzimuthDeg,sunEl:c.sunElevationDeg,dist:c.sunDistance,sunPos:c.sunPosition,amb:c.ambientIntensity,hemi:c.hemisphereIntensity,cloud:{n:c.cloudPuffCount,size:c.cloudSize,rad:c.cloudRadius,h:c.cloudHeight},counts:c.counts,sizes:c.sizes};})()"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg;let amb=null,hemi=null;d.scene.traverse(o=>{if(o.isAmbientLight)amb=o;if(o.isHemisphereLight)hemi=o;});return {sunPos:d.sun.position.toArray().map(n=>+n.toFixed(3)),sunI:d.sun.intensity,ambI:amb&&amb.intensity,hemiI:hemi&&hemi.intensity,realCounts:{grass:d.grass.count,tuft:d.tufts&&d.tufts.count,lav:d.lavender&&d.lavender.count,daisy:d.daisies&&d.daisies.count,butterfly:d.butterflies&&d.butterflies.count,glintBed:d.glints.userData.anchors.filter(a=>a.group==='bed'||a.bed).length||null,glintAll:d.glints.count},dead:d.glints.userData.anchors.filter(a=>a.dead).length};})()"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,b=d.bed.position,c=d.camera;c.position.set(b.x+4.2,b.y+2.1,b.z+3.6);d.controls.target.set(b.x,b.y+1.0,b.z);d.controls.update();return 'hero';})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"k1-config-hero.png"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,l=d.ladder,c=d.camera;c.position.set(4.6,6.2,7.4);d.controls.target.set(2.6,4.4,0.4);d.controls.update();return 'ladder';})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"k2-config-glints.png"}
+]

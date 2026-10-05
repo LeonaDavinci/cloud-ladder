@@ -1,0 +1,35 @@
+[
+  {"op":"waitFor","js":"!!(window.__rig && window.__rig.P && window.__dbg)"},
+  {"op":"eval","js":"(()=>{const r=window.__rig;r.P.yaw=0.7;r.P.pitch=0;r.P.state='ground';r.P.x=0;r.P.z=0;window.__f0=window.__dbg.renderer.info.render.frame;return 'set yaw=0.7';})()"},
+  {"op":"waitFor","js":"window.__dbg.renderer.info.render.frame > window.__f0 + 3"},
+  {"op":"eval","js":"(()=>{const T=window.__dbg.THREE,c=window.__dbg.camera,r=window.__rig;const f=new T.Vector3();c.getWorldDirection(f);const L=Math.hypot(f.x,f.z)||1;window.__T={f:[f.x/L,f.z/L]};return {cam_rotY:+c.rotation.y.toFixed(4),camInSync:Math.abs(c.rotation.y-r.P.yaw)<1e-6,camFwd:[+(f.x/L).toFixed(3),+(f.z/L).toFixed(3)]};})()"},
+
+  {"op":"eval","js":"(()=>{const r=window.__rig;r.P.x=0;r.P.z=0;window.__T.p0=[0,0];window.__f0=window.__dbg.renderer.info.render.frame;return 'reset';})()"},
+  {"op":"down","x":300,"y":560},
+  {"op":"move","x":300,"y":438},
+  {"op":"waitFor","js":"window.__dbg.renderer.info.render.frame > window.__f0 + 3"},
+  {"op":"eval","js":"(()=>{const t=window.__T,P=window.__rig.P;const dx=P.x-t.p0[0],dz=P.z-t.p0[1];const L=Math.hypot(dx,dz)||1;const rx=-t.f[1],rz=t.f[0];return {stick:'上推',dist:+L.toFixed(3),alongFwd:+((dx/L)*t.f[0]+(dz/L)*t.f[1]).toFixed(3),alongRight:+((dx/L)*rx+(dz/L)*rz).toFixed(3)};})()"},
+  {"op":"up","x":300,"y":438},
+
+  {"op":"eval","js":"(()=>{const r=window.__rig;r.P.x=0;r.P.z=0;window.__T.p0=[0,0];window.__f0=window.__dbg.renderer.info.render.frame;return 'reset';})()"},
+  {"op":"down","x":300,"y":560},
+  {"op":"move","x":300,"y":682},
+  {"op":"waitFor","js":"window.__dbg.renderer.info.render.frame > window.__f0 + 3"},
+  {"op":"eval","js":"(()=>{const t=window.__T,P=window.__rig.P;const dx=P.x-t.p0[0],dz=P.z-t.p0[1];const L=Math.hypot(dx,dz)||1;const rx=-t.f[1],rz=t.f[0];return {stick:'下推',dist:+L.toFixed(3),alongFwd:+((dx/L)*t.f[0]+(dz/L)*t.f[1]).toFixed(3),alongRight:+((dx/L)*rx+(dz/L)*rz).toFixed(3)};})()"},
+  {"op":"up","x":300,"y":682},
+
+  {"op":"eval","js":"(()=>{const r=window.__rig;r.P.x=0;r.P.z=0;window.__T.p0=[0,0];window.__f0=window.__dbg.renderer.info.render.frame;return 'reset';})()"},
+  {"op":"down","x":300,"y":560},
+  {"op":"move","x":422,"y":560},
+  {"op":"waitFor","js":"window.__dbg.renderer.info.render.frame > window.__f0 + 3"},
+  {"op":"eval","js":"(()=>{const t=window.__T,P=window.__rig.P;const dx=P.x-t.p0[0],dz=P.z-t.p0[1];const L=Math.hypot(dx,dz)||1;const rx=-t.f[1],rz=t.f[0];return {stick:'右推',dist:+L.toFixed(3),alongFwd:+((dx/L)*t.f[0]+(dz/L)*t.f[1]).toFixed(3),alongRight:+((dx/L)*rx+(dz/L)*rz).toFixed(3)};})()"},
+  {"op":"up","x":422,"y":560},
+
+  {"op":"eval","js":"(()=>{const r=window.__rig;r.P.x=0;r.P.z=0;window.__T.p0=[0,0];window.__f0=window.__dbg.renderer.info.render.frame;return 'reset';})()"},
+  {"op":"down","x":300,"y":560},
+  {"op":"move","x":178,"y":560},
+  {"op":"waitFor","js":"window.__dbg.renderer.info.render.frame > window.__f0 + 3"},
+  {"op":"eval","js":"(()=>{const t=window.__T,P=window.__rig.P;const dx=P.x-t.p0[0],dz=P.z-t.p0[1];const L=Math.hypot(dx,dz)||1;const rx=-t.f[1],rz=t.f[0];return {stick:'左推',dist:+L.toFixed(3),alongFwd:+((dx/L)*t.f[0]+(dz/L)*t.f[1]).toFixed(3),alongRight:+((dx/L)*rx+(dz/L)*rz).toFixed(3)};})()"},
+  {"op":"up","x":178,"y":560},
+  {"op":"shot","file":"j1-stick.png"}
+]

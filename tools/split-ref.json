@@ -1,0 +1,30 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.postfx && window.__dbg.sceneUI)"},
+  {"op":"wait","ms":1200},
+  {"op":"eval","js":"(function(){['.overlay','#modes','#sticks','#jump-btn','#mode-hint','#bgm','#scene-ui'].forEach(function(s){var e=document.querySelector(s);if(e)e.style.display='none';});window.__pinT=9;try{Object.defineProperty(__dbg.uTime,'value',{configurable:true,get:function(){return window.__pinT;},set:function(){}});}catch(e){}if(__dbg.cloud&&__dbg.cloud.userData&&__dbg.cloud.userData.flow)__dbg.cloud.userData.flow.gain=0;__dbg.camera.position.set(16,9,30);__dbg.controls.target.set(1.5,11.5,-2);__dbg.controls.update();return 'pinned';})()"},
+  {"op":"waitFor","js":"window.__dbg.uTime.value===9"},
+  {"op":"wait","ms":900},
+
+  {"op":"eval","js":"(function(){__dbg.atmos.apply('afternoon');__dbg.postfx.set('off');return 'a/off';})()"},
+  {"op":"wait","ms":800},{"op":"shot","file":"ref-1-a-off.png"},
+
+  {"op":"eval","js":"(function(){__dbg.postfx.set('dream');return 'a/dream';})()"},
+  {"op":"wait","ms":800},{"op":"shot","file":"ref-2-a-dream.png"},
+
+  {"op":"eval","js":"(function(){__dbg.postfx.set('liminal');return 'a/liminal';})()"},
+  {"op":"wait","ms":800},{"op":"shot","file":"ref-3-a-liminal.png"},
+
+  {"op":"eval","js":"(function(){__dbg.atmos.apply('night');__dbg.postfx.set('dream');return 'n/dream';})()"},
+  {"op":"wait","ms":800},{"op":"shot","file":"ref-4-n-dream.png"},
+
+  {"op":"eval","js":"(function(){__dbg.postfx.set('vhs');return 'n/vhs';})()"},
+  {"op":"wait","ms":800},{"op":"shot","file":"ref-5-n-vhs.png"},
+
+  {"op":"eval","js":"(function(){__dbg.atmos.apply('dawn');__dbg.postfx.set('white');return 'd/white';})()"},
+  {"op":"wait","ms":800},{"op":"shot","file":"ref-6-d-white.png"},
+
+  {"op":"eval","js":"(function(){__dbg.atmos.apply('sunset');__dbg.postfx.set('dream');__dbg.atmos.toggleFog();return 's/heavy';})()"},
+  {"op":"wait","ms":800},{"op":"shot","file":"ref-7-s-heavy.png"},
+
+  {"op":"eval","js":"(function(){__dbg.atmos.toggleFog();return JSON.stringify({fogFar:+__dbg.scene.fog.far.toFixed(1),exposure:__dbg.renderer.toneMappingExposure,errs:window.__errs||null,puffs:__dbg.cloud?__dbg.cloud.children.filter(function(o){return o.isSprite;}).length:0});})()"}
+]

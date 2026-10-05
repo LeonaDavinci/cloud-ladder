@@ -1,0 +1,7 @@
+[
+  {"op":"wait","ms":2000},
+  {"op":"eval","js":"JSON.stringify({state:__audio.state,t:+__audio.el.currentTime.toFixed(2),paused:__audio.el.paused,rs:__audio.el.readyState,ns:__audio.el.networkState})"},
+  {"op":"wait","ms":12000},
+  {"op":"eval","js":"JSON.stringify({state:__audio.state,idx:__audio.index,title:__audio.title,t:+__audio.el.currentTime.toFixed(2),paused:__audio.el.paused,vol:+__audio.el.volume.toFixed(3),rs:__audio.el.readyState,dur:+__audio.el.duration.toFixed(1)})"},
+  {"op":"eval","js":"JSON.stringify(window.__errs)"}
+]

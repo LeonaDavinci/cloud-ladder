@@ -1,0 +1,29 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.atmos && window.__rig)"},
+  {"op":"wait","ms":2500},
+
+  {"op":"eval","js":"(function(){var a=__dbg.atmos;a.settleFog();a.apply('afternoon');a.settleFog();return JSON.stringify({case:'默认档（下午·小雾）',state:a.state,fogHeavy:a.fogHeavy,fog:{near:__dbg.scene.fog.near,far:__dbg.scene.fog.far,color:'#'+__dbg.scene.fog.color.getHexString()},animMs:a.fogAnimMs,fx:__dbg.postfx.name});})()"},
+  {"op":"wait","ms":700},
+  {"op":"shot","file":"probe-1-default.png"},
+
+  {"op":"eval","js":"(function(){__dbg.postfx.set('off');return 'fx=off';})()"},
+  {"op":"wait","ms":700},
+  {"op":"shot","file":"probe-2-nofx.png"},
+
+  {"op":"eval","js":"(function(){var a=__dbg.atmos;a.settleFog();a.apply('night');a.settleFog();return JSON.stringify({case:'夜间环境光',ambient:{color:'#'+__dbg.ambient.color.getHexString(),intensity:__dbg.ambient.intensity},hemi:{sky:'#'+__dbg.hemi.color.getHexString(),ground:'#'+__dbg.hemi.groundColor.getHexString(),intensity:__dbg.hemi.intensity},fog:{near:__dbg.scene.fog.near,far:__dbg.scene.fog.far},sun:{color:'#'+__dbg.sun.color.getHexString(),intensity:__dbg.sun.intensity},exposure:+__dbg.renderer.toneMappingExposure.toFixed(3)});})()"},
+  {"op":"wait","ms":700},
+  {"op":"shot","file":"probe-3-night.png"},
+
+  {"op":"eval","js":"(function(){var a=__dbg.atmos;a.apply('afternoon');a.settleFog();return 'back to afternoon';})()"},
+  {"op":"wait","ms":600},
+
+  {"op":"eval","js":"(function(){var a=__dbg.atmos,t=0,n=0,f0=__dbg.scene.fog.far,n0=__dbg.scene.fog.near;a.toggleFog();while(a.stats().fogAnim.t<1&&n<6000){a.update(1/60);t+=1000/60;n++;}return JSON.stringify({case:'小雾→超大雾 动画时长（手动步进 1/60s）',animMs:a.fogAnimMs,measuredMs:Math.round(t),frames:n,fromFar:f0,toFar:__dbg.scene.fog.far,toNear:__dbg.scene.fog.near,heavy:a.fogHeavy});})()"},
+
+  {"op":"eval","js":"(function(){__dbg.atmos.settleFog();return JSON.stringify({case:'超大雾 到位',fog:{near:__dbg.scene.fog.near,far:__dbg.scene.fog.far}});})()"},
+  {"op":"wait","ms":700},
+  {"op":"shot","file":"probe-4-heavy.png"},
+
+  {"op":"eval","js":"(function(){var a=__dbg.atmos;a.toggleFog();a.settleFog();__dbg.postfx.set('dream');return JSON.stringify({case:'回到小雾',fogHeavy:a.fogHeavy,fog:{near:__dbg.scene.fog.near,far:__dbg.scene.fog.far},fx:__dbg.postfx.name,errs:(window.__errs||[])});})()"},
+
+  {"op":"eval","js":"JSON.stringify({case:'config.json 生效值',fog:__dbg.config.fog,climbSpeed:__dbg.config.climbSpeed,mountSpeed:__dbg.config.mountSpeed,atmosphere:__dbg.config.atmosphere,climb:__rig.climb})"}
+]

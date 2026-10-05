@@ -1,0 +1,13 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.bed && window.__dbg.terrainHeight)"},
+  {"op":"wait","ms":2600},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,th=d.terrainHeight,cx=-2,cz=1.2;const out={center:th(cx,cz)};const probe=(hx,hz,label)=>{let mn=1e9,mx=-1e9;for(let i=-2;i<=2;i++)for(let j=-2;j<=2;j++){const x=cx+hx*i/2,z=cz+hz*j/2;const y=th(x,z);if(y<mn)mn=y;if(y>mx)mx=y;}return [label,+(mn-terrainRef).toFixed(3),+(mx-terrainRef).toFixed(3)];};let terrainRef=th(cx,cz);const r=[];r.push(probe(3.4,4.7,'unsized(3.4x4.7)'));r.push(probe(4.08,5.64,'x1.2(4.08x5.64)'));r.push(probe(4.9,6.8,'x1.44(4.9x6.8)'));return {centerY:terrainRef, spokes:r};})()"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg;d.bed.updateMatrixWorld(true);const b=new (d.THREE.Box3)().setFromObject(d.bed);const c=b.getCenter(new d.THREE.Vector3()),s1=b.getSize(new d.THREE.Vector3());let n=0;d.bed.traverse(o=>{if(o.isMesh&&o.visible)n++;});const vp=d.camera.position;return {bedWorldMin:[+b.min.x.toFixed(3),+b.min.y.toFixed(3),+b.min.z.toFixed(3)],bedWorldSize:[+s1.x.toFixed(3),+s1.y.toFixed(3),+s1.z.toFixed(3)],visibleMeshes:n,groundAtCenter:+d.terrainHeight(c.x,c.z).toFixed(3)};})()"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,cm=d.camera;cm.position.set(3.4,1.5,7.6);d.controls.target.set(-2,1.35,1.2);d.controls.update();return 'side';})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"b-before-side.png"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,cm=d.camera;cm.position.set(-2,7.5,12.5);d.controls.target.set(-2,1.5,1.2);d.controls.update();return 'top';})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"b-before-top.png"},
+  {"op":"eval","js":"(()=>{const e=window.__errs||[];return {errs:e.length};})()"}
+]

@@ -1,0 +1,172 @@
+{
+ "url": "http://127.0.0.1:8241/?mode=roam&v=74",
+ "env": {
+  "webAudio": true,
+  "audioOk": true,
+  "audioState": "playing",
+  "ladderLen": 12.9,
+  "bedTop": 2.928,
+  "steps": 5,
+  "fps": 0.23,
+  "routeBoost": {
+   "climbStepFovBoost": 8,
+   "baseFov": 56,
+   "stepsWithBoost": 1,
+   "climbStepIndex": 1
+  }
+ },
+ "cases": {
+  "climb": {
+   "expect": 64,
+   "waitedMs": 21843,
+   "ok": true,
+   "state": {
+    "fov": 63.952,
+    "pos": [
+     23.421,
+     2.626,
+     30.377
+    ],
+    "rot": [
+     0.3861,
+     0.5312,
+     0
+    ],
+    "step": 1,
+    "mode": "roam"
+   },
+   "trace": null,
+   "shotFov64": "shots/fov-climb.png"
+  },
+  "free": {
+   "expect": 56,
+   "waitedMs": 28224,
+   "ok": true,
+   "state": {
+    "fov": 56.044,
+    "pos": [
+     23.631,
+     4.956,
+     31.002
+    ],
+    "rot": [
+     0.1571,
+     0.3246,
+     0
+    ],
+    "step": 1,
+    "mode": "free"
+   },
+   "shotFov56": "shots/fov-normal.png"
+  },
+  "fly": {
+   "expect": 56,
+   "state": {
+    "fov": 56,
+    "pos": [
+     23.631,
+     4.956,
+     31.002
+    ],
+    "rot": [
+     0.1477,
+     0.3939,
+     0
+    ],
+    "step": 0,
+    "mode": "roam"
+   }
+  },
+  "reset": {
+   "expect": 56,
+   "before": {
+    "fov": 63.956,
+    "pos": [
+     31.391,
+     1.181,
+     31.397
+    ],
+    "rot": [
+     0.3727,
+     0.6944,
+     0
+    ],
+    "step": 1,
+    "mode": "roam"
+   },
+   "after": {
+    "fov": 56,
+    "pos": [
+     16,
+     9,
+     30
+    ],
+    "rot": [
+     -0.0128,
+     0.4859,
+     0
+    ],
+    "step": 0,
+    "mode": "free"
+   }
+  },
+  "stepExit": {
+   "expect": 56,
+   "waitedMs": 30005,
+   "ok": false,
+   "state": {
+    "fov": 56.096,
+    "pos": [
+     23.508,
+     2.6,
+     30.382
+    ],
+    "rot": [
+     0.025,
+     0.7152,
+     0
+    ],
+    "step": 2,
+    "mode": "roam"
+   }
+  },
+  "noSpurious": {
+   "poofsBeforeE2E": 0
+  },
+  "e2e": {
+   "frames": 1341,
+   "jumped": false,
+   "sawFov64DuringClimb": true,
+   "maxFov": 64,
+   "minFov": 56,
+   "stepsSeen": [
+    0,
+    1
+   ],
+   "fovByStep": {
+    "0": 56,
+    "1": 64
+   },
+   "finalState": {
+    "t": 354451,
+    "step": 1,
+    "mode": "roam",
+    "fov": 64,
+    "foot": 6.86,
+    "state": "ladder",
+    "leapOn": false,
+    "landed": false,
+    "poofs": 0,
+    "hint": ""
+   },
+   "poofs": 0,
+   "landingShot": null
+  },
+  "synth": {
+   "err": null,
+   "before": 0,
+   "after": 1
+  }
+ },
+ "poofCalls": []
+}

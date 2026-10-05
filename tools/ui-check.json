@@ -1,0 +1,10 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.sceneUI && window.__dbg.atmos && window.__dbg.postfx)"},
+  {"op":"wait","ms":900},
+  {"op":"eval","js":"(function(){var u=document.getElementById('scene-ui');var r=[];u.querySelectorAll('.ui-row').forEach(function(row){var lab=row.querySelector('.ui-lab');r.push({lab:lab?lab.textContent:'',v:[].map.call(row.querySelectorAll('button'),function(b){return b.textContent+(b.classList.contains('active')?'*':'');})});});return JSON.stringify({rows:r,tip:(u.querySelector('.ui-tip')||{}).textContent,atmosNames:__dbg.atmos.names,atmosLabels:__dbg.atmos.labels,fxNames:__dbg.postfx.names,fxShort:__dbg.postfx.shortLabels,fogHeavy:__dbg.atmos.fogHeavy,state:__dbg.atmos.state,fx:__dbg.postfx.name});})()"},
+  {"op":"eval","js":"(function(){window.__c=[];['dawn','sunset','night','afternoon'].forEach(function(k){__dbg.sceneUI.click(k);window.__c.push(k+':'+__dbg.atmos.state);});return JSON.stringify(window.__c);})()"},
+  {"op":"eval","js":"(function(){window.__c=[];__dbg.postfx.names.forEach(function(k){__dbg.sceneUI.click(k);window.__c.push(k+':'+__dbg.postfx.name+':'+__dbg.postfx.enabled);});return JSON.stringify(window.__c);})()"},
+  {"op":"eval","js":"(function(){var a=[];a.push('fog0='+__dbg.atmos.fogHeavy);__dbg.sceneUI.toggleFog();a.push('fog1='+__dbg.atmos.fogHeavy);__dbg.sceneUI.toggleFog();a.push('fog2='+__dbg.atmos.fogHeavy);return a.join(' ');})()"},
+  {"op":"eval","js":"(function(){document.dispatchEvent(new KeyboardEvent('keydown',{key:'3',bubbles:true}));window.dispatchEvent(new KeyboardEvent('keydown',{key:'3'}));window.dispatchEvent(new KeyboardEvent('keydown',{key:'6'}));window.dispatchEvent(new KeyboardEvent('keydown',{key:'0'}));window.dispatchEvent(new KeyboardEvent('keydown',{key:'f'}));return JSON.stringify({state:__dbg.atmos.state,fx:__dbg.postfx.name,fog:__dbg.atmos.fogHeavy});})()"},
+  {"op":"eval","js":"JSON.stringify({errs:window.__errs})"}
+]

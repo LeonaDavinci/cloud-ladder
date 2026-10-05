@@ -1,0 +1,5 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.atmos)"},
+  {"op":"wait","ms":1500},
+  {"op":"eval","js":"(function(){var out=__dbg.scene.children.map(function(o,i){var m=o.material;return {i:i,t:o.type,n:o.name||'',kids:(o.children||[]).length,v:o.visible,mat:m?(m.type+(m.isMeshBasicMaterial?'/basic':'')):'',geo:o.geometry?o.geometry.type:'',vc:(o.geometry&&o.geometry.attributes&&o.geometry.attributes.color)?1:0,ro:o.renderOrder,scale:o.scale?[+o.scale.x.toFixed(1),+o.scale.y.toFixed(1),+o.scale.z.toFixed(1)]:null};});return JSON.stringify(out);})()"}
+]

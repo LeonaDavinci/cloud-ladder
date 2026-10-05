@@ -1,0 +1,7 @@
+[
+  {"op":"eval","js":"(function(){var e=document.getElementById('boot-tip');var cs=e?getComputedStyle(e):null;return JSON.stringify({mode:new URLSearchParams(location.search).get('boot'),display:cs?cs.display:null,hasEl:!!e});})()"},
+  {"op":"waitFor","js":"!!(window.__dbg && window.__rig)","timeout":120000},
+  {"op":"wait","ms":2600},
+  {"op":"eval","js":"(function(){var e=document.getElementById('boot-tip');var cs=e?getComputedStyle(e):null;return JSON.stringify({afterReady:{boot:window.__boot.state,display:cs?(cs.display+'/'+cs.visibility+'/op'+cs.opacity):null,cls:e?e.className:null}});})()"},
+  {"op":"shot","file":"bootmode.png"}
+]

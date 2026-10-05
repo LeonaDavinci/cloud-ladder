@@ -1,0 +1,35 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.sceneUI)"},
+  {"op":"wait","ms":1500},
+  {"op":"eval","js":"(function(){window.__pinT=9;try{Object.defineProperty(__dbg.uTime,'value',{configurable:true,get:function(){return window.__pinT;},set:function(){}});}catch(e){}if(__dbg.cloud&&__dbg.cloud.userData&&__dbg.cloud.userData.flow)__dbg.cloud.userData.flow.gain=0;__dbg.camera.position.set(16,9,30);__dbg.controls.target.set(1.5,11.5,-2);__dbg.controls.update();return 'ready';})()"},
+  {"op":"wait","ms":900},
+
+  {"op":"eval","js":"(function(){__dbg.sceneUI.click('afternoon');__dbg.postfx.set('dream');return 'a/dream';})()"},
+  {"op":"wait","ms":700},{"op":"shot","file":"g-afternoon-dream.png"},
+
+  {"op":"eval","js":"(function(){__dbg.sceneUI.click('dawn');return 'd/dream';})()"},
+  {"op":"wait","ms":700},{"op":"shot","file":"g-dawn-dream.png"},
+
+  {"op":"eval","js":"(function(){__dbg.sceneUI.click('sunset');return 's/dream';})()"},
+  {"op":"wait","ms":700},{"op":"shot","file":"g-sunset-dream.png"},
+
+  {"op":"eval","js":"(function(){__dbg.sceneUI.click('night');return 'n/dream';})()"},
+  {"op":"wait","ms":700},{"op":"shot","file":"g-night-dream.png"},
+
+  {"op":"eval","js":"(function(){__dbg.sceneUI.click('afternoon');__dbg.postfx.set('liminal');return 'a/liminal';})()"},
+  {"op":"wait","ms":700},{"op":"shot","file":"g-liminal.png"},
+
+  {"op":"eval","js":"(function(){__dbg.postfx.set('vhs');return 'a/vhs';})()"},
+  {"op":"wait","ms":700},{"op":"shot","file":"g-vhs.png"},
+
+  {"op":"eval","js":"(function(){__dbg.postfx.set('white');return 'a/white';})()"},
+  {"op":"wait","ms":700},{"op":"shot","file":"g-white.png"},
+
+  {"op":"eval","js":"(function(){__dbg.postfx.set('off');return 'a/off';})()"},
+  {"op":"wait","ms":700},{"op":"shot","file":"g-off.png"},
+
+  {"op":"eval","js":"(function(){__dbg.sceneUI.click('sunset');__dbg.postfx.set('dream');__dbg.sceneUI.toggleFog();return 's/heavy';})()"},
+  {"op":"wait","ms":700},{"op":"shot","file":"g-fog-heavy.png"},
+
+  {"op":"eval","js":"(function(){__dbg.sceneUI.click('afternoon');__dbg.sceneUI.toggleFog();return JSON.stringify({fog:__dbg.atmos.fogHeavy,errs:window.__errs});})()"}
+]

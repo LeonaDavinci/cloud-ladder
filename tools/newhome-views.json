@@ -1,0 +1,18 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.config && window.__dbg.bed)"},
+  {"op":"wait","ms":3400},
+  {"op":"eval","js":"(()=>{const d=window.__dbg;return {url:location.pathname+location.search,bedScale:d.config.bed.scale,surfaceY:d.config.bed.surfaceY,tuftCount:(d.tufts&&d.tufts.count)||null,daisyCount:(d.daisies&&d.daisies.count)||null,cloudNearFade:d.config.cloudNearFade};})()"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,c=d.camera;c.position.set(8.4,3.1,11.6);d.controls.target.set(-2,1.9,1.2);d.controls.update();return 'hero';})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"home-1-hero.png"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,c=d.camera;c.position.set(-2,1.6,10.2);d.controls.target.set(-2,2.0,0.8);d.controls.update();return 'front';})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"home-2-front.png"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,c=d.camera;c.position.set(-2,9.2,13.4);d.controls.target.set(-2,1.7,1.2);d.controls.update();return 'top';})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"home-3-top.png"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,c=d.camera;c.position.set(2.2,6.6,12.5);d.controls.target.set(-1.2,4.0,1.2);d.controls.update();return 'ladder';})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"home-4-ladder.png"},
+  {"op":"eval","js":"(()=>{const e=window.__errs||[];return {errs:e.length,list:e.slice(0,3),version:(window.__dbg&&window.__dbg.version)||null};})()"}
+]

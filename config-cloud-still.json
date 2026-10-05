@@ -1,0 +1,204 @@
+{
+  "_说明": {
+    "用法": "这是给你手动调参的「面板」。本文件里的值会覆盖 scene.json 里的对应参数；删掉某一项就退回 scene.json 的原值。改完保存 → 刷新网页即可生效（建议 Ctrl+F5 强刷，或把 index.html 里 main.js?v=N 的 N 加一）。",
+    "sun.azimuthDeg": "阳光方位角（度）。0=正北，90=正东，180=正南，270=正西。",
+    "sun.elevationDeg": "阳光仰角（度）。0=贴地（影子最长、最黄昏），90=正上方（正午）。调小 = 光更斜、影子更长更柔。",
+    "sun.distance": "太阳离原点的距离（米）。只影响阴影相机的贴合度，不影响亮度。",
+    "sun.intensity": "阳光强度。1.0~2.5，越大越亮也越容易过曝。",
+    "sun.color": "阳光颜色。暖一点用 #ffd9b0，冷一点用 #e8f0ff。",
+    "ambient.intensity": "环境光强度。越大，背光面/阴影里越亮、整体越平。",
+    "ambient.color": "环境光颜色。冷紫 #93a0e4，暖白 #fff3e0。",
+    "hemisphere.intensity": "半球光强度。天空色照在朝上的面，地面色照在朝下的面。",
+    "cloud.puffCount": "云由多少个小团堆出来。越大云越厚实，也越吃性能。",
+    "cloud.size": "单个云团的大小范围 [最小, 最大]（米）。",
+    "cloud.radius": "整朵云的体积半径 [X, Y, Z]（米）。Y 调大 = 云更高更厚。",
+    "cloud.height": "云心离地高度（米）。",
+    "cloud.opacity": "云的透明度 [底部, 顶部]。",
+    "cloud.flatten": "云团压扁系数。1 = 正圆，0.85 ≈ 略扁。",
+    "cloud.nearFade": "贴着镜头多近的云片淡成透明（米）。0 = 关掉这一项。云是几百张半透明 billboard 叠出来的，镜头贴到云上会糊满屏；这个小半径等于在眼前挖一个小球。默认 2.5。",
+    "cloud.insideFade": "相机整个钻进云团内部时，整朵云一起变透（否则往外看是十几米厚的粉白，什么都看不见 —— 梯子顶端正好整段在云团里）。判定用云团椭球：在云外时系数恒为 1，从地面/远处看云一个像素都不变。false = 关掉。默认 true。",
+    "cloud.wind": "让云活起来的一组参数。不写这一组云就是静止的。每片云只围着自己的原位做小幅游移 + 自转 + 呼吸，整朵云的轮廓不会变。",
+    "cloud.wind.dir": "风的方向 [X, Z]，与草叶摆动一致（草沿 +X 偏 +Z）。云片主要沿这个方向来回游移，改成 [-1, -0.5] 就是反过来。",
+    "cloud.wind.drift": "云片游移的幅度 = 自身尺寸 x 这个值 x 内芯权重。0.30 ⇒ 位移最大约自己尺寸的 1/3、来回总行程约 2/3 个自身大小（硬上限就是这个量级：云片宽 5~10 米，整朵云半径才 10.5 米，再大整朵云就开始变形）。0 = 不游移、只自转。",
+    "cloud.wind.rate": "游移的快慢（弧度/秒）。0.30 ≈ 21 秒一个来回。0 = 不游移。",
+    "cloud.wind.rot": "云片自身来回转动的幅度（弧度）。0.25 ≈ ±14°，让近处云片有翻涌感。0 = 不转。注意云片是 1.8:0.85 的长方形，转多了会让整朵云的剪影胖一圈，所以别超过 0.4。",
+    "cloud.wind.rotRate": "自转与呼吸的快慢（弧度/秒）。0.15 ≈ 40 秒一个来回，比游移更慢，两层节奏错开才不机械。",
+    "cloud.wind.breathe": "云片尺寸的呼吸幅度（比例）。0.03 = ±3%，只改大小、不位移，用来补「边缘在翻涌」的观感。0 = 关掉。",
+    "cloud.wind.inner": "内芯窗口 [低于此值全速动, 高于此值完全不动, 幂次]，按云片的归一化椭球半径（0 = 云心，1 = 云面）取舍。默认 [0.55, 0.95, 2]。这一项决定了整朵云稳不稳：外圈那几十片直接撑起云的轮廓，它们只要挪一点、转几度，整个剪影就胖一圈（实测：仅 ±7° 自转就让画面里的云量读数变一个档）。所以外圈权重被压到 0（完全静止，与旧版逐像素一致），只有内芯在搅动。想让整朵云都动起来就把上限调大（如 [0.3, 1.2, 1]），想让云更稳就调小（如 [0.6, 0.85, 3]）。",
+    "cloud.wind.gain": "总增益：把游移/自转/呼吸一起缩放。1 = 按上面各值；0 = 完全静止（等于旧版静态云）；1.5~2 = 明显翻滚。它是运行时实时读取的，改完刷新即生效，也是做幅度对照实验的入口。",
+    "counts.grass": "近处草叶数量（0~24m 内）。默认 15000。",
+    "counts.grassTuft": "中景草丛数量（0~120m 内）。默认 16000。",
+    "counts.lavender": "薰衣草总株数（含床边那几簇）。默认 4200。",
+    "counts.daisy": "床边白菊花总株数（会按各簇原比例分摊；面板里的花簇没写 count 就各簇平分）。默认 190。",
+    "daisies.clusters": "床边白菊花的花簇，可以摆任意多块。这里给的是「最终世界坐标」，不会再跟着 sizes.bedScale 外推。center=[x,z] 簇心；rx/rz 椭圆铺展半径（沿床长边铺就 rx 大、rz 小）；feather 0~1，越小花越往中间聚、边缘越稀（1=均匀铺满整块）；size=[最小,最大] 单株尺寸；yOffset 是离地抬升。默认两块：床两条长边（±Z）各一条，横着铺满整张床的长度。",
+    "daisies.clusters[].count": "这一簇的株数。留空则按 counts.daisy 在各簇间平分/按比例分。",
+    "counts.butterfly": "蝴蝶只数。默认 9。",
+    "counts.glintBed": "床板侧面的闪烁高光个数。默认 8。",
+    "counts.glintLadder": "梯杆上的闪烁高光个数。默认 10。",
+    "sizes.grassRadius": "草叶铺设半径（米）。",
+    "sizes.tuftRadius": "中景草丛铺设半径（米）。",
+    "sizes.lavenderRadius": "薰衣草大田半径（米）。",
+    "sizes.bladeHeight": "单株草的高度（米）。",
+    "sizes.bedScale": "床的整体缩放（1 = 原尺寸）。缩放原点是「床底中心」，所以床只会往外、往上长，底面始终贴在草地上，不会陷进去。改大时床周围的无草区、蝴蝶航线、床边花簇会按同比例自动外推。",
+    "bed.avoidMargin": "床边「无草区」在床的外沿之外再多留多少米（0 = 草紧贴床边）。默认 0.6。调大 = 床周围留出一圈平整地面（床更「踏在地上」）；调小 = 草长到床边（更野）。",
+    "sizes.daisyScale": "白菊花尺寸倍率（1 = 默认）。",
+    "sizes.butterflyScale": "蝴蝶尺寸倍率（1 = 默认）。",
+    "sizes.glintScale": "闪烁高光尺寸倍率（1 = 默认）。",
+    "grassColors.blade": "近处草叶（0~24m，细长叶片）的顶点色渐变 [根部, 尖端]。",
+    "grassColors.bladeTintLight": "近处草叶的逐株明度范围 [最暗, 最亮]。",
+    "grassColors.tuftBlade": "中远处草丛（0~120m，贴图草）的色板 [根部, 中部, 尖端]。这是「看上去最深」的元凶：根部色越深、整丛越黑。",
+    "grassColors.tuftTintLight": "中远处草丛的逐株明度范围 [最暗, 最亮]。1 = 原色，越小越暗。",
+    "bedShadow.enabled": "床底暗部总开关。false = 关掉深色草环和接地阴影。",
+    "bedShadow.grass": "床沿那一圈深色草的株数。默认 2600。",
+    "bedShadow.ringWidth": "深色草环从床沿往外铺多宽（米）。默认 0.55，只贴着床沿一小圈。",
+    "bedShadow.falloff": "密度衰减指数。越大越「贴床」：环外沿迅速掉到 0、不外扩。默认 3.2（1 = 线性）。",
+    "bedShadow.heightScale": "深色草的高度倍率（1 = 完全按 size 的尺寸）。",
+    "bedShadow.size": "深色草逐株大小范围 [最小, 最大]。普通草是 [0.75, 1.45]，所以这里 0.3~0.6 就是明显的小草。",
+    "bedShadow.edgeBoost": "贴床那一侧额外增高多少（0 = 不增高）。默认 0，保持小草。",
+    "bedShadow.tintLight": "深色草的明度范围 [最暗, 最亮]，越小越黑。普通草是 [0.42, 0.6]。",
+    "bedShadow.aoOpacity": "接地阴影的强度 0~1。越大床下越暗、越有压住地面的感觉。",
+    "bedShadow.aoSpread": "接地阴影从床沿往外扩散的距离（米）。默认 0.6，紧了才像接触阴影。"
+  },
+  "sun": {
+    "azimuthDeg": -54.465,
+    "elevationDeg": 46.49,
+    "distance": 77.946,
+    "intensity": 1.5,
+    "color": "#ffe0ec"
+  },
+  "ambient": {
+    "intensity": 0.8,
+    "color": "#93a0b4"
+  },
+  "hemisphere": {
+    "intensity": 1.1,
+    "sky": "#b7a8ee",
+    "ground": "#575c9c"
+  },
+  "cloud": {
+    "puffCount": 360,
+    "size": [
+      2.8,
+      5.6
+    ],
+    "radius": [
+      8.5,
+      4.6,
+      6.4
+    ],
+    "height": 12.87,
+    "opacity": [
+      0.7,
+      1
+    ],
+    "flatten": 0.85,
+    "nearFade": 2.5,
+    "insideFade": true,
+    "wind": {
+      "dir": [
+        1,
+        0.55
+      ],
+      "drift": 0,
+      "rate": 0,
+      "rot": 0,
+      "rotRate": 0,
+      "breathe": 0,
+      "inner": [
+        0.55,
+        0.95,
+        2
+      ],
+      "gain": 0
+    }
+  },
+  "counts": {
+    "grass": 15000,
+    "grassTuft": 16000,
+    "lavender": 4200,
+    "daisy": 190,
+    "butterfly": 9,
+    "glintBed": 8,
+    "glintLadder": 10
+  },
+  "sizes": {
+    "grassRadius": 24,
+    "tuftRadius": 120,
+    "lavenderRadius": 34,
+    "bladeHeight": 0.62,
+    "bedScale": 1.2,
+    "daisyScale": 1,
+    "butterflyScale": 1,
+    "glintScale": 1
+  },
+  "bed": {
+    "avoidMargin": 0.6
+  },
+  "daisies": {
+    "clusters": [
+      {
+        "center": [
+          -2,
+          4.55
+        ],
+        "rx": 2.95,
+        "rz": 1.15,
+        "feather": 0.3,
+        "size": [
+          0.45,
+          0.78
+        ]
+      },
+      {
+        "center": [
+          -2,
+          -2.45
+        ],
+        "rx": 2.95,
+        "rz": 1.15,
+        "feather": 0.3,
+        "size": [
+          0.45,
+          0.78
+        ]
+      }
+    ]
+  },
+  "grassColors": {
+    "blade": [
+      "#5f9c3a",
+      "#c8e98a"
+    ],
+    "bladeTintLight": [
+      0.42,
+      0.6
+    ],
+    "tuftBlade": [
+      "#79b544",
+      "#a3d066",
+      "#d8ee9a"
+    ],
+    "tuftTintLight": [
+      0.6,
+      0.8
+    ]
+  },
+  "bedShadow": {
+    "enabled": true,
+    "grass": 900,
+    "ringWidth": 0.55,
+    "falloff": 3.2,
+    "heightScale": 1,
+    "size": [
+      0.3,
+      0.6
+    ],
+    "edgeBoost": 0,
+    "tintLight": [
+      0.16,
+      0.3
+    ],
+    "aoOpacity": 0.42,
+    "aoSpread": 0.5
+  }
+}

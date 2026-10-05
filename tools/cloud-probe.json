@@ -1,0 +1,21 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.scene)"},
+  {"op":"wait","ms":2600},
+  {"op":"eval","js":"(()=>{const s=window.__dbg.scene;let g=null;s.traverse(o=>{if(o.isGroup&&o.children.some(c=>c.isSprite))g=g||o;});window.__cg=g;const sp=g.children.filter(c=>c.isSprite),pl=g.children.filter(c=>c.userData&&c.userData.isBillboard);return {sprites:sp.length,planes:pl.length,planeVisible:pl.filter(p=>p.visible).length,totalChildren:g.children.length};})()"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,c=d.camera;c.position.set(-2,5.6,27);d.controls.target.set(2.6,13.6,1.6);d.controls.update();return 'ground';})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"cp-1-ground-with.png"},
+  {"op":"eval","js":"(()=>{const pl=window.__cg.children.filter(c=>c.userData&&c.userData.isBillboard);pl.forEach(p=>p.visible=false);return pl.length;})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"cp-2-ground-without.png"},
+  {"op":"eval","js":"(()=>{const pl=window.__cg.children.filter(c=>c.userData&&c.userData.isBillboard);pl.forEach(p=>p.visible=true);return pl.length;})()"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,c=d.camera;c.position.set(2.6,20.5,16);d.controls.target.set(2.6,13.8,1.6);d.controls.update();return 'above';})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"cp-3-above-with.png"},
+  {"op":"eval","js":"(()=>{const pl=window.__cg.children.filter(c=>c.userData&&c.userData.isBillboard);pl.forEach(p=>p.visible=false);return pl.length;})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"cp-4-above-without.png"},
+  {"op":"eval","js":"(()=>{const pl=window.__cg.children.filter(c=>c.userData&&c.userData.isBillboard);pl.forEach(p=>p.visible=true);return pl.length;})()"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg;const box=new d.THREE.Box3();let n=0;window.__cg.children.forEach(c=>{if(c.userData&&c.userData.isBillboard)box.expandByObject(c);});return {shadowPlaneBox:[box.min.toArray().map(v=>+v.toFixed(2)),box.max.toArray().map(v=>+v.toFixed(2))],rendererInfo:d.renderer.info.render};})()"},
+  {"op":"eval","js":"(()=>{const e=window.__errs||[];return {errs:e.length,list:e.slice(0,3)};})()"}
+]

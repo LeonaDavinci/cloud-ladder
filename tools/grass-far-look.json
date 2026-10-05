@@ -1,0 +1,13 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.tufts && window.__dbg.grass)"},
+  {"op":"wait","ms":2600},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,c=d.camera;c.position.set(-2,3.2,26);d.controls.target.set(-2,1.4,0);d.controls.update();return 'mid';})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"h1-mid-after.png"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,c=d.camera;c.position.set(-2,9,60);d.controls.target.set(-2,2,0);d.controls.update();return 'far';})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"h2-far-after.png"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,c=d.camera;c.position.set(14,2.0,14);d.controls.target.set(-2,1.6,0);d.controls.update();return 'near-mid';})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"h3-near-mid-after.png"}
+]

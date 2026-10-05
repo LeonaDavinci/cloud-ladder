@@ -1,0 +1,14 @@
+[
+  {"op":"wait","ms":2500},
+  {"op":"eval","js":"(function(){var a=__dbg.butterflies.instanceMatrix.array,n=__dbg.butterflies.count,o=[],C=[[-2,4.55],[-2,-2.45]];for(var i=0;i<n;i++){var k=i*16,x=a[k+12],y=a[k+13],z=a[k+14],d0=Math.hypot(x-C[0][0],z-C[0][1]),d1=Math.hypot(x-C[1][0],z-C[1][1]);o.push({near:(d0<d1?'A':'B'),d:+Math.min(d0,d1).toFixed(2),y:+y.toFixed(2)});}return JSON.stringify(o);})()"},
+  {"op":"eval","js":"(function(){__dbg.camera.position.set(-2,3.4,11.2);__dbg.controls.target.set(-2,0.9,4.4);return 'cam-wide';})()"},
+  {"op":"wait","ms":3500},
+  {"op":"shot","file":"ds-2-wide.png"},
+  {"op":"eval","js":"(function(){__dbg.camera.position.set(-2,1.55,8.2);__dbg.controls.target.set(-2,0.5,4.6);return 'cam-close';})()"},
+  {"op":"wait","ms":3500},
+  {"op":"shot","file":"ds-3-close.png"},
+  {"op":"eval","js":"(function(){__dbg.camera.position.set(-2,6.6,13.5);__dbg.controls.target.set(-2,1.6,2.2);return 'cam-old';})()"},
+  {"op":"wait","ms":3500},
+  {"op":"shot","file":"ds-4-oldcam.png"},
+  {"op":"eval","js":"(function(){var a=__dbg.butterflies.instanceMatrix.array,n=__dbg.butterflies.count,o=[];for(var i=0;i<n;i++){var k=i*16;o.push(+a[k+13].toFixed(2));}return JSON.stringify({ys:o,errs:(window.__errs||[]).length});})()"}
+]

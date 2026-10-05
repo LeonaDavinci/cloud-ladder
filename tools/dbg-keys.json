@@ -1,0 +1,5 @@
+[
+  {"op":"eval","js":"JSON.stringify(Object.keys(__dbg))"},
+  {"op":"eval","js":"JSON.stringify(Object.keys(__dbg).filter(k=>{const v=__dbg[k];return v&&v.isObject3D;}))"},
+  {"op":"eval","js":"JSON.stringify(Object.keys(__dbg).filter(k=>{const v=__dbg[k];return v&&v.isObject3D;}).map(k=>[k,__dbg[k].visible,__dbg[k].children.length]))"}
+]

@@ -1,0 +1,36 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__rig && window.__vp)"},
+  {"op":"wait","ms":2200},
+
+  {"op":"eval","js":"(function(){var m=document.querySelector('meta[name=viewport]');var cs=getComputedStyle(document.body);var de=getComputedStyle(document.documentElement);var cv=document.querySelector('#app canvas');return JSON.stringify({meta:m?m.content:'(none)',userScalableNo:!!m&&/user-scalable\\s*=\\s*no/i.test(m.content),maxScale1:!!m&&/maximum-scale\\s*=\\s*1(\\.0)?(,|\\s|$)/i.test(m.content),htmlUserSelect:de.userSelect||de.webkitUserSelect,bodyUserSelect:cs.userSelect||cs.webkitUserSelect,htmlTouchAction:de.touchAction,canvasTouchAction:getComputedStyle(cv).touchAction,vpHook:!!window.__vp});})()"},
+
+  {"op":"eval","js":"(function(){var cv=document.querySelector('#app canvas');var c=__dbg.camera,o=__dbg.controls;window.__probe={plain:null,ctrl:null};cv.addEventListener('wheel',function(e){if(e.ctrlKey||e.metaKey)window.__probe.ctrl=e.defaultPrevented;else window.__probe.plain=e.defaultPrevented;});var st={d0:c.position.distanceTo(o.target)};var e2=new WheelEvent('wheel',{deltaY:-120,ctrlKey:true,bubbles:true,cancelable:true});cv.dispatchEvent(e2);st.ctrlPrevented=e2.defaultPrevented;st.ctrlReachedCanvas=(window.__probe.ctrl!==null);window.__wheel=st;return JSON.stringify(st);})()"},
+  {"op":"wait","ms":1600},
+  {"op":"eval","js":"(function(){var d=__dbg.camera.position.distanceTo(__dbg.controls.target);return JSON.stringify({d0:+window.__wheel.d0.toFixed(4),d1:+d.toFixed(4),deltaCtrl:+Math.abs(d-window.__wheel.d0).toFixed(6),ctrlChangedCamera:Math.abs(d-window.__wheel.d0)>1e-4});})()"},
+  {"op":"eval","js":"(function(){var cv=document.querySelector('#app canvas');var d0=__dbg.camera.position.distanceTo(__dbg.controls.target);var e1=new WheelEvent('wheel',{deltaY:-120,bubbles:true,cancelable:true});cv.dispatchEvent(e1);window.__wheel2={d0:d0,plainReachedCanvas:(window.__probe.plain!==null)};return JSON.stringify(window.__wheel2);})()"},
+  {"op":"wait","ms":2600},
+  {"op":"eval","js":"(function(){var d=__dbg.camera.position.distanceTo(__dbg.controls.target);return JSON.stringify({d0:+window.__wheel2.d0.toFixed(4),d1:+d.toFixed(4),plainChangedCamera:Math.abs(d-window.__wheel2.d0)>1e-3});})()"},
+
+  {"op":"drag","from":[40,30],"x":280,"y":30,"steps":16,"ms":600},
+  {"op":"wait","ms":900},
+  {"op":"eval","js":"(function(){var s=window.getSelection();var h=__rig.home;var c=__dbg.camera,o=__dbg.controls;var dx=Math.abs(c.position.x-h.pos.x)+Math.abs(c.position.y-h.pos.y)+Math.abs(c.position.z-h.pos.z);return JSON.stringify({selectedTextLen:s?s.toString().length:-1,selectedText:s?s.toString():null,camMovedByDrag:+(dx.toFixed(4)),camAfterDrag:[+c.position.x.toFixed(3),+c.position.y.toFixed(3),+c.position.z.toFixed(3)],home:[+h.pos.x.toFixed(3),+h.pos.y.toFixed(3),+h.pos.z.toFixed(3)]});})()"},
+
+  {"op":"clickSel","sel":"#reset-btn"},
+  {"op":"wait","ms":800},
+  {"op":"eval","js":"(function(){var h=__rig.home,c=__dbg.camera,o=__dbg.controls;var dp=Math.abs(c.position.x-h.pos.x)+Math.abs(c.position.y-h.pos.y)+Math.abs(c.position.z-h.pos.z);var dt=Math.abs(o.target.x-h.target.x)+Math.abs(o.target.y-h.target.y)+Math.abs(o.target.z-h.target.z);return JSON.stringify({mode:__rig.mode,step:__rig.step,posErr:+dp.toFixed(9),targetErr:+dt.toFixed(9),exact:(dp<1e-6&&dt<1e-6),cam:[+c.position.x.toFixed(3),+c.position.y.toFixed(3),+c.position.z.toFixed(3)],target:[+o.target.x.toFixed(3),+o.target.y.toFixed(3),+o.target.z.toFixed(3)],hitClass:document.getElementById('reset-btn').className});})()"},
+  {"op":"shot","file":"reset-1-after-reset.png"},
+
+  {"op":"eval","js":"(function(){var b=document.querySelectorAll('.mode-btn');var out=[];for(var i=0;i<b.length;i++){var r=b[i].getBoundingClientRect();out.push({t:b[i].textContent.trim(),x:Math.round(r.x),y:Math.round(r.y),r:Math.round(r.right),b:Math.round(r.bottom),act:b[i].getAttribute('data-act')||null,active:b[i].classList.contains('active')});}return JSON.stringify({win:[innerWidth,innerHeight],btns:out});})()"},
+
+  {"op":"eval","js":"(function(){__rig.setMode('roam');__rig.goto(3);return JSON.stringify({mode:__rig.mode,step:__rig.step,autoWalk:__rig.autoWalk});})()"},
+  {"op":"waitFor","js":"__rig.leap.landed","timeout":60000},
+  {"op":"eval","js":"JSON.stringify({atLanding_mode:__rig.mode,atLanding_step:__rig.step,foot:+__rig.P.foot.toFixed(3),bedTop:+__rig.rig.bed.top.toFixed(3)})"},
+  {"op":"shot","file":"reset-2-roam-landed.png"},
+  {"op":"waitFor","js":"__rig.mode==='walk'","timeout":120000},
+  {"op":"wait","ms":900},
+  {"op":"eval","js":"JSON.stringify({afterWait_mode:__rig.mode,afterWait_step:__rig.step,onBed:__rig.P.state==='ground'&&Math.abs(__rig.P.foot-__rig.rig.bed.top)<0.06,foot:+__rig.P.foot.toFixed(3),jumpBtnOn:document.getElementById('jump-btn').classList.contains('on'),stickLayer:getComputedStyle(document.getElementById('sticks')).zIndex})"},
+  {"op":"shot","file":"reset-3-auto-walk.png"},
+
+  {"op":"eval","js":"(function(){__rig.setMode('free');__rig.reset();var h=__rig.home,c=__dbg.camera;var d=Math.abs(c.position.x-h.pos.x)+Math.abs(c.position.y-h.pos.y)+Math.abs(c.position.z-h.pos.z);return JSON.stringify({modeAfterReset:__rig.mode,posErrAfterRoamReset:+d.toFixed(9),step:__rig.step});})()"},
+  {"op":"eval","js":"JSON.stringify({errs:(window.__errs||[]).slice(0,4)})"}
+]

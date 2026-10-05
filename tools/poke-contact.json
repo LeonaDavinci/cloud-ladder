@@ -1,0 +1,14 @@
+[
+  {"op":"eval","js":"JSON.stringify({ladder:__rig.rig.ladder.foot, up:__rig.rig.ladder.up, len:__rig.rig.ladder.length})"},
+  {"op":"eval","js":"__dbg.cloud.userData.flow.gain = 0"},
+  {"op":"eval","js":"(()=>{const L=__rig.rig.ladder;__rig.P.state='ladder';__rig.P.ls=L.length;__rig.P.lsq=L.length;return [L.foot[1]+L.up[1]*L.length].map(v=>+v.toFixed(2));})()"},
+  {"op":"wait","ms":3000},
+  {"op":"eval","js":"(()=>{const c=__dbg.cloud;const p=__dbg.camera.position;const C=c.userData?[2.6,12.87,1.6]:[0,0,0];const e=Math.hypot((p.x-2.6)/8.5,(p.y-12.87)/4.6,(p.z-1.6)/6.4);return JSON.stringify({cam:[p.x,p.y,p.z].map(v=>+v.toFixed(2)), e:+e.toFixed(3)});})()"},
+  {"op":"eval","js":"JSON.stringify(__dbg.cloudStat())"},
+  {"op":"shot","file":"ct-1-inside.png"},
+  {"op":"eval","js":"(()=>{const L=__rig.rig.ladder;__rig.P.ls=L.length-1.2;return 'moved';})()"},
+  {"op":"wait","ms":2500},
+  {"op":"eval","js":"JSON.stringify(__dbg.cloudStat())"},
+  {"op":"shot","file":"ct-2-move.png"},
+  {"op":"eval","js":"JSON.stringify(window.__errs)"}
+]

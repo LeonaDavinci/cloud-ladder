@@ -1,0 +1,8 @@
+[
+  {"op":"wait","ms":3500},
+  {"op":"shot","file":"bd-0-default.png"},
+  {"op":"eval","js":"(function(){__dbg.camera.position.set(9,5.0,22);__dbg.controls.target.set(-1.6,1.4,3.0);return 'near';})()"},
+  {"op":"wait","ms":3500},
+  {"op":"shot","file":"bd-1-near.png"},
+  {"op":"eval","js":"(function(){var T=__dbg.THREE,a=__dbg.butterflies.instanceMatrix.array,cam=__dbg.camera,o=[];for(var i=0;i<4;i++){var k=i*16;var v=new T.Vector3(a[k+12],a[k+13],a[k+14]);v.project(cam);o.push([+v.x.toFixed(2),+v.y.toFixed(2)]);}return JSON.stringify({ndc:o,cam:[+cam.position.x.toFixed(1),+cam.position.y.toFixed(1),+cam.position.z.toFixed(1)]});})()"}
+]

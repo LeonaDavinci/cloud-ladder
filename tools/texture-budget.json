@@ -1,0 +1,6 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__rig && window.__loop)"},
+  {"op":"waitFor","js":"(function(){var n=0;__dbg.bed.traverse(function(o){if(!o.isMesh)return;var v=o.visible,p=o.parent;while(p&&v){if(!p.visible)v=false;p=p.parent;}if(v)n++;});return n>0&&n<6;})()","timeout":60000},
+  {"op":"wait","ms":2500},
+  {"op":"eval","js":"(function(){var seen={},maxEdge=0,over=0,total=0,list=[],bytes=0;__dbg.scene.traverse(function(o){if(!o.material)return;var ms=Array.isArray(o.material)?o.material:[o.material];ms.forEach(function(m){Object.keys(m).forEach(function(k){var t=m[k];if(!t||!t.isTexture||seen[t.uuid])return;seen[t.uuid]=1;var im=t.image||{},w=im.width||0,h=im.height||0,e=Math.max(w,h);total++;if(e>maxEdge)maxEdge=e;if(e>2048)over++;bytes+=w*h*4;if(list.length<24)list.push(k+' '+w+'x'+h);});});});return JSON.stringify({uniqueTextures:total,maxEdge:maxEdge,over2048:over,estBytes:bytes,estMiB:+(bytes/1048576).toFixed(2),sample:list,renderTargetsApprox:(__dbg.renderer.info.memory.textures-total)});})()"}
+]

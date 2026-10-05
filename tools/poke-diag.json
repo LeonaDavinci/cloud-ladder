@@ -1,0 +1,10 @@
+[
+  {"op":"eval","js":"__dbg.camera.position.set(20.5, 14.6, 11.5)"},
+  {"op":"eval","js":"__dbg.controls.target.set(2.6, 12.87, 1.6)"},
+  {"op":"eval","js":"__dbg.cloud.userData.flow.gain = 0"},
+  {"op":"wait","ms":2200},
+  {"op":"clickAt","js":"(()=>{const {THREE,camera}=__dbg;const c=new THREE.Vector3(2.6,12.87,1.6);const p=c.clone().project(camera);return [ (p.x*0.5+0.5)*innerWidth, (-p.y*0.5+0.5)*innerHeight ];})()"},
+  {"op":"wait","ms":1500},
+  {"op":"eval","js":"JSON.stringify(__dbg.cloudStat())"},
+  {"op":"eval","js":"JSON.stringify(window.__errs)"}
+]

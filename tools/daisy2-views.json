@@ -1,0 +1,29 @@
+[
+  { "op": "waitFor", "js": "!!(window.__dbg && window.__dbg.daisies && window.__dbg.config && window.__dbg.config.bed)" },
+  { "op": "wait", "ms": 2600 },
+
+  { "op": "eval", "js": "(()=>{const d=window.__dbg;const b=new d.THREE.Box3().setFromObject(d.bed);const e=d.config;return {avoidHalfX:e.bed.avoidHalf&&e.bed.avoidHalf[0],avoidHalfZ:e.bed.avoidHalf&&e.bed.avoidHalf[1],fromPanel:e.daisyClustersFromPanel,clusters:e.daisies?e.daisies.clusters.map(c=>[c.center,c.rx,c.rz,c.count,c.feather]):(d.__dbg_daisy||null),bedBox:[[+b.min.x.toFixed(2),+b.min.z.toFixed(2)],[+b.max.x.toFixed(2),+b.max.z.toFixed(2)]],counts:e.counts.daisy};})()" },
+  { "op": "eval", "js": "(()=>{const d=window.__dbg;const m=d.daisies;const M=new d.THREE.Matrix4();const v=new d.THREE.Vector3();let mnx=1e9,mxx=-1e9,mnz=1e9,mxz=-1e9;const g={};for(let i=0;i<m.count;i++){m.getMatrixAt(i,M);v.setFromMatrixPosition(M);mnx=Math.min(mnx,v.x);mxx=Math.max(mxx,v.x);mnz=Math.min(mnz,v.z);mxz=Math.max(mxz,v.z);const k=v.z>1.2?'+Z边':'-Z边';g[k]=(g[k]||0)+1;}return JSON.stringify({count:m.count,boxX:[+mnx.toFixed(2),+mxx.toFixed(2)],boxZ:[+mnz.toFixed(2),+mxz.toFixed(2)],perSide:g});})()" },
+
+  { "op": "eval", "js": "(()=>{const d=window.__dbg,c=d.camera;c.position.set(-2,7.2,13);d.controls.target.set(-2,1.6,1.0);d.controls.update();return 'front';})()" },
+  { "op": "wait", "ms": 2600 },
+  { "op": "shot", "file": "y1-front.png" },
+
+  { "op": "eval", "js": "(()=>{const d=window.__dbg,c=d.camera;c.position.set(-11.5,5.2,10);d.controls.target.set(-2,1.6,1.4);d.controls.update();return 'q3';})()" },
+  { "op": "wait", "ms": 2600 },
+  { "op": "shot", "file": "y2-q3.png" },
+
+  { "op": "eval", "js": "(()=>{const d=window.__dbg,c=d.camera;c.position.set(-2,1.55,5.6);d.controls.target.set(-2,2.0,1.2);d.controls.update();return 'low';})()" },
+  { "op": "wait", "ms": 2600 },
+  { "op": "shot", "file": "y3-low.png" },
+
+  { "op": "eval", "js": "(()=>{const d=window.__dbg;d.grass.visible=false;if(d.tufts)d.tufts.visible=false;d.lavender.visible=false;const s=d.scene.getObjectByName('bedShadow');if(s)s.visible=false;const c=d.camera;c.position.set(-2,12,5.1);d.controls.target.set(-2,1.5,1.1);d.controls.update();return 'top-iso';})()" },
+  { "op": "wait", "ms": 2600 },
+  { "op": "shot", "file": "y4-top-iso.png" },
+
+  { "op": "eval", "js": "(()=>{const d=window.__dbg;d.grass.visible=true;if(d.tufts)d.tufts.visible=true;d.lavender.visible=true;const s=d.scene.getObjectByName('bedShadow');if(s)s.visible=true;const c=d.camera;c.position.set(1.5,4.4,9.5);d.controls.target.set(-2,1.7,1.5);d.controls.update();return 'hero';})()" },
+  { "op": "wait", "ms": 2600 },
+  { "op": "shot", "file": "y5-hero.png" },
+
+  { "op": "eval", "js": "(()=>{const e=window.__errs||[];return {errs:e.length,list:e.slice(0,3)};})()" }
+]

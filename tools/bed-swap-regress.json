@@ -1,0 +1,16 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__rig)"},
+  {"op":"waitFor","js":"(function(){var n=0;__dbg.bed.traverse(function(o){if(!o.isMesh)return;var v=o.visible,p=o.parent;while(p&&v){if(!p.visible)v=false;p=p.parent;}if(v)n++;});return n>0&&n<6;})()","timeout":60000},
+  {"op":"wait","ms":900},
+  {"op":"eval","js":"JSON.stringify({bedModel:__dbg.bed.userData.bedModel,bedTop:+__rig.rig.bed.top.toFixed(3),bedOrigin:+__dbg.bed.position.y.toFixed(3),ladderLen:+__dbg.ladder.userData.rig.length.toFixed(3),glbTris:(function(){var n=0;__dbg.bed.traverse(function(o){if(o.isMesh&&o.visible)n+=(o.geometry.index?o.geometry.index.count:o.geometry.attributes.position.count)/3;});return n;})()})"},
+  {"op":"eval","js":"(function(){var T=__dbg.THREE,bed=__dbg.bed;bed.updateMatrixWorld(true);var bb=new T.Box3().setFromObject(bed);var rc=new T.Raycaster(),down=new T.Vector3(0,-1,0),hits=[],N=11;for(var i=0;i<N;i++)for(var j=0;j<N;j++){var x=bb.min.x+(i+0.5)/N*(bb.max.x-bb.min.x),z=bb.min.z+(j+0.5)/N*(bb.max.z-bb.min.z);rc.set(new T.Vector3(x,bb.max.y+3,z),down);var hs=rc.intersectObject(bed,true),top=null;for(var k=0;k<hs.length;k++){if(!hs[k].object.visible)continue;if(top===null||hs[k].point.y>top)top=hs[k].point.y;}if(top!==null)hits.push(+(top-bed.position.y).toFixed(3));}var s=hits.slice().sort(function(a,b){return a-b;});var hist={};hits.forEach(function(v){var b=(Math.round(v*20)/20).toFixed(2);hist[b]=(hist[b]||0)+1;});var mode=Object.keys(hist).sort(function(a,b){return hist[b]-hist[a];})[0];return JSON.stringify({rays:hits.length,min:s[0],p25:s[Math.floor(s.length*0.25)],median:s[Math.floor(s.length*0.5)],p75:s[Math.floor(s.length*0.75)],max:s[s.length-1],mode:mode,modeN:hist[mode],target:+(__rig.rig.bed.top-bed.position.y).toFixed(3)});})()"},
+  {"op":"shot","file":"swap-0-default.png"},
+  {"op":"eval","js":"(function(){__rig.setMode('roam');__rig.goto(3);return 'roam@goto3';})()"},
+  {"op":"waitFor","js":"__rig.mode==='walk'","timeout":180000},
+  {"op":"eval","js":"JSON.stringify({endMode:__rig.mode,endStep:__rig.step,state:__rig.P.state,foot:+__rig.P.foot.toFixed(3),bedTop:+__rig.rig.bed.top.toFixed(3),diff:+(__rig.P.foot-__rig.rig.bed.top).toFixed(4)})"},
+  {"op":"shot","file":"swap-1-onbed.png"},
+  {"op":"clickSel","sel":"#reset-btn"},
+  {"op":"wait","ms":700},
+  {"op":"eval","js":"(function(){var h=__rig.home,c=__dbg.camera;var d=Math.abs(c.position.x-h.pos.x)+Math.abs(c.position.y-h.pos.y)+Math.abs(c.position.z-h.pos.z);return JSON.stringify({afterResetMode:__rig.mode,posErr:+d.toFixed(9)});})()"},
+  {"op":"eval","js":"JSON.stringify({errs:(window.__errs||[]).slice(0,8)})"}
+]

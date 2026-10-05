@@ -1,0 +1,19 @@
+[
+  {"op":"eval","js":"__dbg.camera.position.set(21.5, 15.4, 12.4)"},
+  {"op":"eval","js":"__dbg.controls.target.set(2.6, 12.87, 1.6)"},
+  {"op":"eval","js":"__dbg.cloud.userData.flow.gain = 0"},
+  {"op":"wait","ms":3000},
+  {"op":"eval","js":"__dbg.cloudPeakReset(); 'reset'"},
+  {"op":"shot","file":"fin-0-before.png"},
+  {"op":"clickAt","js":"(()=>{const {THREE,camera}=__dbg;const p=new THREE.Vector3(2.6,12.87,1.6).project(camera);const q=p.clone();q.x-=0.12;q.y-=0.10;return [ (q.x*0.5+0.5)*innerWidth, (-q.y*0.5+0.5)*innerHeight ];})()"},
+  {"op":"wait","ms":420},
+  {"op":"shot","file":"fin-1-ripple.png"},
+  {"op":"eval","js":"JSON.stringify(__dbg.cloudStat())"},
+  {"op":"wait","ms":1600},
+  {"op":"shot","file":"fin-2-dent.png"},
+  {"op":"wait","ms":22000},
+  {"op":"eval","js":"JSON.stringify(__dbg.cloudStat())"},
+  {"op":"shot","file":"fin-3-back.png"},
+  {"op":"eval","js":"JSON.stringify({audio:__audio.state,title:__audio.title,t:+__audio.el.currentTime.toFixed(1),vol:+__audio.el.volume.toFixed(2)})"},
+  {"op":"eval","js":"JSON.stringify(window.__errs)"}
+]

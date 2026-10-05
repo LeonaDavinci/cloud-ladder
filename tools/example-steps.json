@@ -1,0 +1,15 @@
+[
+  { "op": "wait", "ms": 1500 },
+  { "op": "waitFor", "js": "!!window.__rig", "timeout": 30000 },
+  { "op": "eval", "js": "innerWidth + 'x' + innerHeight" },
+  { "op": "fps" },
+  { "op": "clickSel", "sel": "[data-mode=walk]" },
+  { "op": "down", "x": 300, "y": 430 },
+  { "op": "move", "x": 300, "y": 350 },
+  { "op": "wait", "ms": 1200 },
+  { "op": "shot", "file": "step-walk.png" },
+  { "op": "up", "x": 300, "y": 350 },
+  { "op": "clickSel", "sel": "[data-mode=free]" },
+  { "op": "wait", "ms": 800 },
+  { "op": "eval", "js": "document.querySelector('.mode-btn.active').dataset.mode" }
+]

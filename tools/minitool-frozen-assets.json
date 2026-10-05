@@ -1,0 +1,8 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__rig && window.__loop)"},
+  {"op":"waitFor","js":"(function(){var n=0;__dbg.bed.traverse(function(o){if(!o.isMesh)return;var v=o.visible,p=o.parent;while(p&&v){if(!p.visible)v=false;p=p.parent;}if(v)n++;});return n>0&&n<6;})()","timeout":60000},
+  {"op":"wait","ms":1200},
+  {"op":"waitFor","js":"(function(){var e=document.getElementById('boot-tip');return !e||getComputedStyle(e).opacity==='0';})()","timeout":20000},
+  {"op":"eval","js":"(function(){function visMeshes(root){var n=0;root.traverse(function(o){if(!o.isMesh)return;var v=o.visible,p=o.parent;while(p&&v){if(!p.visible)v=false;p=p.parent;}if(v)n++;});return n;}return JSON.stringify({rev:(window.THREE&&window.THREE.REVISION)||null,sceneChildren:__dbg.scene.children.length,bedMeshesVisible:visMeshes(__dbg.bed),bedChildren:__dbg.bed.children.length,cloudPuffs:(__dbg.cloud.userData.puffs||[]).length,ladderLen:+__dbg.ladder.userData.rig.length.toFixed(3),bedSrc:window.__bedSrc||null,bedWorld:(__dbg.bed.userData.bedModel||{}).worldSize||null,audioFiles:(window.__audio?window.__audio.tracks.map(function(t){return t.file;}):null),time:+__dbg.time.toFixed(3)});})()"},
+  {"op":"eval","js":"JSON.stringify({errs:(window.__errs||[]).slice(0,6)})"}
+]

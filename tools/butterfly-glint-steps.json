@@ -1,0 +1,22 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.glints && window.__dbg.glints.userData.anchors)"},
+  {"op":"wait","ms":2500},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,T=d.THREE,g=d.glints,A=g.userData.anchors,V=T.Vector3;let dead=0;const bmin=[99,99,99],bmax=[-99,-99,-99];A.forEach(a=>{if(a.dead)dead++;if(a.parent!==d.bed)return;const p=new V().copy(a.local).applyMatrix4(d.bed.matrixWorld);bmin[1]=Math.min(bmin[1],p.y);bmax[1]=Math.max(bmax[1],p.y);});return {n:A.length,dead,bedGlintY:[+bmin[1].toFixed(2),+bmax[1].toFixed(2)],bedTop:+(d.bed.position.y+1.44).toFixed(2)};})()"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,b=d.bed.position,c=d.camera;c.position.set(b.x+3.0,b.y+1.05,b.z+0.2);d.controls.target.set(b.x+0.1,b.y+0.7,b.z-0.3);d.controls.update();return 'longside';})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"b2-bed-side.png"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,T=d.THREE,l=d.ladder,c=d.camera;const p=y=>new T.Vector3(0,y,0).applyMatrix4(l.matrixWorld);const a=p(-3.5);c.position.set(a.x+3.2,a.y+0.6,a.z+3.4);d.controls.target.set(a.x,a.y+0.4,a.z);d.controls.update();return 'rail';})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"b3-ladder-rail.png"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,b=d.bed.position,c=d.camera;c.position.set(b.x+3.4,b.y+2.6,b.z+4.6);d.controls.target.set(b.x,b.y+1.9,b.z);d.controls.update();return 'air';})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"b4-butterflies.png"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,b=d.bed.position,c=d.camera;c.position.set(b.x+4.6,b.y+2.0,b.z+3.2);d.controls.target.set(b.x,b.y+1.0,b.z);d.controls.update();return 'over';})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"b1-overview.png"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,T=d.THREE,g=d.glints;g.getMatrixAt(0,new T.Matrix4());const s=new T.Vector3(),q=new T.Quaternion(),p=new T.Vector3();g.getMatrixAt(0,new T.Matrix4());const m=new T.Matrix4();g.getMatrixAt(0,m);m.decompose(p,q,s);window.__gs=+s.x.toFixed(4);return {glintScaleX:window.__gs};})()"},
+  {"op":"wait","ms":900},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,T=d.THREE,g=d.glints,m=new T.Matrix4(),s=new T.Vector3(),q=new T.Quaternion(),p=new T.Vector3();g.getMatrixAt(0,m);m.decompose(p,q,s);return {glintA:window.__gs,glintB:+s.x.toFixed(4)};})()"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,c=d.camera;c.position.set(16,9,30);d.controls.target.set(1.5,11.5,-2);d.controls.update();return 'default';})()"},
+  {"op":"wait","ms":2500}
+]

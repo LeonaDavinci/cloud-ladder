@@ -1,0 +1,14 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.atmos)"},
+  {"op":"wait","ms":1800},
+  {"op":"eval","js":"(function(){['.overlay','#modes','#sticks','#jump-btn','#mode-hint','#bgm','#scene-ui'].forEach(function(s){var e=document.querySelector(s);if(e)e.style.display='none';});window.__pinT=9;try{Object.defineProperty(__dbg.uTime,'value',{configurable:true,get:function(){return window.__pinT;},set:function(){}});}catch(e){}if(__dbg.cloud&&__dbg.cloud.userData&&__dbg.cloud.userData.flow)__dbg.cloud.userData.flow.gain=0;__dbg.postfx.set('off');__dbg.atmos.apply('sunset');window.__farB=[__dbg.scene.children[6]];return JSON.stringify({ok:1,pinned:__dbg.uTime.value===9});})()"},
+  {"op":"wait","ms":900},
+  {"op":"shot","file":"fx-0-sunset-base.png"},
+  {"op":"eval","js":"(function(){window.__farB.forEach(function(g){g.visible=false;});return 'farB off';})()"},
+  {"op":"wait","ms":600},
+  {"op":"shot","file":"fx-1-nofarB.png"},
+  {"op":"eval","js":"(function(){window.__farB.forEach(function(g){g.visible=true;});var s=window.__farB[0].children;return JSON.stringify(s.map(function(o){return [+o.scale.x.toFixed(0),+o.scale.y.toFixed(0),+o.position.length().toFixed(0)];}).sort(function(a,b){return b[0]-a[0];}).slice(0,5));})()"},
+  {"op":"wait","ms":500},
+  {"op":"shot","file":"fx-2-restored.png"},
+  {"op":"eval","js":"JSON.stringify({errs:window.__errs})"}
+]

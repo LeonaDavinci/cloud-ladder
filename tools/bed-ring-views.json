@@ -1,0 +1,13 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.scene.getObjectByName('bedShadow'))"},
+  {"op":"wait","ms":2200},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,b=d.bed.position,c=d.camera;c.position.set(b.x+1.9,b.y+1.62,b.z+2.1);d.controls.target.set(b.x,b.y+0.35,b.z);d.controls.update();return 'player';})()"},
+  {"op":"wait","ms":2800},
+  {"op":"shot","file":"n4-player-eye.png"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,b=d.bed.position,c=d.camera;c.position.set(b.x+3.6,b.y+2.4,b.z+4.0);d.controls.target.set(b.x,b.y+0.6,b.z);d.controls.update();return 'mid';})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"n5-mid.png"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,b=d.bed.position,c=d.camera;c.position.set(b.x-3.4,b.y+2.1,b.z-2.6);d.controls.target.set(b.x,b.y+0.5,b.z);d.controls.update();return 'back';})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"n6-back-side.png"}
+]

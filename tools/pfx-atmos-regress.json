@@ -1,0 +1,9 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.sceneUI && window.__dbg.postfx && window.__dbg.atmos)"},
+  {"op":"wait","ms":1000},
+  {"op":"eval","js":"JSON.stringify({cfgPostfx:__dbg.config.postfx,cfgAtmos:__dbg.config.atmosphere})"},
+  {"op":"eval","js":"(function(){var out={};__dbg.atmos.names.forEach(function(st){__dbg.atmos.apply(st);if(__dbg.atmos.settleFog)__dbg.atmos.settleFog();var row={};__dbg.postfx.names.forEach(function(fx){__dbg.postfx.set(fx);var s=__dbg.postfx.stats();row[fx]={on:s.enabled,th:s.bloom.threshold,st:s.bloom.strength,pass:s.passes.length};});out[st]={state:__dbg.atmos.state,fog:{c:'#'+__dbg.scene.fog.color.getHexString(),near:__dbg.scene.fog.near,far:__dbg.scene.fog.far},exp:__dbg.renderer.toneMappingExposure,orb:__dbg.atmos.stats().orb,stars:__dbg.atmos.stats().stars,fx:row};});return JSON.stringify(out);})()"},
+  {"op":"eval","js":"(function(){var out={};__dbg.atmos.names.forEach(function(st){__dbg.atmos.apply(st);if(__dbg.atmos.settleFog)__dbg.atmos.settleFog();var a=[];a.push('L'+(__dbg.atmos.fogHeavy?'?':'')+'far'+__dbg.scene.fog.far);__dbg.atmos.toggleFog();if(__dbg.atmos.settleFog)__dbg.atmos.settleFog();a.push('Hfar'+__dbg.scene.fog.far+'/'+__dbg.scene.fog.near);__dbg.atmos.toggleFog();if(__dbg.atmos.settleFog)__dbg.atmos.settleFog();a.push('back'+__dbg.scene.fog.far);out[st]=a.join(' ');});return JSON.stringify(out);})()"},
+  {"op":"eval","js":"(function(){__dbg.postfx.set('dream');__dbg.atmos.apply('afternoon');__dbg.sceneUI.click('night');__dbg.sceneUI.click('off');__dbg.sceneUI.toggleFog();var r={state:__dbg.atmos.state,fx:__dbg.postfx.name,enabled:__dbg.postfx.enabled,fog:__dbg.atmos.fogHeavy};__dbg.sceneUI.click('off');__dbg.sceneUI.toggleFog();return JSON.stringify(r);})()"},
+  {"op":"eval","js":"JSON.stringify({errs:window.__errs,ui:!!__dbg.sceneUI})"}
+]

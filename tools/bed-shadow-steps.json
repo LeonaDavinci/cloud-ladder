@@ -1,0 +1,16 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.scene.getObjectByName('bedShadow'))"},
+  {"op":"wait","ms":2500},
+  {"op":"eval","js":"(()=>{const g=window.__dbg.scene.getObjectByName('bedShadow');const u=g.userData;const ring=g.children.find(c=>c.isInstancedMesh);const patch=g.children.find(c=>c.isMesh&&!c.isInstancedMesh);return {footprint:u.footprint,ringCount:ring&&ring.count,aoSize:u.aoSize,patchGeo:patch&&[patch.geometry.parameters.width,patch.geometry.parameters.height],children:g.children.map(c=>c.type)};})()"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,g=d.scene.getObjectByName('bedShadow'),u=g.userData,f=u.footprint,ring=g.children.find(c=>c.isInstancedMesh);const M=new d.THREE.Matrix4(),P=new d.THREE.Vector3(),Q=new d.THREE.Quaternion(),S=new d.THREE.Vector3();let minD=1e9,maxD=-1e9,inside=0,maxTop=-1e9;const bladeH=(window.__dbg.grass?1:1);for(let i=0;i<ring.count;i++){ring.getMatrixAt(i,M);M.decompose(P,Q,S);const qx=Math.abs(P.x-f.cx)-f.hx, qz=Math.abs(P.z-f.cz)-f.hz;const sd=Math.hypot(Math.max(qx,0),Math.max(qz,0))+Math.min(Math.max(qx,qz),0);if(sd<minD)minD=sd;if(sd>maxD)maxD=sd;if(sd<0)inside++;const top=P.y+S.y*0.62;if(top>maxTop)maxTop=top;}return {minDistOutside:+minD.toFixed(4),maxDistOutside:+maxD.toFixed(4),bladesInsideBed:inside,highestBladeTop:+maxTop.toFixed(3),terrainNearBed:+d.terrainHeight(f.cx,f.cz).toFixed(3)};})()"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg;const e=new d.THREE.Vector3();let lo=new d.THREE.Color(9,9,9),hi=new d.THREE.Color(0,0,0);const g=d.scene.getObjectByName('bedShadow').children.find(c=>c.isInstancedMesh);const c=new d.THREE.Color();for(let i=0;i<g.count;i++){g.getColorAt(i,c);const L=0.2126*c.r+0.7152*c.g+0.0722*c.b;if(L<0.2126*lo.r+0.7152*lo.g+0.0722*lo.b)lo.copy(c);if(L>0.2126*hi.r+0.7152*hi.g+0.0722*hi.b)hi.copy(c);}const gc=d.grass.getColorAt(0,new d.THREE.Color());return {ringDarkest:lo.getHexString(),ringBrightest:hi.getHexString(),normalGrassSample:gc.getHexString(),glintsDead:d.glints.userData.anchors.filter(a=>a.dead).length};})()"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,f=d.scene.getObjectByName('bedShadow').userData.footprint,c=d.camera;c.position.set(f.cx+3.0, d.terrainHeight(f.cx,f.cz)+0.85, f.cz+4.6);d.controls.target.set(f.cx-0.2, d.terrainHeight(f.cx,f.cz)+0.55, f.cz+0.4);d.controls.update();return 'ground-eye';})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"r1-ground-eye.png"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,f=d.scene.getObjectByName('bedShadow').userData.footprint,c=d.camera;c.position.set(f.cx+0.4, d.terrainHeight(f.cx,f.cz)+9.5, f.cz+0.6);d.controls.target.set(f.cx, d.terrainHeight(f.cx,f.cz), f.cz);d.controls.update();return 'top';})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"r2-ring-from-top.png"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,f=d.scene.getObjectByName('bedShadow').userData.footprint,c=d.camera;c.position.set(f.cx+4.2, d.terrainHeight(f.cx,f.cz)+2.2, f.cz-4.4);d.controls.target.set(f.cx-0.3, d.terrainHeight(f.cx,f.cz)+0.6, f.cz+0.2);d.controls.update();return 'corner';})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"r3-corner.png"}
+]

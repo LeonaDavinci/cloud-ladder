@@ -1,0 +1,15 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__rig)","timeout":120000},
+  {"op":"waitFor","js":"window.__boot && window.__boot.state.hidden === true","timeout":180000},
+  {"op":"wait","ms":2600},
+  {"op":"eval","js":"(function(){var d=window.__dbg;try{d.postfx.set('off');d.postfx.pinTime(0);}catch(e){}var c=d.camera,t=d.controls.target;c.fov=42;c.updateProjectionMatrix();t.set(-2,1.05,3.6);c.position.set(-2,2.35,8.2);d.controls.update();return 'cam-edge-z';})()"},
+  {"op":"wait","ms":900},
+  {"op":"shot","file":"bededge-z.png"},
+  {"op":"eval","js":"(function(){var d=window.__dbg,c=d.camera,t=d.controls.target;t.set(-2,1.15,-1.6);c.position.set(-2,2.6,-7.6);d.controls.update();return 'cam-edge-z-neg';})()"},
+  {"op":"wait","ms":900},
+  {"op":"shot","file":"bededge-zneg.png"},
+  {"op":"eval","js":"(function(){var d=window.__dbg,c=d.camera,t=d.controls.target;t.set(-2,1.6,1.2);c.position.set(-2-3.6,8.5,1.2+3.6);d.controls.update();return 'cam-45';})()"},
+  {"op":"wait","ms":900},
+  {"op":"shot","file":"bededge-45.png"},
+  {"op":"eval","js":"JSON.stringify({errs:(window.__errs||[]).slice(0,5)})"}
+]

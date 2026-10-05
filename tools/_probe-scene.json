@@ -1,0 +1,4 @@
+[
+  {"op": "wait", "ms": 2000},
+  {"op": "eval", "js": "(()=>{const D=window.__dbg;const f=o=>{const g=o.geometry,p=(g&&g.parameters)||{};const sz=[p.width,p.height,p.radius,p.radiusTop,p.depth].filter(v=>v!==undefined).join('x');return (g?g.type:'-')+'('+sz+') y='+(+o.position.y.toFixed(2))+' x='+(+o.position.x.toFixed(1))+' mat='+(o.material&&o.material.type||'-')+' vis='+o.visible+' n='+(o.name||'-')};const direct=D.scene.children;const meshes=direct.filter(o=>o.isMesh);const groups=direct.filter(o=>o.isGroup).map(o=>'GRP#'+(o.name||'-')+'('+o.children.length+') first='+(o.children[0]?(o.children[0].geometry?o.children[0].geometry.type:o.children[0].type):'-'));return 'MESHES: '+meshes.map(f).join(' || ')+' :: GROUPS: '+groups.join(' | ')})()"}
+]

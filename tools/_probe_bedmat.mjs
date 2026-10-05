@@ -1,0 +1,22 @@
+import http from 'node:http';import fs from 'node:fs';import path from 'node:path';import { spawn } from 'node:child_process';
+const ROOT=path.resolve('dist-minitool'),PORT=8737,CHROME='C:/Program Files/Google/Chrome/Application/chrome.exe';
+const MIME={'.html':'text/html','.js':'text/javascript','.css':'text/css','.svg':'image/svg+xml','.png':'image/png','.xml':'application/octet-stream','.mp3':'audio/mpeg','.glb':'model/gltf-binary'};
+const server=http.createServer((req,res)=>{let p=decodeURIComponent(req.url.split('?')[0]);if(p==='/')p='/index.html';fs.readFile(path.join(ROOT,p),(e,b)=>{if(e){res.writeHead(404);res.end();return;}res.writeHead(200,{'Content-Type':MIME[path.extname(p)]||'application/octet-stream'});res.end(b);});});
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+await new Promise(r=>server.listen(PORT,r));
+const chrome=spawn(CHROME,['--headless=new','--no-sandbox','--disable-dev-shm-usage','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader','--window-size=800,600','--remote-debugging-port=9223','about:blank'],{stdio:'ignore'});
+await wait(1500);
+const list=await fetch('http://127.0.0.1:9223/json/list').then(r=>r.json());
+const pt=list.find(t=>t.type==='page');
+const ws=new WebSocket(pt.webSocketDebuggerUrl);
+let id=0;const pend=new Map();
+const send=(m,p={})=>new Promise(r=>{const i=++id;pend.set(i,r);ws.send(JSON.stringify({id:i,method:m,params:p}));});
+ws.addEventListener('message',ev=>{const m=JSON.parse(ev.data);if(m.id&&pend.has(m.id)){pend.get(m.id)(m);pend.delete(m.id);}});
+await new Promise(r=>ws.addEventListener('open',r,{once:true}));
+await send('Page.enable');await send('Runtime.enable');
+await send('Page.navigate',{url:`http://127.0.0.1:${PORT}/`});
+for(let i=0;i<60;i++){await wait(500);const r=await send('Runtime.evaluate',{expression:'!!(window.__dbg&&window.__dbg.bed&&window.__dbg.bed.userData.bedModel)',returnByValue:true});if(r.result&&r.result.result&&r.result.result.value)break;}
+const expr=`(function(){const b=window.__dbg.bed;const out=[];b.traverse(o=>{if(o.isMesh&&o.visible){const m=o.material;out.push({name:o.name||o.type,matType:m.type,color:[Math.round(m.color.r*255),Math.round(m.color.g*255),Math.round(m.color.b*255)],roughness:m.roughness,metalness:m.metalness,hasMap:!!m.map,side:m.side,vertexColors:!!m.vertexColors});}});return out;})()`;
+const r=await send('Runtime.evaluate',{expression:expr,returnByValue:true});
+console.log(JSON.stringify(r.result.result.value,null,1));
+ws.close();try{chrome.kill('SIGKILL');}catch{}server.close();process.exit(0);

@@ -1,0 +1,19 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__rig && !!window.__ui)"},
+  {"op":"wait","ms":2200},
+  {"op":"eval","js":"(function(){window.__bbox=function(s){var e=document.querySelector(s);if(!e)return null;var d=getComputedStyle(e).display;var b=e.getBoundingClientRect();return {d:d,v:(d!=='none'&&(b.width>0||b.height>0))?1:0,x:Math.round(b.x),y:Math.round(b.y),r:Math.round(b.right),bt:Math.round(b.bottom)};};window.__m=function(tag){var box={toggle:__bbox('#ui-toggle'),panel:__bbox('#scene-ui'),fogRow:__bbox('#ui-fog'),jump:__bbox('#jump-btn'),modes:__bbox('#modes'),hud:__bbox('#hud-tl'),bgm:__bbox('#bgm')};function hit(a,c){if(!a||!c||!a.v||!c.v)return false;return a.x<c.r&&c.x<a.r&&a.y<c.bt&&c.y<a.bt;}var n=Object.keys(box),p=[];for(var i=0;i<n.length;i++)for(var j=i+1;j<n.length;j++)if(hit(box[n[i]],box[n[j]]))p.push(n[i]+'x'+n[j]);return {tag:tag,w:innerWidth,h:innerHeight,hidden:__ui.hidden,mode:__rig.mode,box:box,overlaps:p,errs:(window.__errs||[]).length};};return 'ok';})()"},
+  {"op":"eval","js":"JSON.stringify(window.__m('M1-竖屏-自由'))"},
+  {"op":"shot","file":"ui-hide-m1-free.png"},
+  {"op":"eval","js":"(function(){__rig.setMode('walk');return 'walk';})()"},
+  {"op":"wait","ms":800},
+  {"op":"eval","js":"JSON.stringify(window.__m('M2-竖屏-步行'))"},
+  {"op":"shot","file":"ui-hide-m2-walk.png"},
+  {"op":"clickSel","sel":"#ui-toggle"},
+  {"op":"wait","ms":400},
+  {"op":"eval","js":"JSON.stringify(window.__m('M3-竖屏-收起'))"},
+  {"op":"shot","file":"ui-hide-m3-hidden.png"},
+  {"op":"clickSel","sel":"#ui-toggle"},
+  {"op":"wait","ms":400},
+  {"op":"eval","js":"JSON.stringify(window.__m('M4-竖屏-恢复'))"},
+  {"op":"eval","js":"JSON.stringify({errs:window.__errs||[]})"}
+]

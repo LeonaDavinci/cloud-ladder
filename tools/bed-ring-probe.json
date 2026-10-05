@@ -1,0 +1,6 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.glints && window.__dbg.glints.userData.anchors.length)"},
+  {"op":"wait","ms":2000},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,b=d.bed;b.updateMatrixWorld(true);const box=new d.THREE.Box3();let n=0;b.traverse(o=>{if(o.isMesh&&o.visible){n++;box.expandByObject(o);}});return {visMeshes:n,bedPos:b.position.toArray().map(v=>+v.toFixed(3)),rotY:+b.rotation.y.toFixed(4),wMin:box.min.toArray().map(v=>+v.toFixed(3)),wMax:box.max.toArray().map(v=>+v.toFixed(3)),size:box.getSize(new d.THREE.Vector3()).toArray().map(v=>+v.toFixed(3))};})()"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,cx=-2,cz=1.2;const rows=[];for(let dz=-4;dz<=4;dz+=2){const r=[];for(let dx=-4;dx<=4;dx++){r.push(+d.terrainHeight(cx+dx,cz+dz).toFixed(3));}rows.push('dz'+dz+': '+r.join(' '));}return rows;})()"}
+]

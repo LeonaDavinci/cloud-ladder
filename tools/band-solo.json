@@ -1,0 +1,17 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.atmos)"},
+  {"op":"wait","ms":1500},
+  {"op":"eval","js":"(function(){var s=__dbg.scene;window.__bands=[s.children[7],s.children[8],s.children[9]];window.__hide=[];s.children.forEach(function(o,i){if(i>3&&window.__bands.indexOf(o)<0){o.visible=false;window.__hide.push(i);}});window.__fog=s.fog;s.fog=null;window.__bands.forEach(function(b){b.visible=false;});return 'hid '+window.__hide.length+' objs, fog off';})()"},
+  {"op":"wait","ms":400},
+  {"op":"shot","file":"off.png"},
+  {"op":"eval","js":"(function(){window.__bands[0].visible=true;return 'on 2200';})()"},
+  {"op":"wait","ms":400},
+  {"op":"shot","file":"on-2200.png"},
+  {"op":"eval","js":"(function(){window.__bands[0].visible=false;window.__bands[1].visible=true;return 'on 2950';})()"},
+  {"op":"wait","ms":400},
+  {"op":"shot","file":"on-2950.png"},
+  {"op":"eval","js":"(function(){window.__bands[1].visible=false;window.__bands[2].visible=true;return 'on 3400';})()"},
+  {"op":"wait","ms":400},
+  {"op":"shot","file":"on-3400.png"},
+  {"op":"eval","js":"(function(){window.__bands.forEach(function(b){b.visible=true;});__dbg.scene.children.forEach(function(o,i){if(i>3)o.visible=true;});__dbg.scene.fog=window.__fog;return 'restored';})()"}
+]

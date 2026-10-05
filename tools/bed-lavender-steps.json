@@ -1,0 +1,22 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.bed && window.__dbg.lavender)"},
+  {"op":"wait","ms":3000},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,T=d.THREE,L=d.lavender,m=new T.Matrix4(),v=new T.Vector3(),b=d.bed.position;let near=0;for(let i=0;i<L.count;i++){L.getMatrixAt(i,m);v.setFromMatrixPosition(m);if(Math.hypot(v.x-b.x,v.z-b.z)<7)near++;}return {lavTotal:L.count,within7m:near};})()"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,b=d.bed.position,c=d.camera;c.position.set(b.x+2.4,b.y+1.9,b.z+1.4);d.controls.target.set(b.x+0.1,b.y+1.3,b.z-0.7);d.controls.update();return 'tight';})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"c1-bed-smooth.png"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,b=d.bed.position,c=d.camera;c.position.set(b.x+6.4,b.y+3.2,b.z+7.4);d.controls.target.set(b.x,b.y+0.7,b.z);d.controls.update();return 'wide';})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"c2-lavender-near.png"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,b=d.bed.position,c=d.camera;c.position.set(b.x+7.6,b.y+1.5,b.z+0.4);d.controls.target.set(b.x,b.y+0.9,b.z-0.2);d.controls.update();return 'profile';})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"c5-lavender-profile.png"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,T=d.THREE,l=d.ladder,c=d.camera;const p=new T.Vector3(0.44,-2.6,0.1).applyMatrix4(l.matrixWorld);c.position.set(p.x+2.2,p.y+0.8,p.z+2.4);d.controls.target.set(p.x,p.y+0.4,p.z);d.controls.update();return 'rail';})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"c4-rail-closeup.png"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,b=d.bed.position,c=d.camera;c.position.set(b.x+3.2,b.y+2.2,b.z+4.2);d.controls.target.set(b.x,b.y+1.0,b.z);d.controls.update();return 'hero';})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"c3-hero.png"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,c=d.camera;c.position.set(16,9,30);d.controls.target.set(1.5,11.5,-2);d.controls.update();return 'default';})()"},
+  {"op":"wait","ms":2500}
+]

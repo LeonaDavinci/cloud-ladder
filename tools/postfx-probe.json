@@ -1,0 +1,9 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.postfx)"},
+  {"op":"eval","js":"(function(){window.__fc=0;(function f(){window.__fc++;requestAnimationFrame(f);})();__dbg.postfx.set('off');return 'off';})()"},
+  {"op":"wait","ms":6000},
+  {"op":"eval","js":"(function(){window.__off=window.__fc;__dbg.postfx.set('dream');window.__fc=0;return 'dream';})()"},
+  {"op":"wait","ms":6000},
+  {"op":"eval","js":"JSON.stringify({offFrames:window.__off,dreamFrames:window.__fc,st:__dbg.postfx.stats(),errs:(window.__errs||[]).length})"},
+  {"op":"shot","file":"pxp-1-dream.png"}
+]

@@ -1,0 +1,376 @@
+html,body{margin:0;padding:0;overflow:hidden;height:100%;background:#8a78cc;}
+
+/* ---- 禁止页面缩放 / 禁止文字选择 ----
+   这块场景是「一块画面」，不是一篇文档：浏览器默认那套缩放（双指捏合、双击放大、
+   Ctrl+滚轮、Ctrl +/−/0）和文字选择（拖拽划出一片蓝底、移动端长按弹复制菜单）
+   在这里全是打扰 —— 拖拽本来就要旋转镜头，一划就选中整片界面文字。
+   一共三层，缺一层就有入口：
+     1) <meta viewport user-scalable=no>（index.html）—— 移动端捏合缩放，最有效的一层
+     2) 这里的 touch-action:manipulation —— 双击缩放不再触发
+     3) main.js 的 lockViewport() —— 桌面端的 Ctrl+滚轮 / Ctrl± / Safari 双指 gesture
+   注意 canvas 反过来要 touch-action:none：它得吃掉全部手势自己做镜头控制。
+   为什么不做成 config.json 里的开关：它必须在**页面一加载**就生效，
+   而 config.json 是异步读来的 —— 前几百毫秒会漏过去，缩放已经发生了。 */
+html{
+  -webkit-text-size-adjust:100%;text-size-adjust:100%;  /* 横屏/系统字号不再放大正文 */
+  touch-action:manipulation;
+}
+html,body,button,input,textarea,select,a{
+  -webkit-user-select:none;-moz-user-select:none;user-select:none;
+  -webkit-touch-callout:none;              /* iOS 长按弹「拷贝/查询」菜单 */
+  -webkit-tap-highlight-color:transparent; /* 移动端点击时那一下蓝色高亮 */
+}
+/* 表单控件单独放行：真出现输入框时还得能选中、能剪贴 */
+input,textarea{-webkit-user-select:text;user-select:text;}
+
+#app{width:100%;height:100%;}
+#app canvas{display:block;touch-action:none;}
+/* ---- 左上角标题栏（标题 + BGM，竖排一列） ----
+   为什么用容器而不是各自写死 top：标题块高度不是常数 —— 「#梦核」标签
+   在窄屏会换行、字号在移动断点又会变，两个 fixed 元素各写各的 top 迟早叠上。
+   放进同一个 flex 竖列后，"标题在上、BGM 在下" 由布局保证，量都不会叠。
+   容器自己 pointer-events:none，只有里面的按钮吃点击。 */
+#hud-tl{
+  position:fixed;left:18px;top:16px;z-index:21;
+  display:flex;flex-direction:column;align-items:flex-start;gap:10px;
+  pointer-events:none;
+}
+.overlay{
+  position:relative;pointer-events:none;
+  color:#fff;font-family:"PingFang SC","Microsoft YaHei",sans-serif;
+  text-shadow:0 2px 12px rgba(60,30,90,.55);
+}
+.overlay h1{margin:0;font-size:22px;font-weight:600;letter-spacing:2px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+.overlay h1 .tag{
+  font-size:12px;font-weight:500;letter-spacing:1px;opacity:.9;
+  color:#ffe6f6;background:rgba(255,255,255,.18);
+  border:1px solid rgba(255,255,255,.35);
+  padding:3px 9px;border-radius:999px;
+  text-shadow:0 1px 6px rgba(60,30,90,.45);
+}
+.overlay p{margin:6px 0 0;font-size:12px;opacity:.85;letter-spacing:1px;}
+
+/* ---- 梦核 BGM 播放器（跟在标题下方，由 #hud-tl 的竖列排版定位） ---- */
+#bgm{
+  position:relative;                   /* 位置交给 #hud-tl，这里不写 left/top */
+  display:flex;align-items:center;gap:6px;
+  font:500 12px/1 "PingFang SC","Microsoft YaHei",sans-serif;letter-spacing:.5px;
+  color:#fff;
+}
+#bgm button{
+  pointer-events:auto;cursor:pointer;
+  color:inherit;font:inherit;
+  background:rgba(40,25,70,.28);border:1px solid rgba(255,255,255,.28);
+  padding:8px 13px;border-radius:999px;
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  box-shadow:0 6px 18px rgba(40,20,70,.22);
+  transition:background .18s, transform .18s, opacity .18s;
+  max-width:52vw;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
+}
+#bgm button:hover{background:rgba(255,255,255,.2);transform:translateY(-1px);}
+#bgm .bgm-btn{display:flex;align-items:center;gap:7px;}
+#bgm .bgm-ico{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;opacity:.95;}
+#bgm .bgm-ico svg{display:block;}
+#bgm .bgm-next{display:inline-flex;align-items:center;justify-content:center;padding:8px 11px;opacity:.8;}
+#bgm .bgm-next svg{display:block;}
+#bgm .bgm-ttl{overflow:hidden;text-overflow:ellipsis;}
+#bgm .bgm-next{padding:8px 11px;opacity:.75;}
+#bgm.playing .bgm-ico{animation:bgm-spin 3.4s linear infinite;}
+#bgm.blocked button{background:linear-gradient(135deg,rgba(255,158,203,.75) 0%,rgba(150,140,230,.75) 100%);
+  border-color:rgba(255,255,255,.5);box-shadow:0 8px 22px rgba(120,60,170,.32);}
+#bgm.paused .bgm-ttl,#bgm.loading .bgm-ttl{opacity:.75;}
+@keyframes bgm-spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+@media (max-width:520px){
+  #hud-tl{left:10px;top:10px;gap:8px;}
+  .overlay h1{font-size:19px;letter-spacing:1px;gap:8px;}
+  .overlay h1 .tag{font-size:11px;padding:2px 8px;}
+  .overlay p{font-size:11px;margin-top:4px;}
+  #bgm{gap:4px;font-size:11px;}
+  #bgm button{padding:7px 11px;max-width:46vw;}
+  #bgm .bgm-next{padding:7px 10px;}
+}
+@media (prefers-reduced-motion:reduce){
+  #bgm.playing .bgm-ico{animation:none;}
+}
+
+/* ---- 模式按钮：自由 / 漫游 / 步行 ---- */
+#modes{
+  position:fixed;right:18px;top:118px;z-index:20;
+  display:flex;flex-direction:column;gap:8px;align-items:flex-end;
+}
+.mode-btn{
+  pointer-events:auto;cursor:pointer;
+  font:600 13px/1 "PingFang SC","Microsoft YaHei",sans-serif;letter-spacing:1px;
+  color:#fff;background:rgba(255,255,255,.14);
+  border:1px solid rgba(255,255,255,.34);
+  padding:9px 17px;border-radius:999px;
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  box-shadow:0 6px 18px rgba(40,20,70,.25);
+  transition:background .18s, transform .18s, box-shadow .18s;
+}
+.mode-btn:hover{background:rgba(255,255,255,.26);transform:translateY(-1px);}
+.mode-btn.active{
+  background:linear-gradient(135deg,#ff9ecb 0%,#b79ae4 100%);
+  border-color:rgba(255,255,255,.55);
+  box-shadow:0 8px 22px rgba(120,60,170,.35);
+}
+/* 复位：这一排里唯一的**动作**按钮（其余三个是模式开关，有 .active 态）。
+   所以刻意压低一格 —— 细虚线描边 + 更淡的底 —— 让「现在在哪个模式」
+   一眼还能从高亮的实心胶囊上认出来，不会和模式按钮混成四个同权选项。 */
+#reset-btn{
+  font-weight:500;
+  background:rgba(40,25,70,.22);
+  border-style:dashed;border-color:rgba(255,255,255,.32);
+}
+#reset-btn:hover{background:rgba(255,255,255,.22);}
+#reset-btn:active{transform:translateY(0) scale(.96);}
+/* 点下去给一下确认感：#modes 由 main.js 加 .hit 类闪 220ms（复位是瞬时的，
+   不像切模式有 active 高亮可以看，没有这一下会像「点了没反应」） */
+#reset-btn.hit{background:#fff;color:#5a3fa8;border-style:solid;}
+
+/* ---- 步行模式：虚拟摇杆（按下处生成圆形） ---- */
+/* 摇杆层：铺满全屏但不吃事件（pointer-events:none），每次按下才在接触点生成一个圆。
+   写四个物理方向属性而不是简写 `inset:0` —— `inset` 是 Chrome 87 才有的，
+   小工具的最低基线是 WebView 61，用简写会整条声明被丢弃 ⇒ 摇杆层没有尺寸。 */
+#sticks{position:fixed;top:0;right:0;bottom:0;left:0;z-index:15;pointer-events:none;}
+.stick{
+  position:absolute;display:none;border-radius:50%;
+  border:2px solid rgba(255,255,255,.45);
+  background:radial-gradient(circle, rgba(255,255,255,.20), rgba(255,255,255,.05) 70%);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  box-shadow:0 8px 26px rgba(40,20,70,.32);
+}
+.stick.on{display:block;}
+.stick-knob{
+  position:absolute;left:50%;top:50%;width:50%;height:50%;
+  margin:-25% 0 0 -25%;border-radius:50%;
+  background:linear-gradient(135deg,#ffb3da 0%,#b79ae4 100%);
+  border:2px solid rgba(255,255,255,.75);
+  box-shadow:0 4px 14px rgba(40,20,70,.35);
+}
+.stick-label{
+  position:absolute;left:0;right:0;bottom:-22px;text-align:center;
+  font:500 11px/1 "PingFang SC","Microsoft YaHei",sans-serif;letter-spacing:1px;
+  color:rgba(255,255,255,.9);text-shadow:0 2px 8px rgba(60,30,90,.7);
+}
+
+/* ---- 跳跃按钮（仅漫游 / 步行模式出现） ---- */
+#jump-btn{
+  position:fixed;right:26px;bottom:30px;z-index:19;
+  width:82px;height:82px;border-radius:50%;
+  display:none;place-items:center;cursor:pointer;
+  font:700 18px/1 "PingFang SC","Microsoft YaHei",sans-serif;letter-spacing:2px;
+  color:#fff;background:linear-gradient(135deg,rgba(255,158,203,.85) 0%,rgba(150,140,230,.85) 100%);
+  border:2px solid rgba(255,255,255,.6);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  box-shadow:0 10px 26px rgba(60,30,100,.35);
+  transition:transform .12s, box-shadow .18s, opacity .2s;
+}
+#jump-btn.on{display:grid;}
+#jump-btn:active{transform:scale(.93);box-shadow:0 4px 14px rgba(60,30,100,.4);}
+
+/* ---- 模式提示条 ---- */
+#mode-hint{
+  position:fixed;left:50%;top:20%;height:3%;transform:translateX(-50%);z-index:18;
+  pointer-events:none;opacity:0;transition:opacity .25s;
+  font:500 12px/1 "PingFang SC","Microsoft YaHei",sans-serif;letter-spacing:1px;
+  color:#fff;background:rgba(40,25,70,.35);border:1px solid rgba(255,255,255,.22);
+  padding:8px 16px;border-radius:999px;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  text-shadow:0 1px 6px rgba(40,20,70,.5);white-space:nowrap;
+}
+/* 漫游结束时的提示（爬到顶了）——从「说明」变成「结果」，做得醒目一点 */
+#mode-hint.hold{
+  font:700 13px/1 "PingFang SC","Microsoft YaHei",sans-serif;letter-spacing:2px;
+  padding:10px 22px;
+  background:linear-gradient(135deg,rgba(255,158,203,.94) 0%,rgba(150,140,230,.94) 100%);
+  border-color:rgba(255,255,255,.62);
+  box-shadow:0 10px 26px rgba(60,30,100,.38);
+}
+@media (max-width:520px){
+  #modes{right:10px;top:110px;gap:6px;flex-direction:column;align-items:flex-end;}
+  .mode-btn{padding:8px 13px;font-size:12px;}
+  #mode-hint{bottom:64px;font-size:11px;white-space:normal;max-width:86vw;text-align:center;}
+  #jump-btn{right:16px;bottom:20px;width:72px;height:72px;font-size:16px;}
+}
+
+/* ---- 时相 / 滤镜 / 雾档 面板（**左下角，三排按钮贴着屏幕底边**） ----
+   为什么放左下而不是顶部：这三排是「玩法控制」，顶部左上留给标题+BGM、
+   右上留给模式按钮；左下这块画面本来就是草地（远景环山与天空在中上），
+   压在这里不挡景。
+   bottom:6px —— 已经把按钮压到能压的最低处了（留 6px 免得胶囊的描边/投影
+   贴到窗口边上）。之所以只能到这里，是因为面板里最后一行原本是「1–4 时相 ·
+   5–9 滤镜…」那行小字：它在最底下占着 17px，按钮就永远悬在它上面。
+   把那行小字挪到三排按钮**上面**（见 index.html 的 DOM 顺序）之后，
+   最底部这一行才真正是按钮。
+   右下是 #jump-btn（bottom:30，82px 见方）—— 一个在左、一个在右，水平错开。
+   曾经是 78px（那时标题块也在左下、要让开它），标题搬到左上角后就不必留那空了。
+   ⚠ 别再用负的 bottom 去「再往下挪一点」：面板 117px 高，`bottom:-10%` 在
+   1264×625 的窗口里等于把整块往下推 62px，实测「滤镜」「雾」两排完全落到屏幕外
+   （只有「时相」那排还看得见），看上去就像按钮丢了。6px 就是「贴着底边还能看见」
+   的极限值，想再低只能先把面板做矮（比如把三排并成两排），不是改这个数。 */
+#scene-ui{
+  position:fixed;left:18px;bottom:6px;z-index:20;
+  display:flex;flex-direction:column;gap:7px;
+  pointer-events:none;                 /* 面板本身不吃点击，只有按钮吃 */
+  font:500 12px/1 "PingFang SC","Microsoft YaHei",sans-serif;letter-spacing:.5px;
+}
+#scene-ui .ui-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+#scene-ui .ui-lab{
+  width:26px;flex:0 0 26px;text-align:right;
+  font-size:11px;letter-spacing:1px;color:rgba(255,255,255,.82);
+  text-shadow:0 1px 8px rgba(60,30,90,.6);
+}
+#scene-ui button{
+  pointer-events:auto;cursor:pointer;
+  color:#fff;font:inherit;
+  background:rgba(40,25,70,.28);border:1px solid rgba(255,255,255,.28);
+  padding:7px 12px;border-radius:999px;
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  box-shadow:0 6px 18px rgba(40,20,70,.22);
+  transition:background .18s, transform .18s, box-shadow .18s;
+  white-space:nowrap;
+}
+#scene-ui button:hover{background:rgba(255,255,255,.2);transform:translateY(-1px);}
+#scene-ui button.active{
+  background:linear-gradient(135deg,rgba(255,158,203,.85) 0%,rgba(150,140,230,.85) 100%);
+  border-color:rgba(255,255,255,.55);
+  box-shadow:0 8px 22px rgba(120,60,170,.35);
+}
+/* 雾档按钮：切换时给个「啪一下」的闪，强调这是瞬时硬切、不是渐变 */
+#scene-ui button.flash{background:rgba(255,255,255,.55);color:#3a2560;}
+/* 快捷键图例：挂在三排按钮**上面**（DOM 顺序也是），所以是 margin-bottom
+   而不是 margin-top —— 它是「下面这几排各自对应哪几个键」的说明。 */
+#scene-ui .ui-tip{
+  margin:0 0 1px;font-size:10.5px;letter-spacing:.8px;
+  color:rgba(255,255,255,.62);text-shadow:0 1px 8px rgba(60,30,90,.6);
+}
+@media (max-width:520px){
+  /* 手机上 bottom 仍是 104，**不能跟着桌面一起压到底**：右下 #jump-btn
+     （bottom:20、72px 见方）在漫游/步行时会出现，窄屏（≤390pt）下它的左沿
+     会伸进面板的横向范围，只能靠竖直方向让开 —— 面板底边要留在跳按钮顶边
+     （离地 92px）之上。 */
+  #scene-ui{left:10px;bottom:104px;gap:5px;font-size:11px;}
+  #scene-ui .ui-lab{width:22px;flex-basis:22px;font-size:10px;}
+  #scene-ui button{padding:6px 10px;}
+  #scene-ui .ui-tip{display:none;}     /* 手机上键盘提示没意义，省点地方 */
+}
+@media (prefers-reduced-motion:reduce){
+  #scene-ui button{transition:none;}
+}
+
+/* ---- 底部居中：切换 UI（隐藏 / 显示其余全部按钮） ----
+   位置：屏幕正中、贴着底边。左下有面板、右下有「跳」，只有正中是空的，
+   而且这个开关是「总管所有面板」的，逻辑上不属于任何一块 —— 放正中才读得对。
+   两个 span 由 body.ui-hidden 二选一显示，文案就是「这次点击会做什么」。 */
+#ui-toggle{
+  position:fixed;left:50%;bottom:10px;transform:translateX(-50%);z-index:30;
+  cursor:pointer;
+  font:600 12px/1 "PingFang SC","Microsoft YaHei",sans-serif;letter-spacing:1.5px;
+  color:#fff;background:rgba(40,25,70,.30);
+  border:1px solid rgba(255,255,255,.30);
+  padding:9px 18px;border-radius:999px;
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  box-shadow:0 6px 18px rgba(40,20,70,.25);
+  transition:background .18s, opacity .18s, transform .12s;
+  opacity:.92;
+  white-space:nowrap;
+}
+#ui-toggle:hover{background:rgba(255,255,255,.24);opacity:1;}
+#ui-toggle:active{transform:translateX(-50%) scale(.95);}
+#ui-toggle .ui-on{display:inline;}
+#ui-toggle .ui-off{display:none;}
+/* 收起状态：开关自己留着（否则没法恢复），但压暗一点，别在纯净画面里当主角 */
+body.ui-hidden #ui-toggle{opacity:.4;}
+body.ui-hidden #ui-toggle:hover{opacity:.95;}
+body.ui-hidden #ui-toggle .ui-on{display:none;}
+body.ui-hidden #ui-toggle .ui-off{display:inline;}
+
+/* ---- 隐藏 UI：只留左上角标题（h1 + #梦核 标签）和上面那个开关 ----
+   用 !important 是必须的，不是图省事：
+     · #mode-hint 的 opacity 是 main.js 每帧写内联样式的，普通选择器压不住内联；
+     · #jump-btn.on / #scene-ui button.active 这类「逻辑类」的优先级也不低，
+       统一抬到 !important 才能保证「这一类关闭」不被别处的状态类掀翻。
+   隐藏的是**控件与提示**，不是标题：.overlay 里的 h1（云端之梯 + #梦核）留着，
+   它下面那行「拖拽旋转 · 滚轮缩放 …」属于操作提示，一并收掉。 */
+body.ui-hidden #modes,
+body.ui-hidden #scene-ui,
+body.ui-hidden #jump-btn,
+body.ui-hidden #bgm,
+body.ui-hidden #mode-hint,
+body.ui-hidden #sticks,
+body.ui-hidden #hud-tl .overlay p{ display:none !important; }
+
+@media (max-width:520px){
+  #ui-toggle{padding:8px 14px;font-size:11px;bottom:12px;}
+}
+@media (prefers-reduced-motion:reduce){
+  #ui-toggle{transition:none;}
+}
+
+/* ============================================================
+   Flex gap 基线层（Chrome 61 / Android 8.1 的 WebView）
+   ------------------------------------------------------------
+   基线内核不支持 **Flex 容器**的 gap（那时 gap 只对 Grid 生效）⇒ 整排 / 整列的间距
+   全部塌成 0：右上四个模式按钮连成一条、左上标题与 BGM 贴在一起、三排面板挤成一坨。
+   按 css-compatibility.md §4 分两层（不维护两份样式表）：
+     · 基线 = 子项单边 margin（下面这组，任何内核都生效）
+     · 增强 = 原本各处写好的 gap（上面那些规则，一个字没动）
+   main.js 的 detectFlexGap() 实测一次 Flex 布局行为后给 <html> 挂
+   .supports-flex-gap，基线 margin 随即全归零、交回给 gap —— 现代浏览器上的几何
+   与加这一层之前**逐像素一致**（已用既有的 UI 布局回归逐项核对）。
+   ⚠ 不能用 CSS.supports('gap','1px') / @supports (gap:1px) 判断：语法检测只证明
+   内核认识这个属性，不证明它在 Flex 里生效 —— 支持 Grid gap 却不支持 Flex gap 的
+   内核同样会通过，而那正是最需要拦下的一批。
+   ============================================================ */
+#hud-tl > * + *{margin-top:10px;}
+#modes > * + *{margin-top:8px;}
+#bgm > * + *{margin-left:6px;}
+#bgm .bgm-btn > * + *{margin-left:7px;}
+#scene-ui > * + *{margin-top:7px;}
+#scene-ui .ui-row > * + *{margin-left:6px;}
+/* h1 里是「文字 + <span>标签」：文字会生成一个匿名 flex 项，`> * + *` 选不到它，
+   所以这里必须直接点到那个 span 上 */
+.overlay h1 .tag{margin-left:10px;}
+@media (max-width:520px){
+  #hud-tl > * + *{margin-top:8px;}
+  #modes > * + *{margin-top:6px;}
+  #bgm > * + *{margin-left:4px;}
+  #scene-ui > * + *{margin-top:5px;}
+  .overlay h1 .tag{margin-left:8px;}
+}
+.supports-flex-gap #hud-tl > * + *,
+.supports-flex-gap #modes > * + *,
+.supports-flex-gap #bgm > * + *,
+.supports-flex-gap #bgm .bgm-btn > * + *,
+.supports-flex-gap #scene-ui > * + *,
+.supports-flex-gap #scene-ui .ui-row > * + *,
+.supports-flex-gap .overlay h1 .tag{margin-top:0;margin-left:0;}
+
+/* ============================================================
+   安全区（真机刘海 / 底部指示条）
+   ------------------------------------------------------------
+   容器在 PC 模拟器里注入 --safe-area-inset-* 变量来模拟安全区，真机走 env() 真值，
+   所以按 cross-platform-h5.md §3 用 var(--…, env(…, 0px)) 组合 —— 两端都生效。
+   两个来源都没有时（普通桌面浏览器）整条声明退化无效、padding/bottom 取初始值，
+   布局与加这一层之前完全一样（这也是为什么它敢无条件加）。
+   受影响的四处都是贴边控件：左上标题、左下三排面板、底部正中的切换开关、右下「跳」。
+   ⚠ 这两条按断点分别写：本文件末尾追加的规则会盖过上面的移动断点，
+   所以「手机上的 bottom」必须在这里原样重申一遍，否则移动端会被改成桌面值。 */
+/* 「先写普通值、紧跟一行变量版本」是必须的，不是重复：
+   若某内核认识 var() 但既没有 env()、容器也没注入变量，变量版本会整条失效，
+   此时 bottom 会退回初始值 auto —— 底部那两个控件直接飞走。留着上一行就能兜住。 */
+#hud-tl{padding-top:0;padding-top:var(--safe-area-inset-top, env(safe-area-inset-top, 0px));
+        padding-left:0;padding-left:var(--safe-area-inset-left, env(safe-area-inset-left, 0px));}
+#scene-ui{padding-bottom:0;padding-bottom:var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
+          padding-left:0;padding-left:var(--safe-area-inset-left, env(safe-area-inset-left, 0px));}
+#ui-toggle{bottom:10px;}
+#ui-toggle{bottom:calc(10px + var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)));}
+#jump-btn{bottom:30px;}
+#jump-btn{bottom:calc(30px + var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)));}
+@media (max-width:520px){
+  #ui-toggle{bottom:12px;}
+  #ui-toggle{bottom:calc(12px + var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)));}
+  #jump-btn{bottom:20px;}
+  #jump-btn{bottom:calc(20px + var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)));}
+}

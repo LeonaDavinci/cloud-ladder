@@ -1,0 +1,8 @@
+{
+  "_说明": {
+    "用途": "A/B 对照用：把床的整体缩放锁回 1.0，其余全部沿用 scene.json。用法 index.html?config=config-bedscale1.json。"
+  },
+  "sizes": {
+    "bedScale": 1
+  }
+}

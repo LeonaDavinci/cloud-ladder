@@ -1,0 +1,29 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__rig && window.__rig.steps>4)"},
+  {"op":"wait","ms":3000},
+
+  {"op":"eval","js":"(function(){var T=__dbg.THREE;window.__orbit=function(azD,elD,r){var ps=__dbg.cloud.userData.puffs,c=new T.Vector3();for(var i=0;i<ps.length;i++)c.add(ps[i].home);c.multiplyScalar(1/ps.length);var a=azD*Math.PI/180,e=(elD||0)*Math.PI/180;var pos=new T.Vector3(c.x+r*Math.cos(e)*Math.sin(a),c.y+r*Math.sin(e),c.z+r*Math.cos(e)*Math.cos(a));var ctl=__dbg.controls;ctl.enableDamping=false;__dbg.camera.position.copy(pos);ctl.target.copy(c);ctl.update();ctl.update();return __dbg.camera.position.toArray().map(function(v){return +v.toFixed(2);});};window.__setShade=function(S){var st=__dbg.atmos.state,stt=__dbg.atmos.states[st]||{};var use=(S&&typeof S==='object')?S:(stt.cloudShade||null);__dbg.shadeCloud(__dbg.sun.position,use);return use;};return 'helpers ready';})()"},
+
+  {"op":"eval","js":"(function(){__dbg.postfx.set('dream');__dbg.atmos.apply('night');__dbg.atmos.settleFog();__rig.reset();return JSON.stringify({fx:__dbg.postfx.name,state:__dbg.atmos.state});})()"},
+  {"op":"wait","ms":1400},
+  {"op":"eval","js":"(function(){return JSON.stringify({case:'dream-night-home A(no shade)',use:__setShade({backDark:0,hinge:0.78})});})()"},
+  {"op":"shot","file":"dream-night-home-A.png"},
+  {"op":"eval","js":"(function(){return JSON.stringify({case:'dream-night-home B(own shade)',use:__setShade(null),stats:__dbg.cloudShadeStats()});})()"},
+  {"op":"shot","file":"dream-night-home-B.png"},
+
+  {"op":"eval","js":"(function(){return JSON.stringify({cam:__orbit(16,8,34)});})()"},
+  {"op":"wait","ms":1200},
+  {"op":"eval","js":"(function(){return JSON.stringify({case:'dream-night-side A(no shade)',use:__setShade({backDark:0,hinge:0.78})});})()"},
+  {"op":"shot","file":"dream-night-side-A.png"},
+  {"op":"eval","js":"(function(){return JSON.stringify({case:'dream-night-side B(own shade)',use:__setShade(null),stats:__dbg.cloudShadeStats()});})()"},
+  {"op":"shot","file":"dream-night-side-B.png"},
+
+  {"op":"eval","js":"(function(){var st=__dbg.atmos.states.sunset;__dbg.postfx.set('dream');__dbg.atmos.apply('sunset');__dbg.atmos.settleFog();__rig.reset();return 'sunset dream';})()"},
+  {"op":"wait","ms":1400},
+  {"op":"eval","js":"(function(){return JSON.stringify({case:'dream-sunset-home A(no shade)',use:__setShade({backDark:0,hinge:0.78})});})()"},
+  {"op":"shot","file":"dream-sunset-home-A.png"},
+  {"op":"eval","js":"(function(){return JSON.stringify({case:'dream-sunset-home B(own shade)',use:__setShade(null),stats:__dbg.cloudShadeStats()});})()"},
+  {"op":"shot","file":"dream-sunset-home-B.png"},
+
+  {"op":"eval","js":"JSON.stringify({errs:(window.__errs||[])})"}
+]

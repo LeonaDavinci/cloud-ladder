@@ -1,0 +1,19 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__rig)"},
+  {"op":"waitFor","js":"(function(){var n=0;__dbg.bed.traverse(function(o){if(!o.isMesh)return;var v=o.visible,p=o.parent;while(p&&v){if(!p.visible)v=false;p=p.parent;}if(v)n++;});return n>0&&n<6;})()","timeout":60000},
+  {"op":"wait","ms":1200},
+  {"op":"eval","js":"(function(){var b=__dbg.bed;var box=new __dbg.THREE.Box3().setFromObject(b);var s=box.getSize(new __dbg.THREE.Vector3());var c=box.getCenter(new __dbg.THREE.Vector3());var out={world:{min:box.min.toArray().map(function(v){return +v.toFixed(3);}),max:box.max.toArray().map(function(v){return +v.toFixed(3);}),size:s.toArray().map(function(v){return +v.toFixed(3);}),center:c.toArray().map(function(v){return +v.toFixed(3);})},nodes:[]};b.traverse(function(o){if(!o.isMesh)return;var g=o.geometry;var bb=new __dbg.THREE.Box3().setFromObject(o);var mm=Array.isArray(o.material)?o.material[0]:o.material;out.nodes.push({name:o.name||'(anon)',vis:o.visible,tris:(g.index?g.index.count:g.attributes.position.count)/3,size:bb.getSize(new __dbg.THREE.Vector3()).toArray().map(function(v){return +v.toFixed(3);}),lower:bb.min.toArray().map(function(v){return +v.toFixed(3);}),mat:mm?(mm.type+' map='+(mm.map?'Y':'N')+' norm='+(mm.normalMap?'Y':'N')+' mr='+(mm.metalnessMap?'Y':'N')+' vc='+mm.vertexColors+' metal='+mm.metalness+' rough='+mm.roughness):null});});out.rig={top:+__rig.rig.bed.top.toFixed(3),surfaceY:+__rig.rig.bed.top.toFixed(3)};return JSON.stringify(out);})()"},
+  {"op":"eval","js":"(function(){var c=__dbg.camera,t=__dbg.controls.target;t.set(-2,1.6,1.2);c.position.set(-2+5.2,3.4,1.2+5.2);__dbg.controls.update();return 'cam-bed-3q';})()"},
+  {"op":"wait","ms":500},
+  {"op":"shot","file":"bed-look-3q-old.png"},
+  {"op":"eval","js":"(function(){var c=__dbg.camera,t=__dbg.controls.target;t.set(-2,1.5,1.2);c.position.set(-2,1.9,1.2+6.4);__dbg.controls.update();return 'cam-bed-front';})()"},
+  {"op":"wait","ms":500},
+  {"op":"shot","file":"bed-look-side-old.png"},
+  {"op":"eval","js":"(function(){var c=__dbg.camera,t=__dbg.controls.target;t.set(-2,1.5,1.2);c.position.set(-2+6.6,2.0,1.2);__dbg.controls.update();return 'cam-bed-end';})()"},
+  {"op":"wait","ms":500},
+  {"op":"shot","file":"bed-look-end-old.png"},
+  {"op":"eval","js":"(function(){var c=__dbg.camera,t=__dbg.controls.target;t.set(-2,1.4,1.2);c.position.set(-2+3.4,7.2,1.2+3.4);__dbg.controls.update();return 'cam-bed-top';})()"},
+  {"op":"wait","ms":500},
+  {"op":"shot","file":"bed-look-top-old.png"},
+  {"op":"eval","js":"JSON.stringify({errs:(window.__errs||[]).slice(0,8)})"}
+]

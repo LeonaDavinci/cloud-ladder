@@ -1,0 +1,8 @@
+[
+  {"op":"eval","js":"(function(){var e=document.getElementById('boot-tip');if(!e)return 'no-el';var cs=getComputedStyle(e);return JSON.stringify({t:0,display:cs.display,opacity:cs.opacity,text:(e.textContent||'').trim()});})()"},
+  {"op":"shot","file":"boot-early.png"},
+  {"op":"waitFor","js":"!!(window.__dbg && window.__rig && window.__boot&&window.__boot.state.firstFrame)","timeout":120000},
+  {"op":"wait","ms":2500},
+  {"op":"eval","js":"(function(){var e=document.getElementById('boot-tip');var cs=e?getComputedStyle(e):null;return JSON.stringify({after:{boot:window.__boot.state.mode,hidden:window.__boot.state.hidden,reason:window.__boot.state.reason,display:cs?cs.display:null,opacity:cs?cs.opacity:null,visible:window.__boot.state.visible}});})()"},
+  {"op":"shot","file":"boot-late.png"}
+]

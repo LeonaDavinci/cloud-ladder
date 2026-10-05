@@ -1,0 +1,17 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__rig && window.__rig.steps>4)"},
+  {"op":"wait","ms":3000},
+
+  {"op":"eval","js":"(function(){__dbg.postfx.set('off');__dbg.atmos.apply('night');__dbg.atmos.settleFog();return 'night ready';})()"},
+  {"op":"wait","ms":600},
+
+  {"op":"eval","js":"(function(){var T=__dbg.THREE,ps=__dbg.cloud.userData.puffs;var n=new T.Vector3();var c=new T.Vector3();for(var i=0;i<ps.length;i++)c.add(ps[i].home);c.multiplyScalar(1/ps.length);window.__cc=c;var n0=new T.Vector3();ps[0].plate.getWorldDirection(n0);var w0=new T.Vector3();ps[0].plate.getWorldPosition(w0);return JSON.stringify({cloudCenter:[+c.x.toFixed(2),+c.y.toFixed(2),+c.z.toFixed(2)],sun:[+__dbg.sun.position.x.toFixed(2),+__dbg.sun.position.y.toFixed(2),+__dbg.sun.position.z.toFixed(2)],cam:[+__dbg.camera.position.x.toFixed(2),+__dbg.camera.position.y.toFixed(2),+__dbg.camera.position.z.toFixed(2)],plate0:{pos:[+w0.x.toFixed(2),+w0.y.toFixed(2),+w0.z.toFixed(2)],normal:[+n0.x.toFixed(3),+n0.y.toFixed(3),+n0.z.toFixed(3)]}});})()"},
+
+  {"op":"eval","js":"(function(){var T=__dbg.THREE,ps=__dbg.cloud.userData.puffs,cam=__dbg.camera,c=window.__cc;var n=new T.Vector3(),w=new T.Vector3(),t=new T.Vector3(),q=new T.Vector3();window.__probe=function(azD,elD,r){var a=azD*Math.PI/180,e=elD*Math.PI/180;cam.position.set(c.x+r*Math.cos(e)*Math.sin(a),c.y+r*Math.sin(e),c.z+r*Math.cos(e)*Math.cos(a));cam.up.set(0,1,0);cam.lookAt(c);cam.updateMatrixWorld(true);var back=0,backOn=0;for(var i=0;i<ps.length;i++){var p=ps[i];p.plate.getWorldDirection(n);p.plate.getWorldPosition(w);t.copy(cam.position).sub(w);if(n.dot(t)<0){back++;q.copy(w).project(cam);if(Math.abs(q.x)<1&&Math.abs(q.y)<1&&q.z<1)backOn++;}}return {back:back,backOn:backOn};};return 'probe ready';})()"},
+
+  {"op":"eval","js":"(function(){var out=[];for(var az=0;az<360;az+=15){var r=window.__probe(az,0,34);out.push(az+':'+r.back+'/'+r.backOn);}return 'r34/el0 ' + out.join(' ');})()"},
+  {"op":"eval","js":"(function(){var out=[];for(var el=-60;el<=80;el+=20){var r=window.__probe(0,el,20);out.push(el+':'+r.back+'/'+r.backOn);}return 'az0/r20 俯仰 ' + out.join(' ');})()"},
+  {"op":"eval","js":"(function(){var out=[];[[0,0,6],[0,0,10],[0,0,14],[0,0,20],[90,0,10],[180,0,10],[270,0,10],[0,40,10],[0,-30,10],[45,10,8]].forEach(function(q){var r=window.__probe(q[0],q[1],q[2]);out.push('az'+q[0]+'el'+q[1]+'r'+q[2]+':'+r.back+'/'+r.backOn);});return '近距 ' + out.join(' ');})()"},
+  {"op":"eval","js":"(function(){var best=[];for(var az=0;az<360;az+=10){for(var ei=0;ei<9;ei++){var el=[-60,-40,-20,-5,10,30,60,75,85][ei];for(var ri=0;ri<5;ri++){var r=[5,8,12,20,34][ri];var q=window.__probe(az,el,r);if(q.backOn>0)best.push({az:az,el:el,r:r,back:q.back,on:q.backOn});}}}best.sort(function(a,b){return b.on-a.on;});return JSON.stringify({total:best.length,top:best.slice(0,10)});})()"},
+  {"op":"eval","js":"JSON.stringify({errs:(window.__errs||[])})"}
+]

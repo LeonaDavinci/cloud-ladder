@@ -1,0 +1,12 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.tufts && window.__dbg.config)"},
+  {"op":"wait","ms":2400},
+  {"op":"eval","js":"(()=>{const d=window.__dbg;return {cfgColors:d.config.grassColors, tuftBlade:d.tufts.material.map? 'tex':'?', tuftCount:d.tufts.count};})()"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,c=d.camera;c.position.set(-2,1.5,11);d.controls.target.set(-2,1.48,0);d.controls.update();return 'close';})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"k1-tuft-close.png"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,c=d.camera;c.position.set(-2,1.55,-8);d.controls.target.set(-2,1.5,6);d.controls.update();return 'close2';})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"k2-tuft-close2.png"},
+  {"op":"eval","js":"(()=>{const e=window.__errs||[];return {errs:e.length};})()"}
+]

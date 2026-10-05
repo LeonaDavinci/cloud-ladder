@@ -1,0 +1,20 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__rig && window.__rig.steps>4)"},
+  {"op":"wait","ms":2500},
+
+  {"op":"eval","js":"(function(){__rig.setMode('roam');return 'enter roam';})()"},
+  {"op":"wait","ms":1800},
+  {"op":"eval","js":"(function(){__rig.setMode('free');return 'back to free';})()"},
+  {"op":"wait","ms":1800},
+  {"op":"eval","js":"(function(){var t=__dbg.controls.target,l=__rig.rig.ladder,c=__dbg.camera;var mid=[l.foot[0]+l.up[0]*l.length*0.5,l.foot[1]+l.up[1]*l.length*0.5,l.foot[2]+l.up[2]*l.length*0.5];var d=Math.hypot(t.x-mid[0],t.y-mid[1],t.z-mid[2]);var camT=Math.hypot(t.x-c.position.x,t.y-c.position.y,t.z-c.position.z);var v=new __dbg.THREE.Vector3(t.x,t.y,t.z).project(c);var sx=Math.round((v.x*0.5+0.5)*innerWidth),sy=Math.round((-v.y*0.5+0.5)*innerHeight);var centered=(Math.abs(sx-innerWidth/2)<=1&&Math.abs(sy-innerHeight/2)<=1);return JSON.stringify({case:'漫游切回自由：焦点按设计留在「当时的视线前方」',target:[+t.x.toFixed(3),+t.y.toFixed(3),+t.z.toFixed(3)],ladderMid:mid.map(function(v){return +v.toFixed(3);}),distFromLadderMid:+d.toFixed(4),camToTarget:+camT.toFixed(3),onScreen:[sx,sy],screenCenter:[Math.round(innerWidth/2),Math.round(innerHeight/2)],verdict:centered?'✔ 相机没跳（焦点仍在画面正中；与梯子中点的距离非 0 正是设计，见 main.js 的 orbitAim 注释）':'✘ 焦点跑到画面外了'});})()"},
+  {"op":"shot","file":"regress-free-after-roam.png"},
+
+  {"op":"eval","js":"(function(){var out=[],errs=[];__dbg.postfx.set('off');__dbg.atmos.apply('afternoon');out.push('base');return JSON.stringify({phase:__dbg.atmos.state,fx:__dbg.postfx.name,fogFar:__dbg.scene.fog.far,exp:+__dbg.renderer.toneMappingExposure.toFixed(3)});})()"},
+  {"op":"eval","js":"(function(){var res=[];['afternoon','dawn','sunset','night'].forEach(function(st){__dbg.atmos.settleFog();__dbg.atmos.apply(st);__dbg.atmos.settleFog();var row=[st];['dream','liminal','vhs','white','off'].forEach(function(fx){__dbg.postfx.set(fx);var s=__dbg.postfx.stats();row.push(fx+':'+(s.enabled?'on':'off')+',pass'+s.passes.length);});row.push('fog'+__dbg.scene.fog.far);row.push('exp'+__dbg.renderer.toneMappingExposure.toFixed(2));res.push(row.join(' '));});return res.join(' | ');})()"},
+  {"op":"eval","js":"(function(){var a=__dbg.atmos;var out=[];['light','heavy','light','heavy','light'].forEach(function(){var h=a.toggleFog();a.settleFog();out.push((h?'H':'L')+__dbg.scene.fog.far+'/'+__dbg.scene.fog.near);});return out.join(' ');})()"},
+  {"op":"eval","js":"(function(){__dbg.atmos.apply('afternoon');__dbg.atmos.settleFog();__dbg.postfx.set('off');var b=document.querySelectorAll('#scene-ui button');b[3].click();return 'ui click → '+document.querySelector('#scene-ui button.active').textContent+' / '+__dbg.atmos.state;})()"},
+  {"op":"wait","ms":900},
+  {"op":"eval","js":"(function(){document.querySelectorAll('#scene-ui button')[8].click();return '雾按钮 → '+document.querySelectorAll('#scene-ui button')[8].textContent;})()"},
+  {"op":"wait","ms":900},
+  {"op":"eval","js":"JSON.stringify({after:{state:__dbg.atmos.state,fx:__dbg.postfx.name,fogHeavy:__dbg.atmos.fogHeavy,errs:(window.__errs||[])}})"}
+]

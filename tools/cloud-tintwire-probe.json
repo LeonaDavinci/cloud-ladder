@@ -1,0 +1,8 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__rig && window.__rig.steps>4)"},
+  {"op":"wait","ms":2000},
+  {"op":"eval","js":"(function(){var a=__dbg.atmos;var ks=[];for(var k in a)ks.push(k);return JSON.stringify({atmosKeys:ks,stats:(typeof a.stats==='function')?a.stats():null});})()"},
+  {"op":"eval","js":"(function(){var st=__dbg.atmos.states,o={};Object.keys(st).forEach(function(k){o[k]={tint:st[k].tint||null,cloudShade:st[k].cloudShade||null};});var ps=__dbg.cloud.userData.puffs;var p=ps[0];var m=p.sp.material;return JSON.stringify({states:o,puff0:{base:'#'+m.userData.__tintBase.getHexString(),tintColor:m.userData.__tintColor?('#'+m.userData.__tintColor.getHexString()):null,cur:'#'+m.color.getHexString(),hasBase:!!m.userData.__tintBase}});})()"},
+  {"op":"eval","js":"(function(){var ps=__dbg.cloud.userData.puffs,m=ps[0].sp.material;var out={};['afternoon','dawn','sunset','night'].forEach(function(k){__dbg.atmos.apply(k);out[k]={cur:'#'+m.color.getHexString(),lin:[+m.color.r.toFixed(4),+m.color.g.toFixed(4),+m.color.b.toFixed(4)],base:'#'+m.userData.__tintBase.getHexString(),tintColor:m.userData.__tintColor?('#'+m.userData.__tintColor.getHexString()):null};});return JSON.stringify({puff0PerPhase:out});})()"},
+  {"op":"eval","js":"JSON.stringify({errs:(window.__errs||[])})"}
+]

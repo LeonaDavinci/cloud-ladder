@@ -1,0 +1,46 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__rig && window.__rig.steps>4)"},
+  {"op":"wait","ms":3000},
+
+  {"op":"eval","js":"(function(){window.__orbit=function(azDeg,elDeg,r){var T=__dbg.THREE,ps=__dbg.cloud.userData.puffs,c=new T.Vector3();for(var i=0;i<ps.length;i++)c.add(ps[i].home);c.multiplyScalar(1/ps.length);var az=azDeg*Math.PI/180,el=(elDeg||0)*Math.PI/180;var pos=new T.Vector3(c.x+r*Math.cos(el)*Math.sin(az),c.y+r*Math.sin(el),c.z+r*Math.cos(el)*Math.cos(az));var ctl=__dbg.controls;ctl.enableDamping=false;__dbg.camera.position.copy(pos);ctl.target.copy(c);ctl.update();ctl.update();window.__cc=c;return __dbg.camera.position.toArray().map(function(v){return +v.toFixed(2);});};return JSON.stringify({center:__orbit(0,6,34)});})()"},
+
+  {"op":"eval","js":"(function(){__dbg.postfx.set('off');__dbg.atmos.apply('night');__dbg.atmos.settleFog();return JSON.stringify({state:__dbg.atmos.state,fx:__dbg.postfx.name,near:+__dbg.scene.fog.near.toFixed(2),far:+__dbg.scene.fog.far.toFixed(1),fogColor:'#'+__dbg.scene.fog.color.getHexString(),exp:+__dbg.renderer.toneMappingExposure.toFixed(3)});})()"},
+  {"op":"wait","ms":800},
+
+  {"op":"eval","js":"(function(){var ps=__dbg.cloud.userData.puffs;var n=new __dbg.THREE.Vector3(),w=new __dbg.THREE.Vector3(),t=new __dbg.THREE.Vector3();var cam=__dbg.camera.position;var back=0,front=0,onScreen=0,offScreen=0;var first=null;for(var i=0;i<ps.length;i++){var p=ps[i];p.plate.getWorldDirection(n);p.plate.getWorldPosition(w);t.copy(cam).sub(w);var d=n.dot(t);var isBack=(d<0);if(isBack)back++;else front++;if(isBack){var q=w.clone().project(__dbg.camera);if(Math.abs(q.x)<1&&Math.abs(q.y)<1&&q.z<1)onScreen++;else offScreen++;}}function lum(c){return +(c.r+c.g+c.b).toFixed(3);}var p0=ps[0];return JSON.stringify({puffs:ps.length,backFacing:back,frontFacing:front,backOnScreen:onScreen,backOffScreen:offScreen,plate0:{color:'#'+p0.plate.material.color.getHexString(),lum:lum(p0.plate.material.color),opacity:p0.plate.material.opacity,side:p0.plate.material.side,colorWrite:p0.plate.material.colorWrite,depthWrite:p0.plate.material.depthWrite,transparent:p0.plate.material.transparent,renderOrder:p0.plate.renderOrder,inTintReg:!!p0.plate.material.userData.__tintBase},sprite0:{color:'#'+p0.sp.material.color.getHexString(),lum:lum(p0.sp.material.color),opacity:+p0.sp.material.opacity.toFixed(3),inTintReg:!!p0.sp.material.userData.__tintBase},plateIsBrighterThanSprite:lum(p0.plate.material.color)>lum(p0.sp.material.color)});})()"},
+
+  {"op":"eval","js":"JSON.stringify({az:0,cam:__orbit(0,6,34)})"},
+  {"op":"wait","ms":900},
+  {"op":"shot","file":"night-az000.png"},
+
+  {"op":"eval","js":"JSON.stringify({az:45,cam:__orbit(45,6,34)})"},
+  {"op":"wait","ms":900},
+  {"op":"shot","file":"night-az045.png"},
+
+  {"op":"eval","js":"JSON.stringify({az:90,cam:__orbit(90,6,34)})"},
+  {"op":"wait","ms":900},
+  {"op":"shot","file":"night-az090.png"},
+
+  {"op":"eval","js":"JSON.stringify({az:135,cam:__orbit(135,6,34)})"},
+  {"op":"wait","ms":900},
+  {"op":"shot","file":"night-az135.png"},
+
+  {"op":"eval","js":"JSON.stringify({az:180,cam:__orbit(180,6,34)})"},
+  {"op":"wait","ms":900},
+  {"op":"shot","file":"night-az180.png"},
+
+  {"op":"eval","js":"JSON.stringify({az:225,cam:__orbit(225,6,34)})"},
+  {"op":"wait","ms":900},
+  {"op":"shot","file":"night-az225.png"},
+
+  {"op":"eval","js":"JSON.stringify({az:270,cam:__orbit(270,6,34)})"},
+  {"op":"wait","ms":900},
+  {"op":"shot","file":"night-az270.png"},
+
+  {"op":"eval","js":"JSON.stringify({az:315,cam:__orbit(315,6,34)})"},
+  {"op":"wait","ms":900},
+  {"op":"shot","file":"night-az315.png"},
+
+  {"op":"eval","js":"(function(){var out={};[0,90,180,270].forEach(function(a){__orbit(a,6,34);out['az'+a]=__dbg.renderer.info.render.calls;});return JSON.stringify(out);})()"},
+  {"op":"eval","js":"JSON.stringify({errs:(window.__errs||[])})"}
+]

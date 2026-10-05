@@ -1,0 +1,15 @@
+[
+  {"op":"wait","ms":2500},
+  {"op":"eval","js":"(function(){var a=__dbg.butterflies.instanceMatrix.array,n=__dbg.butterflies.count,o=[];for(var i=0;i<n;i++){var k=i*16;o.push([+a[k+12].toFixed(2),+a[k+13].toFixed(2),+a[k+14].toFixed(2)]);}return JSON.stringify(o);})()"},
+  {"op":"eval","js":"['.overlay','#modes','#sticks','#jump-btn','#mode-hint','#bgm'].forEach(s=>{const e=document.querySelector(s);if(e)e.style.display='none';});'ui off'"},
+  {"op":"eval","js":"(function(){__dbg.camera.position.set(-2,3.2,8.0);__dbg.controls.target.set(-2,1.2,4.6);return 'cam1';})()"},
+  {"op":"wait","ms":3500},
+  {"op":"shot","file":"bf-1.png"},
+  {"op":"eval","js":"(function(){__dbg.camera.position.set(1.2,1.9,8.4);__dbg.controls.target.set(-2.6,1.2,4.6);return 'cam2';})()"},
+  {"op":"wait","ms":3500},
+  {"op":"shot","file":"bf-2.png"},
+  {"op":"eval","js":"(function(){__dbg.camera.position.set(-2,6.6,13.5);__dbg.controls.target.set(-2,1.6,2.2);return 'cam3';})()"},
+  {"op":"wait","ms":3500},
+  {"op":"shot","file":"bf-3.png"},
+  {"op":"eval","js":"(function(){var a=__dbg.butterflies.instanceMatrix.array,n=__dbg.butterflies.count,o=[];for(var i=0;i<n;i++){var k=i*16;o.push(+a[k+13].toFixed(2));}return JSON.stringify({ys:o,errs:(window.__errs||[]).length});})()"}
+]

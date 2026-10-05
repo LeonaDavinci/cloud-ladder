@@ -1,0 +1,18 @@
+[
+  {"op":"wait","ms":2500},
+  {"op":"eval","js":"['.overlay','#modes','#sticks','#jump-btn','#mode-hint','#bgm'].forEach(s=>{const e=document.querySelector(s);if(e)e.style.display='none';});'ui off'"},
+  {"op":"eval","js":"(function(){__dbg.camera.position.set(3.2,2.0,3.2);__dbg.controls.target.set(-3.2,1.1,5.0);return 'camA';})()"},
+  {"op":"wait","ms":3500},
+  {"op":"shot","file":"bk-1.png"},
+  {"op":"eval","js":"(function(){__dbg.camera.position.set(-2,3.2,8.0);__dbg.controls.target.set(-2,1.5,4.6);return 'camB';})()"},
+  {"op":"wait","ms":3500},
+  {"op":"shot","file":"bk-2.png"},
+  {"op":"eval","js":"(function(){var T=__dbg.THREE,a=__dbg.butterflies.instanceMatrix.array,cam=__dbg.camera,o=[];for(var i=0;i<4;i++){var k=i*16;var v=new T.Vector3(a[k+12],a[k+13],a[k+14]);var y=a[k+13];v.project(cam);o.push([+v.x.toFixed(2),+v.y.toFixed(2),+y.toFixed(2)]);}return JSON.stringify(o);})()"},
+  {"op":"eval","js":"(function(){__dbg.camera.position.set(-2,6.6,13.5);__dbg.controls.target.set(-2,1.6,2.2);return 'camC';})()"},
+  {"op":"wait","ms":3500},
+  {"op":"shot","file":"bk-3.png"},
+  {"op":"eval","js":"(function(){__dbg.camera.position.set(-2,2.0,9.6);__dbg.controls.target.set(-2,1.3,4.6);return 'camD';})()"},
+  {"op":"wait","ms":3500},
+  {"op":"shot","file":"bk-4.png"},
+  {"op":"eval","js":"(function(){var a=__dbg.butterflies.instanceMatrix.array,o=[];for(var i=0;i<4;i++){var k=i*16;o.push(+a[k+13].toFixed(2));}return JSON.stringify({ys:o,errs:(window.__errs||[]).length});})()"}
+]

@@ -1,0 +1,6 @@
+[
+  {"op":"wait","ms":9000},
+  {"op":"eval","js":"JSON.stringify((window.__errs||[]).slice(0,4))"},
+  {"op":"eval","js":"(function(){try{return String(document.body.innerText).slice(0,200);}catch(e){return 'x';}})()"},
+  {"op":"eval","js":"(function(){return JSON.stringify({hasDbg:!!window.__dbg, hasAtmos:!!(window.__dbg&&window.__dbg.atmos)});})()"}
+]

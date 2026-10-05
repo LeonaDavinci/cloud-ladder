@@ -1,0 +1,5 @@
+[
+  {"op":"waitFor","js":"!!window.__dbg"},
+  {"op":"eval","await":true,"js":"(async function(){var AC=window.AudioContext||window.webkitAudioContext;var ac=new AC();var files=['bgm-1-dream-ambience.mp3.xml','bgm-2-somnium.mp3.xml','bgm-3-waking-states.mp3.xml','bgm-4-dream-static.mp3.xml'];var out=[];for(var i=0;i<files.length;i++){var f=files[i];try{var r=await fetch('audio/'+f,{cache:'no-store'});var b=await r.arrayBuffer();var ab=await ac.decodeAudioData(b);var peak=0,sum=0,n=0,nch=ab.numberOfChannels;for(var c=0;c<nch;c++){var d=ab.getChannelData(c);for(var k=0;k<d.length;k++){var v=d[k];if(v<0)v=-v;if(v>peak)peak=v;if(c===0){sum+=v*v;n++;}}}var rms=Math.sqrt(sum/n);out.push({file:f,dur:+ab.duration.toFixed(1),ch:nch,sr:ab.sampleRate,peak:+peak.toFixed(4),peakDb:+(20*Math.log10(peak)).toFixed(2),rmsDb:+(20*Math.log10(rms)).toFixed(2)});}catch(e){out.push({file:f,err:String(e&&e.message||e).slice(0,90)});}}try{ac.close();}catch(_){}return JSON.stringify(out);})()"},
+  {"op":"eval","js":"JSON.stringify({errs:window.__errs||[]})"}
+]

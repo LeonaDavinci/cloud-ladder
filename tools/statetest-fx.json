@@ -1,0 +1,34 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.atmos && window.__dbg.postfx)"},
+  {"op":"wait","ms":1200},
+
+  {"op":"eval","js":"(function(){['.overlay','#modes','#sticks','#jump-btn','#mode-hint','#bgm','#scene-ui'].forEach(function(s){var e=document.querySelector(s);if(e)e.style.display='none';});window.__pinT=9;try{Object.defineProperty(__dbg.uTime,'value',{configurable:true,get:function(){return window.__pinT;},set:function(){}});}catch(e){}if(__dbg.cloud&&__dbg.cloud.userData&&__dbg.cloud.userData.flow)__dbg.cloud.userData.flow.gain=0;__dbg.postfx.set('dream');__dbg.postfx.pinTime(3.0);return 'ui hidden + 冻帧 + 梦境(颗粒已钉)';})()"},
+
+  {"op":"eval","js":"(function(){function inOrb(o){var p=o;while(p){if(p===__dbg.atmos.orb)return true;p=p.parent;}return false;}window.__fp=function(){var sp=[],ms=[];__dbg.scene.traverse(function(o){if(inOrb(o))return;if(o.isSprite&&o.material&&o.material.color)sp.push(o.material.color.getHexString()+':'+o.material.opacity.toFixed(3));if(o.isMesh&&o.material&&o.material.isMeshBasicMaterial&&o.material.color)ms.push(o.material.color.getHexString());});var u=__dbg.sky&&__dbg.sky.material&&__dbg.sky.material.uniforms;return JSON.stringify({n:sp.length+ms.length,clouds:sp.join('|'),ridged:ms.join('|'),fog:'#'+__dbg.scene.fog.color.getHexString()+'|'+__dbg.scene.fog.near+'|'+__dbg.scene.fog.far,sky:u?[u.cTop.value.getHexString(),u.cMid.value.getHexString(),u.cHor.value.getHexString(),u.cGlow.value.getHexString(),u.uGlowAmp.value,u.uGlowY.value,u.uNoiseAmp.value].join(','):'none',sun:'#'+__dbg.sun.color.getHexString()+'|'+__dbg.sun.intensity+'|'+__dbg.sun.position.toArray().map(function(v){return v.toFixed(3);}).join(','),hemi:'#'+__dbg.hemi.color.getHexString()+'/'+__dbg.hemi.groundColor.getHexString()+'|'+__dbg.hemi.intensity,amb:'#'+__dbg.ambient.color.getHexString()+'|'+__dbg.ambient.intensity,exp:String(__dbg.renderer.toneMappingExposure),stars:__dbg.atmos.stars?(__dbg.atmos.stars.visible+'|'+__dbg.atmos.stars.material.size+'|'+__dbg.atmos.stars.material.opacity.toFixed(3)):'none',orb:__dbg.atmos.orb.visible+'|'+__dbg.atmos.orb.position.toArray().map(function(v){return v.toFixed(1);}).join(','),bloom:JSON.stringify(__dbg.postfx.stats().bloom)});};window.__cmp=function(tag){var f=__fp();if(f===window.__A0)return tag+': MATCH ✔';var a=JSON.parse(window.__A0),b=JSON.parse(f),out=[tag+': DIFF ✘'];['n','fog','sky','sun','hemi','amb','exp','stars','orb','bloom'].forEach(function(k){if(a[k]!==b[k])out.push('  '+k+'  base='+a[k]+'  now='+b[k]);});['clouds','ridged'].forEach(function(k){if(a[k]!==b[k]){var ca=a[k].split('|'),cb=b[k].split('|'),d=[];for(var i=0;i<Math.max(ca.length,cb.length);i++)if(ca[i]!==cb[i])d.push('    ['+i+'] base='+ca[i]+' now='+cb[i]);out.push('  '+k+' 差异 '+d.length+' 项:');out=out.concat(d.slice(0,8));}});return out.join('\\n');};__dbg.atmos.apply('afternoon');window.__A0=__fp();return '基准已存: n='+JSON.parse(window.__A0).n;})()"},
+
+  {"op":"wait","ms":500},
+  {"op":"shot","file":"rt-0-afternoon-base.png"},
+
+  {"op":"eval","js":"(function(){__dbg.atmos.apply('night');return '对照(应当 DIFF): '+__cmp('下午→夜间');})()"},
+  {"op":"eval","js":"(function(){__dbg.atmos.apply('afternoon');return __cmp('夜间→下午');})()"},
+
+  {"op":"eval","js":"(function(){__dbg.atmos.apply('dawn');return __cmp('下午→清晨(对照)');})()"},
+  {"op":"eval","js":"(function(){__dbg.atmos.apply('afternoon');return __cmp('清晨→下午');})()"},
+
+  {"op":"eval","js":"(function(){__dbg.atmos.apply('sunset');return __cmp('下午→日落(对照)');})()"},
+  {"op":"eval","js":"(function(){__dbg.atmos.apply('afternoon');return __cmp('日落→下午');})()"},
+
+  {"op":"eval","js":"(function(){__dbg.atmos.apply('dawn');__dbg.atmos.apply('sunset');__dbg.atmos.apply('night');__dbg.atmos.apply('afternoon');return __cmp('清晨→日落→夜间→下午 连切');})()"},
+
+  {"op":"eval","js":"(function(){__dbg.atmos.toggleFog();var a=__cmp('下午 切超大雾');__dbg.atmos.toggleFog();var b=__cmp('下午 超大雾→小雾');return a+'\\n'+b;})()"},
+
+  {"op":"eval","js":"(function(){__dbg.atmos.apply('night');__dbg.atmos.toggleFog();__dbg.atmos.apply('afternoon');var a=__cmp('夜间大雾→下午');__dbg.atmos.toggleFog();var b=__cmp('  再切回小雾');return a+'\\n'+b;})()"},
+
+  {"op":"eval","js":"(function(){__dbg.sceneUI.click('night');__dbg.sceneUI.click('afternoon');return __cmp('UI 点按键: 夜间→下午');})()"},
+  {"op":"eval","js":"(function(){['night','dawn','sunset','afternoon'].forEach(function(k){__dbg.sceneUI.click(k);});return __cmp('UI 点按键: 夜间→清晨→日落→下午');})()"},
+
+  {"op":"wait","ms":500},
+  {"op":"shot","file":"rt-9-afternoon-back.png"},
+
+  {"op":"eval","js":"JSON.stringify({state:__dbg.atmos.state,fogHeavy:__dbg.atmos.fogHeavy,errs:window.__errs})"}
+]

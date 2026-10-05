@@ -1,0 +1,10 @@
+[
+  {"op":"eval","js":"(function(){var e=document.getElementById('boot-tip');var cs=e?getComputedStyle(e):null;var t=performance.now();return JSON.stringify({tag:'early',nowMs:+t.toFixed(0),hasCanvas:!!document.querySelector('#app canvas'),tipText:e?e.textContent:null,tipDisplay:cs?(cs.display+' / '+cs.visibility+' / op'+cs.opacity):null,boot:window.__boot?window.__boot.state:null});})()"},
+  {"op":"shot","file":"boottip-early.png"},
+  {"op":"waitFor","js":"!!(window.__dbg && window.__rig)","timeout":120000},
+  {"op":"eval","js":"(function(){var e=document.getElementById('boot-tip');var cs=e?getComputedStyle(e):null;return JSON.stringify({tag:'built',nowMs:+performance.now().toFixed(0),tipDisplay:cs?(cs.display+' / '+cs.visibility+' / op'+cs.opacity):null,cls:e?e.className:null,inline:e?e.style.display:null,boot:window.__boot.state});})()"},
+  {"op":"waitFor","js":"window.__boot && window.__boot.state.hidden === true","timeout":120000},
+  {"op":"wait","ms":2500},
+  {"op":"eval","js":"(function(){var e=document.getElementById('boot-tip');var cs=e?getComputedStyle(e):null;return JSON.stringify({tag:'done',nowMs:+performance.now().toFixed(0),boot:window.__boot.state,tipDisplay:cs?(cs.display+' / '+cs.visibility+' / op'+cs.opacity):null,cls:e?e.className:null,inline:e?e.style.display:null,errs:(window.__errs||[]).slice(0,5)});})()"},
+  {"op":"shot","file":"boottip-after.png"}
+]

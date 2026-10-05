@@ -1,0 +1,10 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.sceneUI)"},
+  {"op":"wait","ms":1200},
+  {"op":"eval","js":"(function(){window.__pinT=9;try{Object.defineProperty(__dbg.uTime,'value',{configurable:true,get:function(){return window.__pinT;},set:function(){}});}catch(e){}if(__dbg.cloud&&__dbg.cloud.userData&&__dbg.cloud.userData.flow)__dbg.cloud.userData.flow.gain=0;return 'pinned';})()"},
+  {"op":"wait","ms":700},
+  {"op":"shot","file":"ui-desktop.png"},
+  {"op":"eval","js":"(function(){__dbg.sceneUI.click('night');__dbg.postfx.set('vhs');return 'night+vhs';})()"},
+  {"op":"wait","ms":700},
+  {"op":"shot","file":"ui-night-vhs.png"}
+]

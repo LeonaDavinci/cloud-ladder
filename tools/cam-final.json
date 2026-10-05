@@ -1,0 +1,19 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__rig)"},
+  {"op":"wait","ms":2400},
+  {"op":"eval","js":"(function(){function r(s){var e=document.querySelector(s);if(!e)return null;var b=e.getBoundingClientRect();return [Math.round(b.x),Math.round(b.y),Math.round(b.right),Math.round(b.bottom)];}var c=__dbg.camera.position,t=__dbg.controls.target;var pk=document.querySelector('#scene-ui button.active');return JSON.stringify({w:innerWidth,h:innerHeight,tgt:[+t.x.toFixed(2),+t.y.toFixed(2),+t.z.toFixed(2)],cam:[c.x,c.y,c.z],dist:+c.distanceTo(t).toFixed(2),camDistFromLadderMid:+__dbg.camera.position.distanceTo(new __dbg.THREE.Vector3(0.975,8.243,1.551)).toFixed(2),ui:r('#scene-ui'),tip:r('#scene-ui .ui-tip'),rowTime:r('#ui-time'),rowFog:r('#ui-fog'),hint:r('#mode-hint'),jump:r('#jump-btn'),overlay:r('.overlay'),bgm:r('#bgm'),modes:r('#modes')});})()"},
+  {"op":"shot","file":"fix-1-自由-下午.png"},
+  {"op":"eval","js":"(function(){__dbg.postfx.set('dream');__dbg.atmos.apply('dawn');return 'dawn';})()"},
+  {"op":"wait","ms":1500},
+  {"op":"shot","file":"fix-2-清晨.png"},
+  {"op":"eval","js":"(function(){__dbg.atmos.apply('sunset');return 'sunset';})()"},
+  {"op":"wait","ms":1500},
+  {"op":"shot","file":"fix-3-日落.png"},
+  {"op":"eval","js":"(function(){__dbg.atmos.apply('night');return 'night';})()"},
+  {"op":"wait","ms":1500},
+  {"op":"shot","file":"fix-4-夜间.png"},
+  {"op":"eval","js":"(function(){var d=__dbg.atmos.stats();var o=__dbg.atmos.orb;var v=new __dbg.THREE.Vector3();__dbg.scene.updateMatrixWorld(true);o.getWorldPosition(v);var p=v.clone().project(__dbg.camera);return JSON.stringify({phase:__dbg.atmos.state,orbWorld:[+v.x.toFixed(0),+v.y.toFixed(0),+v.z.toFixed(0)],orbOnScreen:[Math.round((p.x*0.5+0.5)*innerWidth),Math.round((-p.y*0.5+0.5)*innerHeight)],ndc:[+p.x.toFixed(3),+p.y.toFixed(3),+p.z.toFixed(3)],visible:p.z<1&&Math.abs(p.x)<1&&Math.abs(p.y)<1});})()"},
+  {"op":"eval","js":"(function(){__dbg.postfx.set('off');__dbg.atmos.apply('afternoon');return 'back';})()"},
+  {"op":"wait","ms":1200},
+  {"op":"eval","js":"JSON.stringify(window.__errs||[])"}
+]

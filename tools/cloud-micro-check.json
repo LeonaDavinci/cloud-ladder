@@ -1,0 +1,48 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.cloud && window.__dbg.cloud.userData.puffs && window.__dbg.uTime)"},
+  {"op":"wait","ms":1500},
+  {"op":"fps"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,l=d.cloud.userData.puffs,f=d.cloud.userData.flow;const s=l.map(p=>p.w0/1.8);return {puffs:l.length,wind:d.config.cloudWind,ownSize:[+Math.min(...s).toFixed(2),+Math.max(...s).toFixed(2)],amp:[+Math.min(...l.map(p=>p.amp)).toFixed(3),+Math.max(...l.map(p=>p.amp)).toFixed(3)],ampOverOwn:+(l.map(p=>p.amp).reduce((a,b)=>a+b,0)/l.length/s.reduce((a,b)=>a+b,0)*s.length).toFixed(4),puffWidth:[+(Math.min(...s)*1.8).toFixed(2),+(Math.max(...s)*1.8).toFixed(2)]};})()"},
+
+  {"op":"eval","js":"(()=>{const d=window.__dbg,c=d.camera;c.position.set(2.6,20.5,16);d.controls.target.set(2.6,13.8,1.6);d.controls.update();return 'cam-above';})()"},
+  {"op":"wait","ms":2500},
+
+  {"op":"eval","js":"(()=>{window.__dbg.uTime.value=0;return 'T=0';})()"},
+  {"op":"waitFor","js":"window.__dbg.time > 0"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,l=d.cloud.userData.puffs;window.__S=window.__S||[];window.__S.push({t:+d.time.toFixed(3),pos:l.map(p=>[+p.node.position.x.toFixed(4),+p.node.position.y.toFixed(4),+p.node.position.z.toFixed(4)]),rot:l.map(p=>+(p.sp.material.rotation||0).toFixed(5)),sc:l.map(p=>+p.sp.scale.x.toFixed(4))});return {t:+d.time.toFixed(3),n:window.__S.length};})()"},
+  {"op":"shot","file":"cc-t0-above.png"},
+
+  {"op":"eval","js":"(()=>{window.__dbg.uTime.value=3.5;return 'T=3.5';})()"},
+  {"op":"waitFor","js":"window.__dbg.time > 3.5"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,l=d.cloud.userData.puffs;window.__S.push({t:+d.time.toFixed(3),pos:l.map(p=>[+p.node.position.x.toFixed(4),+p.node.position.y.toFixed(4),+p.node.position.z.toFixed(4)]),rot:l.map(p=>+(p.sp.material.rotation||0).toFixed(5)),sc:l.map(p=>+p.sp.scale.x.toFixed(4))});return {t:+d.time.toFixed(3),n:window.__S.length};})()"},
+
+  {"op":"eval","js":"(()=>{window.__dbg.uTime.value=7;return 'T=7';})()"},
+  {"op":"waitFor","js":"window.__dbg.time > 7"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,l=d.cloud.userData.puffs;window.__S.push({t:+d.time.toFixed(3),pos:l.map(p=>[+p.node.position.x.toFixed(4),+p.node.position.y.toFixed(4),+p.node.position.z.toFixed(4)]),rot:l.map(p=>+(p.sp.material.rotation||0).toFixed(5)),sc:l.map(p=>+p.sp.scale.x.toFixed(4))});return {t:+d.time.toFixed(3),n:window.__S.length};})()"},
+  {"op":"shot","file":"cc-t7-above.png"},
+
+  {"op":"eval","js":"(()=>{window.__dbg.uTime.value=10.5;return 'T=10.5';})()"},
+  {"op":"waitFor","js":"window.__dbg.time > 10.5"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,l=d.cloud.userData.puffs;window.__S.push({t:+d.time.toFixed(3),pos:l.map(p=>[+p.node.position.x.toFixed(4),+p.node.position.y.toFixed(4),+p.node.position.z.toFixed(4)]),rot:l.map(p=>+(p.sp.material.rotation||0).toFixed(5)),sc:l.map(p=>+p.sp.scale.x.toFixed(4))});return {t:+d.time.toFixed(3),n:window.__S.length};})()"},
+
+  {"op":"eval","js":"(()=>{window.__dbg.uTime.value=14;return 'T=14';})()"},
+  {"op":"waitFor","js":"window.__dbg.time > 14"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,l=d.cloud.userData.puffs;window.__S.push({t:+d.time.toFixed(3),pos:l.map(p=>[+p.node.position.x.toFixed(4),+p.node.position.y.toFixed(4),+p.node.position.z.toFixed(4)]),rot:l.map(p=>+(p.sp.material.rotation||0).toFixed(5)),sc:l.map(p=>+p.sp.scale.x.toFixed(4))});return {t:+d.time.toFixed(3),n:window.__S.length};})()"},
+  {"op":"shot","file":"cc-t14-above.png"},
+
+  {"op":"eval","js":"(()=>{window.__dbg.uTime.value=17.5;return 'T=17.5';})()"},
+  {"op":"waitFor","js":"window.__dbg.time > 17.5"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,l=d.cloud.userData.puffs;window.__S.push({t:+d.time.toFixed(3),pos:l.map(p=>[+p.node.position.x.toFixed(4),+p.node.position.y.toFixed(4),+p.node.position.z.toFixed(4)]),rot:l.map(p=>+(p.sp.material.rotation||0).toFixed(5)),sc:l.map(p=>+p.sp.scale.x.toFixed(4))});return {t:+d.time.toFixed(3),n:window.__S.length};})()"},
+
+  {"op":"eval","js":"(()=>{window.__dbg.uTime.value=21;return 'T=21';})()"},
+  {"op":"waitFor","js":"window.__dbg.time > 21"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,l=d.cloud.userData.puffs;window.__S.push({t:+d.time.toFixed(3),pos:l.map(p=>[+p.node.position.x.toFixed(4),+p.node.position.y.toFixed(4),+p.node.position.z.toFixed(4)]),rot:l.map(p=>+(p.sp.material.rotation||0).toFixed(5)),sc:l.map(p=>+p.sp.scale.x.toFixed(4))});return {t:+d.time.toFixed(3),n:window.__S.length};})()"},
+  {"op":"shot","file":"cc-t21-above.png"},
+
+  {"op":"eval","js":"(()=>{window.__dbg.uTime.value=24.5;return 'T=24.5';})()"},
+  {"op":"waitFor","js":"window.__dbg.time > 24.5"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,l=d.cloud.userData.puffs;window.__S.push({t:+d.time.toFixed(3),pos:l.map(p=>[+p.node.position.x.toFixed(4),+p.node.position.y.toFixed(4),+p.node.position.z.toFixed(4)]),rot:l.map(p=>+(p.sp.material.rotation||0).toFixed(5)),sc:l.map(p=>+p.sp.scale.x.toFixed(4))});return {t:+d.time.toFixed(3),n:window.__S.length};})()"},
+
+  {"op":"eval","js":"(()=>{const d=window.__dbg,f=d.cloud.userData.flow,l=d.cloud.userData.puffs,S=window.__S;const own=l.map(p=>p.w0/1.8);const K=Math.hypot(1,0.45,0.35);let worstB=0,worstOwn=0;for(let i=0;i<l.length;i++){const b=l[i].amp*K;for(const s of S){const q=s.pos[i];const dd=Math.hypot(q[0]-l[i].home.x,q[1]-l[i].home.y,q[2]-l[i].home.z);if(dd/b>worstB)worstB=dd/b;if(dd/own[i]>worstOwn)worstOwn=dd/own[i];}}const cen=[],rms=[];for(const s of S){let cx=0,cy=0,cz=0;for(const p of s.pos){cx+=p[0];cy+=p[1];cz+=p[2];}cx/=s.pos.length;cy/=s.pos.length;cz/=s.pos.length;let r2=0;for(const p of s.pos){r2+=(p[0]-cx)**2+(p[1]-cy)**2+(p[2]-cz)**2;}r2/=s.pos.length;cen.push([+cx.toFixed(3),+cy.toFixed(3),+cz.toFixed(3)]);rms.push(+Math.sqrt(r2).toFixed(3));}const c0=cen[0];const rotMax=Math.max(...S.flatMap(s=>s.rot.map(Math.abs)));const scMin=Math.min(...S.flatMap(s=>s.sc)),scMax=Math.max(...S.flatMap(s=>s.sc));return {samples:S.length,times:S.map(s=>s.t),puffs:l.length,ampRange:[+Math.min(...l.map(p=>p.amp)).toFixed(3),+Math.max(...l.map(p=>p.amp)).toFixed(3)],ownRange:[+Math.min(...own).toFixed(2),+Math.max(...own).toFixed(2)],offOverBoundMath:+(worstB).toFixed(3),offOverOwnSize:+(worstOwn).toFixed(3),rotMax:+rotMax.toFixed(4),rotAmp:f.rotAmp,breathScaledX:[+scMin.toFixed(3),+scMax.toFixed(3)],centroidDriftMax:+Math.max(...cen.map(c=>Math.hypot(c[0]-c0[0],c[1]-c0[1],c[2]-c0[2]))).toFixed(4),rmsPerTime:rms,rmsSpread:+(Math.max(...rms)-Math.min(...rms)).toFixed(4),errs:(window.__errs||[]).length};})()"},
+  {"op":"eval","js":"(()=>{const e=window.__errs||[];return {errs:e.length,list:e.slice(0,3)};})()"}
+]

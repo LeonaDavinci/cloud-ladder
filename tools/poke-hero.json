@@ -1,0 +1,15 @@
+[
+  {"op":"eval","js":"__dbg.camera.position.set(21.5, 15.4, 12.4)"},
+  {"op":"eval","js":"__dbg.controls.target.set(2.6, 12.87, 1.6)"},
+  {"op":"wait","ms":4000},
+  {"op":"eval","js":"__dbg.cloudPeakReset(); JSON.stringify({t:+__dbg.uTime.value.toFixed(2)})"},
+  {"op":"shot","file":"hr-0-before.png"},
+  {"op":"clickAt","js":"[innerWidth*0.5, innerHeight*0.58]"},
+  {"op":"wait","ms":6500},
+  {"op":"eval","js":"JSON.stringify({t:+__dbg.uTime.value.toFixed(2),s:__dbg.cloudStat()})"},
+  {"op":"shot","file":"hr-1-peak.png"},
+  {"op":"wait","ms":30000},
+  {"op":"eval","js":"JSON.stringify({t:+__dbg.uTime.value.toFixed(2),s:__dbg.cloudStat()})"},
+  {"op":"shot","file":"hr-2-back.png"},
+  {"op":"eval","js":"JSON.stringify({audio:__audio.state,title:__audio.title,errs:window.__errs})"}
+]

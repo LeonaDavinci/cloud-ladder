@@ -1,0 +1,6 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.config)"},
+  {"op":"wait","ms":2200},
+  {"op":"eval","js":"(()=>{const d=window.__dbg;return {q:d.quality,mobileCfg:d.config.counts,real:{grass:d.grass.count,lav:d.lavender.count,glintAll:d.glints.count},dead:d.glints.userData.anchors.filter(a=>a.dead).length};})()"},
+  {"op":"shot","file":"m1-config-mobile.png"}
+]

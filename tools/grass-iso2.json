@@ -1,0 +1,13 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.tufts && window.__dbg.grass)"},
+  {"op":"wait","ms":2600},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,c=d.camera;c.position.set(-2,3.0,30);d.controls.target.set(-2,1.2,0);d.controls.update();return 'ok';})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"j0-all.png"},
+  {"op":"eval","js":"(()=>{window.__dbg.tufts.visible=false;return 'tuft off';})()"},
+  {"op":"wait","ms":2400},
+  {"op":"shot","file":"j1-no-tuft.png"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg;d.tufts.visible=true;d.grass.visible=false;return 'grass off';})()"},
+  {"op":"wait","ms":2400},
+  {"op":"shot","file":"j2-no-grass.png"}
+]

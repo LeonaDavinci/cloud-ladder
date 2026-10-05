@@ -1,0 +1,7 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.terrain && window.__dbg.terrain.material.map)"},
+  {"op":"eval","js":"(()=>{const m=window.__dbg.terrain.material,t=m.map;return {tex:t.image.width,rep:Math.round(t.repeat.x),comp:+m.color.r.toFixed(3),injected:m.userData.macroInjected,genMs:Math.round(t.userData.genMs),quality:window.__dbg.quality};})()"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,c=d.camera;c.position.set(4,6.5,8.5);d.controls.target.set(-1,1.25,0.6);d.controls.update();return 'bird';})()"},
+  {"op":"wait","ms":2800},
+  {"op":"shot","file":"m1-mobile-ground.png"}
+]

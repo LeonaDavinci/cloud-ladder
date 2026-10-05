@@ -1,0 +1,18 @@
+[
+  { "op": "waitFor", "js": "!!(window.__dbg && window.__dbg.ladder)" },
+  { "op": "wait", "ms": 2600 },
+  { "op": "eval", "js": "(()=>{const d=window.__dbg,r=d.ladder.userData.rig;const h=r.length;const p=[r.foot[0]+r.up[0]*h+r.off[0],r.foot[1]+r.up[1]*h+1.68,r.foot[2]+r.up[2]*h+r.off[1]];const c=d.camera;c.position.set(p[0],p[1],p[2]);d.controls.target.set(-2,1.6,1.2);d.controls.update();return {topEye:p.map(v=>+v.toFixed(2)),cloud:d.config?null:null};})()" },
+  { "op": "wait", "ms": 2600 },
+  { "op": "shot", "file": "t1-look-down.png" },
+
+  { "op": "eval", "js": "(()=>{const d=window.__dbg,c=d.camera;d.controls.target.set(c.position.x+6,c.position.y-1.2,c.position.z+9);d.controls.update();return 'down-side';})()" },
+  { "op": "wait", "ms": 2400 },
+  { "op": "shot", "file": "t2-look-sideslant.png" },
+
+  { "op": "eval", "js": "(()=>{const d=window.__dbg,c=d.camera;d.controls.target.set(c.position.x+8,c.position.y-3.4,c.position.z+13);d.controls.update();return 'horizon';})()" },
+  { "op": "wait", "ms": 2400 },
+  { "op": "shot", "file": "t3-look-horizon.png" },
+
+  { "op": "eval", "js": "(()=>{const d=window.__dbg,o=d.scene.children.filter(x=>x.type==='Group'||x.type==='Mesh').map(x=>x.name||x.type+':'+(x.children?x.children.length:0));return o.slice(0,14);})()" },
+  { "op": "eval", "js": "(()=>{const e=window.__errs||[];return {errs:e.length};})()" }
+]

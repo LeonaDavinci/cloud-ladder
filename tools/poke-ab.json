@@ -1,0 +1,20 @@
+[
+  {"op":"eval","js":"__dbg.camera.position.set(21, 15.2, 12)"},
+  {"op":"eval","js":"__dbg.controls.target.set(2.6, 12.87, 1.6)"},
+  {"op":"eval","js":"__dbg.cloud.userData.flow.gain = 0"},
+  {"op":"eval","js":"__dbg.pokeCfg.ripple = false"},
+  {"op":"wait","ms":3000},
+  {"op":"shot","file":"ab-0-before.png"},
+  {"op":"eval","js":"(()=>{const {THREE,camera}=__dbg;const rad=[8.5,4.6,6.4];const c=new THREE.Vector3(2.6,12.87,1.6);const d=camera.position.clone().sub(c).normalize();const t=1/Math.sqrt((d.x/rad[0])**2+(d.y/rad[1])**2+(d.z/rad[2])**2);window.__pk=c.clone().addScaledVector(d,t);window.__pdir=d.clone().negate();return [+t.toFixed(2),[__pk.x,__pk.y,__pk.z].map(v=>+v.toFixed(2))];})()"},
+  {"op":"eval","js":"__dbg.cloudPeakReset(); __dbg.poke(__pk.x,__pk.y,__pk.z,{dir:__pdir,radius:4.6,amount:2.0})"},
+  {"op":"wait","ms":1400},
+  {"op":"eval","js":"JSON.stringify(__dbg.cloudStat())"},
+  {"op":"shot","file":"ab-1-peak.png"},
+  {"op":"wait","ms":3000},
+  {"op":"eval","js":"JSON.stringify(__dbg.cloudStat())"},
+  {"op":"shot","file":"ab-2-decay.png"},
+  {"op":"wait","ms":25000},
+  {"op":"eval","js":"JSON.stringify(__dbg.cloudStat())"},
+  {"op":"shot","file":"ab-3-back.png"},
+  {"op":"eval","js":"__dbg.pokeCfg.ripple = true; JSON.stringify(window.__errs)"}
+]

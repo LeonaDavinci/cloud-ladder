@@ -1,0 +1,11 @@
+[
+  {"op":"wait","ms":2600},
+  {"op":"eval","js":"(function(){var a=window.__audio;if(!a)return 'no __audio';return JSON.stringify({state:a.state,idx:a.index,title:a.title,ok:a.ok,ver:!!a.tracks[0].license,tracks:a.tracks.map(function(t,i){return i+':'+(t.file||'(proc)')+'|'+(t.title||'')+'|'+(t.license||'-');})});})()"},
+  {"op":"eval","js":"(function(){__audio.start(0);return 'start(0)';})()"},
+  {"op":"wait","ms":3500},
+  {"op":"eval","js":"JSON.stringify({probe:0,idx:__audio.index,state:__audio.state,src:__audio.el.currentSrc.split('/').pop(),err:__audio.el.error?__audio.el.error.code:null,dur:__audio.el.duration,rs:__audio.el.readyState,ns:__audio.el.networkState,t:+__audio.el.currentTime.toFixed(2),vol:+__audio.el.volume.toFixed(3)})"},
+  {"op":"eval","js":"(function(){__audio.start(1);return 'start(1)';})()"},
+  {"op":"wait","ms":3500},
+  {"op":"eval","js":"JSON.stringify({probe:1,idx:__audio.index,state:__audio.state,src:__audio.el.currentSrc.split('/').pop(),err:__audio.el.error?__audio.el.error.code:null,dur:__audio.el.duration,rs:__audio.el.readyState,ns:__audio.el.networkState,t:+__audio.el.currentTime.toFixed(2),vol:+__audio.el.volume.toFixed(3)})"},
+  {"op":"eval","js":"JSON.stringify({errs:window.__errs||[]})"}
+]

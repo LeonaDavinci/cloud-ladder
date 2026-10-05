@@ -1,0 +1,138 @@
+== 头部（前 7 行）==
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { createAudio } from './audio.js';
+import { createPostFX } from './postfx.js';
+import { createAtmosphere } from './atmosphere.js';
+
+
+== 顶层声明（86 个）==
+8    var   sun                          行 8-18 (11 行)  uses=-
+19   var   _QS                          行 19-19 (1 行)  uses=-
+20   var   _FORCE_MOBILE                行 20-20 (1 行)  uses=_QS
+21   var   IS_TOUCH                     行 21-21 (1 行)  uses=_FORCE_MOBILE
+22   var   IS_SMALL                     行 22-22 (1 行)  uses=-
+23   var   AUTO_MOBILE                  行 23-24 (2 行)  uses=IS_SMALL,IS_TOUCH
+25   var   QUALITY                      行 25-25 (1 行)  uses=-
+26   var   PR_CAP                       行 26-26 (1 行)  uses=-
+27   var   CLOUD_Q                      行 27-27 (1 行)  uses=-
+28   var   SHADOW_SZ                    行 28-28 (1 行)  uses=-
+29   var   PUFF_N                       行 29-29 (1 行)  uses=-
+30   var   CFG_EFF                      行 30-30 (1 行)  uses=applyConfig
+31   fn    qcount                       行 31-40 (10 行)  uses=QUALITY
+41   var   TINT_CLOUD                   行 41-41 (1 行)  uses=-
+42   var   TINT_BG                      行 42-42 (1 行)  uses=-
+43   fn    regTint                      行 43-58 (16 行)  uses=-
+59   fn    hash2                        行 59-59 (1 行)  uses=-
+60   fn    noise2                       行 60-65 (6 行)  uses=hash2
+66   fn    fbm2                         行 66-67 (2 行)  uses=noise2,ridged
+68   fn    ridged                       行 68-75 (8 行)  uses=noise2
+76   fn    hash1                        行 76-76 (1 行)  uses=-
+77   fn    noise1                       行 77-80 (4 行)  uses=hash1
+81   fn    fbm1                         行 81-83 (3 行)  uses=build,noise1
+84   var   MOUND                        行 84-84 (1 行)  uses=-
+85   var   RANGES                       行 85-85 (1 行)  uses=-
+86   var   MICRO                        行 86-86 (1 行)  uses=-
+87   var   BROAD                        行 87-88 (2 行)  uses=-
+89   fn    terrainHeight                行 89-163 (75 行)  uses=BROAD,MICRO,MOUND,RANGES,fbm2,ridged
+164  fn    hexToRgba                    行 164-171 (8 行)  uses=-
+172  fn    hexToRgb255                  行 172-180 (9 行)  uses=-
+181  fn    buildSky                     行 181-239 (59 行)  uses=-
+240  fn    makeCloudTexture             行 240-300 (61 行)  uses=-
+301  fn    buildRidgeBand               行 301-384 (84 行)  uses=TINT_BG,fbm2,pfbm,regTint
+385  fn    mulberry32                   行 385-393 (9 行)  uses=-
+394  fn    pnoise                       行 394-402 (9 行)  uses=hash2
+403  fn    pfbm                         行 403-408 (6 行)  uses=pnoise
+409  var   SRGB2LIN                     行 409-415 (7 行)  uses=-
+416  fn    makeGrassTexture             行 416-590 (175 行)  uses=SRGB2LIN,hexToRgb255,mulberry32,pfbm,pnoise
+591  fn    buildTerrain                 行 591-683 (93 行)  uses=QUALITY,fbm2,makeGrassTexture,terrainHeight
+684  fn    windSnippet                  行 684-691 (8 行)  uses=-
+692  fn    injectWind                   行 692-699 (8 行)  uses=-
+700  fn    makeShadowDepth              行 700-704 (5 行)  uses=injectWind
+705  fn    applyShadowFlags             行 705-717 (13 行)  uses=-
+718  fn    makeGrassBladeGeo            行 718-745 (28 行)  uses=radius
+746  fn    resolveAvoid                 行 746-761 (16 行)  uses=bedHalfLocal
+762  fn    makeAvoid                    行 762-779 (18 行)  uses=-
+780  fn    buildGrass                   行 780-819 (40 行)  uses=applyShadowFlags,injectWind,makeAvoid,makeGrassBladeGeo,makeShadowDepth,qcount,radius,terrainHeight,windSnippet
+820  fn    makeTuftTexture              行 820-851 (32 行)  uses=hexToRgb255
+852  fn    buildTufts                   行 852-905 (54 行)  uses=applyShadowFlags,injectWind,makeAvoid,makeShadowDepth,makeTuftTexture,qcount,radius,terrainHeight,windSnippet
+906  fn    makeLavenderTexture          行 906-943 (38 行)  uses=-
+944  fn    buildLavender                行 944-1024 (81 行)  uses=applyShadowFlags,fbm2,injectWind,makeAvoid,makeLavenderTexture,makeShadowDepth,qcount,radius,terrainHeight,windSnippet
+1025 fn    buildBed                     行 1025-1089 (65 行)  uses=bedSurfaceHeight,terrainHeight
+1090 fn    smoothGeometryNormals        行 1090-1142 (53 行)  uses=-
+1143 fn    loadBedModel                 行 1143-1188 (46 行)  uses=smoothGeometryNormals
+1189 fn    makeDaisyTexture             行 1189-1240 (52 行)  uses=-
+1241 fn    buildDaisies                 行 1241-1330 (90 行)  uses=applyShadowFlags,injectWind,makeDaisyTexture,makeShadowDepth,qcount,radius,terrainHeight,windSnippet
+1331 fn    bedFootprint                 行 1331-1354 (24 行)  uses=bedHalfLocal,bedScaleOf
+1355 fn    bedHalfLocal                 行 1355-1359 (5 行)  uses=-
+1360 fn    bedScaleOf                   行 1360-1367 (8 行)  uses=-
+1368 fn    bedSurfaceHeight             行 1368-1374 (7 行)  uses=-
+1375 fn    makeBedAoTexture             行 1375-1402 (28 行)  uses=-
+1403 fn    buildBedShadow               行 1403-1505 (103 行)  uses=applyShadowFlags,bedFootprint,injectWind,makeBedAoTexture,makeGrassBladeGeo,makeShadowDepth,qcount,terrainHeight,windSnippet
+1506 fn    makeRailGeometry             行 1506-1538 (33 行)  uses=-
+1539 fn    buildLadder                  行 1539-1597 (59 行)  uses=makeRailGeometry
+1598 fn    makeButterflyTexture         行 1598-1664 (67 行)  uses=-
+1665 fn    buildButterflies             行 1665-1792 (128 行)  uses=bedSurfaceHeight,makeButterflyTexture,terrainHeight
+1793 fn    makeGlintTexture             行 1793-1825 (33 行)  uses=-
+1826 fn    buildGlints                  行 1826-1938 (113 行)  uses=bedHalfLocal,buildLadder,makeGlintTexture
+1939 fn    snapGlintsToBed              行 1939-1970 (32 行)  uses=-
+1971 fn    buildCloud                   行 1971-2145 (175 行)  uses=CLOUD_Q,PUFF_N,TINT_CLOUD,hexToRgba,makeCloudTexture,regTint,shadowPlaneGeometry,terrainHeight,updateCloudFade,updateCloudFlow
+2146 var   radius                       行 2146-2146 (1 行)  uses=-
+2147 var   segments                     行 2147-2147 (1 行)  uses=-
+2148 var   shadowPlaneGeometry          行 2148-2234 (87 行)  uses=makeRippleTexture,radius,segments,sun
+2235 fn    makeRippleTexture            行 2235-2263 (29 行)  uses=-
+2264 fn    puffPoke                     行 2264-2348 (85 行)  uses=-
+2349 fn    rippleAt                     行 2349-2362 (14 行)  uses=-
+2363 fn    updateRipples                行 2363-2387 (25 行)  uses=-
+2388 fn    updateCloudFlow              行 2388-2480 (93 行)  uses=build
+2481 fn    updateCloudFade              行 2481-2530 (50 行)  uses=-
+2531 fn    setupCloudPoke               行 2531-2695 (165 行)  uses=puffPoke,radius,rippleAt,updateRipples
+2696 fn    buildFarClouds               行 2696-2757 (62 行)  uses=TINT_BG,makeCloudTexture,radius,regTint
+2758 fn    makeSupport                  行 2758-2790 (33 行)  uses=terrainHeight
+2791 fn    setupModes                   行 2791-3224 (434 行)  uses=makeSupport
+3225 fn    applyConfig                  行 3225-3555 (331 行)  uses=CFG_EFF,bedSurfaceHeight,build,resolveAvoid
+3556 fn    createSceneUI                行 3556-3660 (105 行)  uses=-
+3661 fn    build                        行 3661-3919 (259 行)  uses=AUTO_MOBILE,BROAD,CFG_EFF,CLOUD_Q,MICRO,MOUND,PR_CAP,PUFF_N,QUALITY,RANGES,SHADOW_SZ,TINT_BG,TINT_CLOUD,bedHalfLocal,bedScaleOf,bedSurfaceHeight,buildBed,buildBedShadow,buildButterflies,buildCloud,buildDaisies,buildFarClouds,buildGlints,buildGrass,buildLadder,buildLavender,buildRidgeBand,buildSky,buildTerrain,buildTufts,createSceneUI,loadBedModel,resolveAvoid,setupCloudPoke,setupModes,snapGlintsToBed,sun,terrainHeight,updateCloudFade,updateCloudFlow
+
+== 被引用次数排行 ==
+terrainHeight                <- 11 次: buildTerrain,buildGrass,buildTufts,buildLavender,buildBed,buildDaisies,buildBedShadow,buildButterflies,buildCloud,makeSupport,build
+radius                       <- 8 次: makeGrassBladeGeo,buildGrass,buildTufts,buildLavender,buildDaisies,shadowPlaneGeometry,setupCloudPoke,buildFarClouds
+injectWind                   <- 6 次: makeShadowDepth,buildGrass,buildTufts,buildLavender,buildDaisies,buildBedShadow
+applyShadowFlags             <- 5 次: buildGrass,buildTufts,buildLavender,buildDaisies,buildBedShadow
+makeShadowDepth              <- 5 次: buildGrass,buildTufts,buildLavender,buildDaisies,buildBedShadow
+qcount                       <- 5 次: buildGrass,buildTufts,buildLavender,buildDaisies,buildBedShadow
+windSnippet                  <- 5 次: buildGrass,buildTufts,buildLavender,buildDaisies,buildBedShadow
+fbm2                         <- 4 次: terrainHeight,buildRidgeBand,buildTerrain,buildLavender
+bedHalfLocal                 <- 4 次: resolveAvoid,bedFootprint,buildGlints,build
+bedSurfaceHeight             <- 4 次: buildBed,buildButterflies,applyConfig,build
+QUALITY                      <- 3 次: qcount,buildTerrain,build
+build                        <- 3 次: fbm1,updateCloudFlow,applyConfig
+TINT_BG                      <- 3 次: buildRidgeBand,buildFarClouds,build
+regTint                      <- 3 次: buildRidgeBand,buildCloud,buildFarClouds
+makeAvoid                    <- 3 次: buildGrass,buildTufts,buildLavender
+hash2                        <- 2 次: noise2,pnoise
+noise2                       <- 2 次: fbm2,ridged
+ridged                       <- 2 次: fbm2,terrainHeight
+BROAD                        <- 2 次: terrainHeight,build
+MICRO                        <- 2 次: terrainHeight,build
+MOUND                        <- 2 次: terrainHeight,build
+RANGES                       <- 2 次: terrainHeight,build
+pfbm                         <- 2 次: buildRidgeBand,makeGrassTexture
+pnoise                       <- 2 次: pfbm,makeGrassTexture
+hexToRgb255                  <- 2 次: makeGrassTexture,makeTuftTexture
+makeGrassBladeGeo            <- 2 次: buildGrass,buildBedShadow
+bedScaleOf                   <- 2 次: bedFootprint,build
+buildLadder                  <- 2 次: buildGlints,build
+CLOUD_Q                      <- 2 次: buildCloud,build
+PUFF_N                       <- 2 次: buildCloud,build
+TINT_CLOUD                   <- 2 次: buildCloud,build
+makeCloudTexture             <- 2 次: buildCloud,buildFarClouds
+updateCloudFade              <- 2 次: buildCloud,build
+updateCloudFlow              <- 2 次: buildCloud,build
+sun                          <- 2 次: shadowPlaneGeometry,build
+CFG_EFF                      <- 2 次: applyConfig,build
+resolveAvoid                 <- 2 次: applyConfig,build
+_QS                          <- 1 次: _FORCE_MOBILE
+_FORCE_MOBILE                <- 1 次: IS_TOUCH
+IS_SMALL                     <- 1 次: AUTO_MOBILE

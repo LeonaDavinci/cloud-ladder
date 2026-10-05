@@ -1,0 +1,28 @@
+[
+  {"op":"eval","js":"__dbg.camera.position.set(21, 15.2, 12)"},
+  {"op":"eval","js":"__dbg.controls.target.set(2.6, 12.87, 1.6)"},
+  {"op":"eval","js":"__dbg.cloud.userData.flow.gain = 0"},
+  {"op":"wait","ms":3000},
+  {"op":"eval","js":"JSON.stringify({state:__audio.state,title:__audio.title,idx:__audio.index,t:+__audio.el.currentTime.toFixed(2),vol:+__audio.el.volume.toFixed(3)})"},
+  {"op":"shot","file":"pk-1-before.png"},
+
+  {"op":"eval","js":"(()=>{const {THREE,camera}=__dbg;const c=new THREE.Vector3(2.6,12.87,1.6);const d=camera.position.clone().sub(c).normalize();const p=c.clone().addScaledVector(d,8.2);window.__pk=p;window.__pdir=d.clone().negate();return [p.x,p.y,p.z].map(v=>v.toFixed(2)).join(',');})()"},
+  {"op":"eval","js":"__dbg.cloudPeakReset(); 'reset'"},
+  {"op":"clickAt","js":"(()=>{const {THREE,camera}=__dbg;const p=__pk.clone().project(camera);return [ (p.x*0.5+0.5)*innerWidth, (-p.y*0.5+0.5)*innerHeight ];})()"},
+  {"op":"wait","ms":900},
+  {"op":"eval","js":"JSON.stringify(__dbg.cloudStat())"},
+  {"op":"shot","file":"pk-2-hit.png"},
+  {"op":"wait","ms":2500},
+  {"op":"eval","js":"JSON.stringify(__dbg.cloudStat())"},
+  {"op":"shot","file":"pk-3-half.png"},
+
+  {"op":"eval","js":"__dbg.camera.position.copy(__pk).addScaledVector(__pdir.clone().negate(), 3.6); __dbg.controls.target.copy(__pk); 'close'"},
+  {"op":"wait","ms":1200},
+  {"op":"shot","file":"pk-3b-close.png"},
+  {"op":"eval","js":"__dbg.camera.position.set(21, 15.2, 12); __dbg.controls.target.set(2.6, 12.87, 1.6); 'wide'"},
+  {"op":"wait","ms":16000},
+  {"op":"eval","js":"JSON.stringify(__dbg.cloudStat())"},
+  {"op":"shot","file":"pk-4-back.png"},
+  {"op":"eval","js":"JSON.stringify({state:__audio.state,title:__audio.title,t:+__audio.el.currentTime.toFixed(2),vol:+__audio.el.volume.toFixed(3)})"},
+  {"op":"eval","js":"JSON.stringify(window.__errs)"}
+]

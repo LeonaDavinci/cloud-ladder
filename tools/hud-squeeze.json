@@ -1,0 +1,12 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.atmos)"},
+  {"op":"wait","ms":2200},
+  {"op":"eval","js":"(function(){document.querySelector('.mode-btn[data-mode=\"walk\"]').click();return 'walk';})()"},
+  {"op":"wait","ms":1200},
+  {"op":"eval","js":"(function(){function r(s){var e=document.querySelector(s);if(!e)return null;var b=e.getBoundingClientRect();if(!b.width&&!b.height)return null;return [Math.round(b.x),Math.round(b.y),Math.round(b.right),Math.round(b.bottom)];}var h=r('#mode-hint'),u=r('#scene-ui');function ov(a,b){return !!(a&&b&&!(a[2]<=b[0]||b[2]<=a[0]||a[3]<=b[1]||b[3]<=a[1]));}return JSON.stringify({txt:document.getElementById('mode-hint').textContent.length,lines:Math.round(document.getElementById('mode-hint').getBoundingClientRect().height/ (parseFloat(getComputedStyle(document.getElementById('mode-hint')).lineHeight)||16)),hint:h,sceneUI:u,撞:ov(h,u)});})()"},
+  {"op":"eval","js":"(function(){var t=document.getElementById('hud-tl');t.style.maxWidth='140px';return 'squeeze';})()"},
+  {"op":"wait","ms":500},
+  {"op":"eval","js":"(function(){function r(s){var e=document.querySelector(s);var b=e.getBoundingClientRect();return [Math.round(b.x),Math.round(b.y),Math.round(b.right),Math.round(b.bottom)];}var t=r('.overlay'),g=r('#bgm');return JSON.stringify({title:t,bgm:g,标题底到BGM顶:g[1]-t[3],重叠:(t[3]>g[1])});})()"},
+  {"op":"shot","file":"hudsq.png"},
+  {"op":"eval","js":"JSON.stringify(window.__errs||[])"}
+]

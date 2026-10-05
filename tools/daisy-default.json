@@ -1,0 +1,6 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.daisies)"},
+  {"op":"wait","ms":3000},
+  {"op":"shot","file":"dd-1-entry.png"},
+  {"op":"eval","js":"(function(){var e=window.__errs||[];return JSON.stringify({errs:e.length});})()"}
+]

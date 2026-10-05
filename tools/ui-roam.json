@@ -1,0 +1,9 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.atmos)"},
+  {"op":"wait","ms":2200},
+  {"op":"eval","js":"(function(){__dbg.setMode?__dbg.setMode('roam'):document.querySelector('.mode-btn[data-mode=\"roam\"]').click();return 'roam';})()"},
+  {"op":"wait","ms":1200},
+  {"op":"eval","js":"(function(){function r(s){var e=document.querySelector(s);if(!e)return null;var b=e.getBoundingClientRect();if(!b.width)return null;return [Math.round(b.x),Math.round(b.y),Math.round(b.right),Math.round(b.bottom)];}var v={w:innerWidth,h:innerHeight,sceneUI:r('#scene-ui'),overlay:r('.overlay'),hint:r('#mode-hint'),jump:r('#jump-btn')};function ov(a,b){return a&&b&&!(a[2]<=b[0]||b[2]<=a[0]||a[3]<=b[1]||b[3]<=a[1]);}v.撞_标题=ov(v.sceneUI,v.overlay);v.撞_跳按钮=ov(v.sceneUI,v.jump);v.撞_提示条=ov(v.sceneUI,v.hint);return JSON.stringify(v);})()"},
+  {"op":"shot","file":"ui-roam-漫游.png"},
+  {"op":"eval","js":"JSON.stringify(window.__errs||[])"}
+]

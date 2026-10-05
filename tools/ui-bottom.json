@@ -1,0 +1,13 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.atmos)"},
+  {"op":"wait","ms":2200},
+  {"op":"eval","js":"(function(){function r(s){var e=document.querySelector(s);if(!e)return null;var b=e.getBoundingClientRect();return [Math.round(b.x),Math.round(b.y),Math.round(b.right),Math.round(b.bottom)];}var v={w:innerWidth,h:innerHeight,sceneUI:r('#scene-ui'),uiTime:r('#ui-time'),uiFilter:r('#ui-filter'),uiFog:r('#ui-fog'),tip:r('#scene-ui .ui-tip'),overlay:r('.overlay'),modes:r('#modes'),bgm:r('#bgm'),hint:r('#mode-hint'),jump:r('#jump-btn'),nBtn:document.querySelectorAll('#scene-ui button').length};return JSON.stringify(v);})()"},
+  {"op":"shot","file":"ui-bottom-下午.png"},
+  {"op":"eval","js":"(function(){__dbg.atmos.apply('night');__dbg.postfx.set('dream');return 'night';})()"},
+  {"op":"wait","ms":900},
+  {"op":"shot","file":"ui-bottom-夜间.png"},
+  {"op":"eval","js":"(function(){__dbg.atmos.apply('afternoon');__dbg.postfx.set('off');var b=document.querySelectorAll('#scene-ui button');b[1].click();return 'click 清晨 → '+document.querySelector('#scene-ui .active').textContent;})()"},
+  {"op":"wait","ms":900},
+  {"op":"shot","file":"ui-bottom-点击后.png"},
+  {"op":"eval","js":"JSON.stringify(window.__errs||[])"}
+]

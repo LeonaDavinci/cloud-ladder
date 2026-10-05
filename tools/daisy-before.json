@@ -1,0 +1,11 @@
+[
+  {"op":"wait","ms":2500},
+  {"op":"eval","js":"(function(){var c=__dbg.cfg||null;return JSON.stringify({bedPos:__dbg.bed?[+__dbg.bed.position.x.toFixed(2),+__dbg.bed.position.y.toFixed(2),+__dbg.bed.position.z.toFixed(2)]:null,bw:__dbg.daisies?__dbg.daisies.count:null,butter:__dbg.butterflies?__dbg.butterflies.count:null,errs:(window.__errs||[]).length});})()"},
+  {"op":"eval","js":"(function(){var th=null;try{th=terrainHeight(-2,4.55).toFixed(2);}catch(e){th='ERR '+e.message;}return 'terrain(-2,4.55)='+th;})()"},
+  {"op":"eval","js":"(function(){__dbg.camera.position.set(-2,6.6,13.5);__dbg.controls.target.set(-2,1.6,2.2);return 'cam set';})()"},
+  {"op":"wait","ms":4000},
+  {"op":"shot","file":"ds-0-before.png"},
+  {"op":"eval","js":"(function(){__dbg.camera.position.set(-2,3.2,10.5);__dbg.controls.target.set(-2,1.1,4.5);return 'cam2';})()"},
+  {"op":"wait","ms":4000},
+  {"op":"shot","file":"ds-1-before-close.png"}
+]

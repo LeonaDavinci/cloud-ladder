@@ -1,0 +1,18 @@
+[
+  {"op":"waitFor","js":"!!window.__dbg"},
+  {"op":"eval","js":"(function(){var a=window.__audio;return JSON.stringify({n:a.tracks.length,ok:a.ok,tracks:a.tracks.map(function(t,i){return i+':'+t.file+'|'+t.title+'|'+t.author+'|gain='+t.gain;})});})()"},
+  {"op":"eval","js":"(function(){__audio.start(0);return 'go0';})()"},
+  {"op":"waitFor","js":"window.__audio.index===0 && (window.__audio.el.duration>0 || !!window.__audio.el.error)"},
+  {"op":"eval","js":"JSON.stringify({i:0,idx:__audio.index,state:__audio.state,src:__audio.el.currentSrc.split('/').pop(),err:__audio.el.error?__audio.el.error.code:null,dur:__audio.el.duration,rs:__audio.el.readyState,vol:+__audio.el.volume.toFixed(3)})"},
+  {"op":"eval","js":"(function(){__audio.start(1);return 'go1';})()"},
+  {"op":"waitFor","js":"window.__audio.index===1 && (window.__audio.el.duration>0 || !!window.__audio.el.error)"},
+  {"op":"eval","js":"JSON.stringify({i:1,idx:__audio.index,state:__audio.state,src:__audio.el.currentSrc.split('/').pop(),err:__audio.el.error?__audio.el.error.code:null,dur:__audio.el.duration,rs:__audio.el.readyState,vol:+__audio.el.volume.toFixed(3)})"},
+  {"op":"eval","js":"(function(){__audio.start(2);return 'go2';})()"},
+  {"op":"waitFor","js":"window.__audio.index===2 && (window.__audio.el.duration>0 || !!window.__audio.el.error)"},
+  {"op":"eval","js":"JSON.stringify({i:2,idx:__audio.index,state:__audio.state,src:__audio.el.currentSrc.split('/').pop(),err:__audio.el.error?__audio.el.error.code:null,dur:__audio.el.duration,rs:__audio.el.readyState,vol:+__audio.el.volume.toFixed(3)})"},
+  {"op":"eval","js":"(function(){__audio.start(3);return 'go3';})()"},
+  {"op":"waitFor","js":"window.__audio.index===3 && (window.__audio.el.duration>0 || !!window.__audio.el.error)"},
+  {"op":"eval","js":"JSON.stringify({i:3,idx:__audio.index,state:__audio.state,src:__audio.el.currentSrc.split('/').pop(),err:__audio.el.error?__audio.el.error.code:null,dur:__audio.el.duration,rs:__audio.el.readyState,vol:+__audio.el.volume.toFixed(3)})"},
+  {"op":"eval","js":"(function(){var b=document.getElementById('bgm');return JSON.stringify({ui:!!b,text:b?b.textContent.trim():null});})()"},
+  {"op":"eval","js":"JSON.stringify({errs:window.__errs||[]})"}
+]

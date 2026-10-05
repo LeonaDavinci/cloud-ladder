@@ -1,0 +1,20 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.atmos)"},
+  {"op":"wait","ms":1500},
+  {"op":"eval","js":"(function(){var s=__dbg.scene;window.__bands=[s.children[7],s.children[8],s.children[9]];window.__others=[];s.children.forEach(function(o,i){if(i>3&&window.__bands.indexOf(o)<0)window.__others.push(o);});return 'others='+window.__others.length;})()"},
+  {"op":"wait","ms":400},
+  {"op":"shot","file":"slvl0-all.png"},
+  {"op":"eval","js":"(function(){window.__bands[2].visible=false;return 'hide 3400';})()"},
+  {"op":"wait","ms":400},
+  {"op":"shot","file":"slvl1-no3400.png"},
+  {"op":"eval","js":"(function(){window.__bands[1].visible=false;return 'hide 2950';})()"},
+  {"op":"wait","ms":400},
+  {"op":"shot","file":"slvl2-no2950.png"},
+  {"op":"eval","js":"(function(){window.__bands[0].visible=false;return 'hide 2200';})()"},
+  {"op":"wait","ms":400},
+  {"op":"shot","file":"slvl3-noall.png"},
+  {"op":"eval","js":"(function(){window.__others.forEach(function(o){o.visible=false;});return 'hide everything but sky';})()"},
+  {"op":"wait","ms":400},
+  {"op":"shot","file":"slvl4-skyonly.png"},
+  {"op":"eval","js":"(function(){window.__bands.forEach(function(b){b.visible=true;});window.__others.forEach(function(o){o.visible=true;});return 'restored';})()"}
+]

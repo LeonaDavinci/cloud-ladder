@@ -1,0 +1,9 @@
+[
+  {"op":"waitFor","js":"!!(window.__rig && window.__rig.P && window.__dbg)"},
+  {"op":"wait","ms":2200},
+  {"op":"eval","js":"(()=>{const r=window.__rig;r.P.yaw=0.7;r.P.pitch=0;r.P.state='ground';r.P.x=0;r.P.z=0;return 'set yaw=0.7';})()"},
+  {"op":"wait","ms":2500},
+  {"op":"eval","js":"(()=>{const T=window.__dbg.THREE,c=window.__dbg.camera,r=window.__rig;const f=new T.Vector3();c.getWorldDirection(f);return {P_yaw:+r.P.yaw.toFixed(4),cam_rotY:+c.rotation.y.toFixed(4),cam_rotX:+c.rotation.x.toFixed(4),order:c.rotation.order,dir:[+f.x.toFixed(3),+f.y.toFixed(3),+f.z.toFixed(3)],parent:c.parent?c.parent.type:null};})()"},
+  {"op":"wait","ms":2500},
+  {"op":"eval","js":"(()=>{const T=window.__dbg.THREE,c=window.__dbg.camera,r=window.__rig;const f=new T.Vector3();c.getWorldDirection(f);return {P_yaw:+r.P.yaw.toFixed(4),cam_rotY:+c.rotation.y.toFixed(4),dir:[+f.x.toFixed(3),+f.y.toFixed(3),+f.z.toFixed(3)],mode:r.mode};})()"}
+]

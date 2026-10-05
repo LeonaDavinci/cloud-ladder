@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <!-- 禁止页面缩放：user-scalable=no + maximum-scale 管住移动端 WebView 的捏合缩放，
+       这是三层里最有效的一层（另两层见 style.css 的 touch-action 与 main.js 的 lockViewport）。
+       viewport-fit=cover 让画面铺到刘海/圆角之外，配合 safe-area 内边距用（见 style.css）。 -->
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>云端之梯 · #梦核 · Ladder to the Cloud</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css?v=74">
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "./vendor/three/three.module.js",
+      "three/addons/": "./vendor/three/addons/"
+    }
+  }
+  </script>
+  <style>
+    /* 用四个物理方向属性而不是简写 inset:0 —— inset 是 Chrome 87 才有的，
+       小工具基线 WebView 61 会整条丢弃 ⇒ 「请用本地服务器打开」那层遮罩没有尺寸。 */
+    #boot-error{
+      position:fixed; top:0; right:0; bottom:0; left:0; display:none; place-items:center;
+      background:#a98fd8; color:#2a2040; font:15px/1.7 system-ui,"Microsoft YaHei",sans-serif;
+      padding:32px; z-index:9999;
+    }
+    #boot-error > div{ max-width:560px; background:rgba(255,255,255,.92); border-radius:16px; padding:24px 28px; }
+    #boot-error h2{ margin:0 0 12px; font-size:18px; }
+    #boot-error code{ background:#efe9fb; padding:2px 6px; border-radius:5px; }
+    #boot-error a{ color:#5a3fa8; }
+
+    /* ---- 加载提示（#boot-tip）----
+       样式必须写在**这里**（head 内联），不能放在 style.css：
+       build() 那段同步构建跑完之前，style.css 可能还没解析完，
+       而提示正是要在那一刻就看得见。
+       配色贴着 body 的 #8a78cc 走，不做成纯色块 —— 淡出时不会有色阶跳变。
+       pointer-events:none：任何时刻都不挡点击/拖拽（它只是块画面，不是遮罩）。
+       隐藏靠 .is-hidden 的 opacity + visibility 过渡；visibility 延到最后再翻，
+       否则透明度还没走完元素就已经消失了。 */
+    #boot-tip{
+      position:fixed; top:0; right:0; bottom:0; left:0; z-index:9000;
+      display:flex; align-items:center; justify-content:center;
+      background:radial-gradient(120% 100% at 50% 38%, #c6b2ec 0%, #a98fd8 58%, #8a78cc 100%);
+      color:#2f2447; font:600 17px/1.6 system-ui,"Microsoft YaHei",sans-serif;
+      letter-spacing:.08em; pointer-events:none;
+      opacity:1; visibility:visible;
+      transition:opacity .5s ease .1s, visibility 0s linear .6s;
+    }
+    #boot-tip.is-hidden{ opacity:0; visibility:hidden; }
+    /* 三个呼吸的小点：静止的提示和卡死的画面长得一模一样，
+       留一个「还在动」的证据，人才愿意继续等。 */
+    #boot-tip i{
+      width:6px; height:6px; margin-left:7px; border-radius:50%; background:#4b3a6e;
+      opacity:.3; animation:boot-pulse 1.1s ease-in-out infinite;
+    }
+    #boot-tip i:nth-of-type(2){ animation-delay:.16s; }
+    #boot-tip i:nth-of-type(3){ animation-delay:.32s; }
+    @keyframes boot-pulse{
+      0%,100%{ opacity:.3; }
+      50%    { opacity:1; }
+    }
+    @media (prefers-reduced-motion: reduce){
+      #boot-tip i{ animation:none; opacity:.6; }
+    }
+  </style>
+</head>
+<body>
+  <!-- 加载提示。放在 body 第一个位置：HTML 是边解析边画的，
+       排在最前面能保证它在主线程被 build() 占住之前就已经上屏。
+       由 main.js 的 BOOT 控制隐藏（首帧已画出 + 登记的异步资源都到齐）。 -->
+  <div id="boot-tip">梦境加载中，稍候。<i></i><i></i><i></i></div>
+  <div id="app"></div>
+  <!-- 左上角标题栏：标题在上、BGM 播放器在下。
+       用一个 flex 竖列把两者绑在一起，而不是各写各的 top —— 这样「#梦核」
+       小标签在窄屏换行、标题块变高时，BGM 会自动跟着往下让，不会叠上去。
+       BGM 的 DOM 由 audio.js 拼好挂进来（见 audio.js 的 buildUI）。 -->
+  <div id="hud-tl">
+    <div class="overlay">
+      <h1>云端之梯<span class="tag">#梦核</span></h1>
+      <p>拖拽旋转 · 滚轮缩放 · 右键平移 · 点击云朵戳一下</p>
+    </div>
+  </div>
+
+  <!-- 模式按钮组。复位排在漫游前面 —— 它是「回到起点」，是这一排里唯一
+       不切换模式的**动作**按钮（没有 .active 态、点了不留在任何状态里），
+       所以给它单独一个 id 和 data-act，main.js 里按 data-mode 过滤时才不会
+       把它当成第四个模式（否则点它会 setMode(undefined)，整个模式机直接失效）。 -->
+  <div id="modes">
+    <button class="mode-btn" id="reset-btn" type="button" data-act="reset"
+            title="复位：回到刚打开时的机位与焦点，并退出漫游 / 步行（快捷键 R）。只复位玩法状态，不改时相、滤镜、雾档"
+    >复位</button>
+    <button class="mode-btn" data-mode="roam">漫游</button>
+    <button class="mode-btn" data-mode="walk">步行</button>
+    <button class="mode-btn" data-mode="free">自由</button>
+  </div>
+  <div id="sticks"></div>
+  <button id="jump-btn" type="button">跳</button>
+  <div id="mode-hint"></div>
+
+  <!-- 时相 / 滤镜 / 雾档。按钮本身由 main.js 按 atmos.names、postfx.shortLabels
+       生成 —— 加档位只改 XML 配置，UI 自动跟着长，不用两头维护。
+       快捷键那行小字放在**三排按钮上面**：按钮是这块面板的主角，要贴着屏幕底边；
+       小字是它的图例（「下面这几排各自对应哪几个键」），挂在上方反而是正确读法，
+       也把最下面那一行的位置让出来给按钮。 -->
+  <div id="scene-ui">
+    <div class="ui-tip">1–4 时相 · 5–9 滤镜 · F 雾档 · 0 原片 · P 看电视/复位</div>
+    <div class="ui-row" id="ui-time"><span class="ui-lab">时相</span></div>
+    <div class="ui-row" id="ui-filter"><span class="ui-lab">滤镜</span></div>
+    <div class="ui-row" id="ui-fog"><span class="ui-lab">雾</span></div>
+    <div class="ui-row" id="ui-projector" style="display:none"><span class="ui-lab">夜</span></div>
+  </div>
+
+  <!-- 底部居中：切换 UI（隐藏 / 显示其余全部按钮）。
+       为什么单独立在屏幕正中底边、而不是并进任何一块面板：它是「总管所有面板」的
+       开关，塞进左下角会让人以为只管时相/滤镜那三排，塞进右上角又像只管模式。
+       两个 span 是同一句话的两态 —— 只显示「当前点击会做什么」：
+       看得见按钮时写「隐藏 UI」，收干净之后写「显示 UI」（由 body.ui-hidden 切换）。
+       点它给 <body> 挂/摘 ui-hidden 类，CSS 层统一收起其余控件（见 style.css）——
+       注意它**不会收起自己**，否则就没有恢复的入口了。 -->
+  <button id="ui-toggle" type="button" aria-pressed="false"
+          title="切换 UI：隐藏界面上的所有按钮与提示（快捷键 H）"
+  ><span class="ui-on">隐藏 UI</span><span class="ui-off">显示 UI</span></button>
+
+  <div id="boot-error">
+    <div id="boot-error-body"></div>
+  </div>
+
+  <script>
+  // 直接双击用 file:// 打开时，Chrome 会按 Windows 注册表把 .js 判成 text/plain，
+  // 从而拒绝执行 ES module。这里提前拦下来并给出明确指引。
+  (function(){
+    function fail(html){
+      var box = document.getElementById('boot-error');
+      document.getElementById('boot-error-body').innerHTML = html;
+      box.style.display = 'grid';
+    }
+    if (location.protocol === 'file:') {
+      fail('<h2>请用本地服务器打开</h2>' +
+           '<p>当前是 <code>file://</code> 协议，Windows 注册表把 <code>.js</code> 的 MIME 标成了 ' +
+           '<code>text/plain</code>，浏览器会拒绝加载 ES module。</p>' +
+           '<p>请双击项目里的 <code>start-server.bat</code>，或访问 ' +
+           '<a href="http://localhost:8123">http://localhost:8123</a></p>');
+      return;
+    }
+    window.addEventListener('error', function(e){
+      if (e.target && e.target.tagName === 'SCRIPT') {
+        fail('<h2>脚本加载失败</h2><p>请按 <code>Ctrl + Shift + R</code> 强制刷新（跳过缓存）。</p>');
+      }
+    }, true);
+  })();
+  </script>
+
+  <!-- ?v= 用于绕过浏览器旧缓存 -->
+  <script type="module" src="main.js?v=76"></script>
+</body>
+</html>

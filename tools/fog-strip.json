@@ -1,0 +1,17 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.atmos)"},
+  {"op":"wait","ms":2500},
+  {"op":"eval","js":"(function(){__dbg.atmos.apply('afternoon');__dbg.atmos.settleFog();__dbg.atmos.setFogAnimMs(2000);__dbg.sceneUI.toggleFog();__dbg.atmos.settleFog();return JSON.stringify({起点_超大雾:[__dbg.scene.fog.near,__dbg.scene.fog.far]});})()"},
+  {"op":"shot","file":"strip-0-超大雾-t0.png"},
+
+  {"op":"eval","js":"(function(){__dbg.sceneUI.toggleFog();__dbg.atmos.update(0.7);return JSON.stringify({t:__dbg.atmos.stats().fogAnim.t,near:+__dbg.scene.fog.near.toFixed(2),far:+__dbg.scene.fog.far.toFixed(1)});})()"},
+  {"op":"shot","file":"strip-1-t0.35.png"},
+
+  {"op":"eval","js":"(function(){__dbg.atmos.update(0.6);return JSON.stringify({t:__dbg.atmos.stats().fogAnim.t,near:+__dbg.scene.fog.near.toFixed(2),far:+__dbg.scene.fog.far.toFixed(1)});})()"},
+  {"op":"shot","file":"strip-2-t0.65.png"},
+
+  {"op":"eval","js":"(function(){__dbg.atmos.update(0.7);return JSON.stringify({t:__dbg.atmos.stats().fogAnim.t,near:+__dbg.scene.fog.near.toFixed(2),far:+__dbg.scene.fog.far.toFixed(1),animating:__dbg.atmos.fogTarget.animating});})()"},
+  {"op":"shot","file":"strip-3-小雾-t1.png"},
+
+  {"op":"eval","js":"JSON.stringify({errs:window.__errs||[]})"}
+]

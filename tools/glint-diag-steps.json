@@ -1,0 +1,6 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.glints && window.__dbg.glints.userData.anchors)"},
+  {"op":"wait","ms":2500},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,T=d.THREE;d.bed.updateMatrixWorld(true);const out=[];d.bed.traverse(o=>{if(!o.isMesh)return;const b=new T.Box3().setFromObject(o);out.push({n:o.name||'?',vis:o.visible,parent:o.parent&&o.parent.name,ymin:+b.min.y.toFixed(2),ymax:+b.max.y.toFixed(2),x:[+b.min.x.toFixed(2),+b.max.x.toFixed(2)],z:[+b.min.z.toFixed(2),+b.max.z.toFixed(2)]});});return out;})()"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,T=d.THREE,g=d.glints,rc=new T.Raycaster();rc.far=8;const nm=new T.Matrix3().getNormalMatrix(d.bed.matrixWorld);const res=[];g.userData.anchors.forEach((a,i)=>{if(a.parent!==d.bed)return;const o=a.probe.clone().applyMatrix4(d.bed.matrixWorld);const nr=a.nrm.clone().applyMatrix3(nm).normalize();rc.set(o,nr.clone().negate());const hs=rc.intersectObject(d.bed,true);res.push({i,dead:!!a.dead,probe:[+o.x.toFixed(2),+o.y.toFixed(2),+o.z.toFixed(2)],hits:hs.slice(0,3).map(h=>({n:h.object.name||'?',vis:h.object.visible,dist:+h.distance.toFixed(2),p:[+h.point.x.toFixed(2),+h.point.y.toFixed(2),+h.point.z.toFixed(2)]}))});});return res.slice(0,6);})()"}
+]

@@ -1,0 +1,6 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__rig)"},
+  {"op":"wait","ms":3000},
+  {"op":"eval","js":"(function(){function visMeshes(root){var n=0;root.traverse(function(o){if(!o.isMesh)return;var v=o.visible,p=o.parent;while(p&&v){if(!p.visible)v=false;p=p.parent;}if(v)n++;});return n;}return JSON.stringify({rev:(window.THREE&&window.THREE.REVISION)||null,sceneChildren:__dbg.scene.children.length,quality:__dbg.quality,counts:__dbg.config?__dbg.config.counts:null,bedMeshesVisible:visMeshes(__dbg.bed),ladderLen:+__dbg.ladder.userData.rig.length.toFixed(3),cloudPuffs:(__dbg.cloud.userData.puffs||[]).length,autoWalk:__rig.autoWalk,vpMeta:(window.__vp&&window.__vp.meta||'').indexOf('user-scalable=no')>=0,flexGap:window.__flexGap,flexGapClass:document.documentElement.classList.contains('supports-flex-gap'),uiToggleBottom:getComputedStyle(document.getElementById('ui-toggle')).bottom,jumpBottom:getComputedStyle(document.getElementById('jump-btn')).bottom,panelPadBottom:getComputedStyle(document.getElementById('scene-ui')).paddingBottom,hasLoop:!!window.__loop,loopRunning:window.__loop&&window.__loop.running,time:+__dbg.time.toFixed(3)});})()"},
+  {"op":"eval","js":"JSON.stringify({errs:(window.__errs||[]).slice(0,6)})"}
+]

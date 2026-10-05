@@ -1,0 +1,13 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__rig && window.__rig.P)"},
+  {"op":"wait","ms":2000},
+
+  {"op":"eval","js":"(function(){__rig.setMode('roam');__rig.goto(1);var P=__rig.P;P.state='ladder';P.ls=0;P.vy=0;return JSON.stringify({prepared:true,mode:__rig.mode,step:__rig.step,ladderLen:+__rig.rig.ladder.length.toFixed(3),step2threshold:+(__rig.rig.ladder.length-__rig.rig.ladder.step*0.22).toFixed(3)});})()"},
+  {"op":"wait","ms":1500},
+
+  {"op":"eval","js":"(function(){var P=__rig.P;window.__s0={ls:P.ls,t:__dbg.time};return JSON.stringify({phase:'t0',state:P.state,ls:+P.ls.toFixed(4),t:+__dbg.time.toFixed(3)});})()"},
+  {"op":"wait","ms":12000},
+  {"op":"eval","js":"(function(){var P=__rig.P,s0=window.__s0,dls=P.ls-s0.ls,dt=__dbg.time-s0.t;return JSON.stringify({phase:'t1',state:P.state,ls:+P.ls.toFixed(4),t:+__dbg.time.toFixed(3),dLs:+dls.toFixed(4),dT:+dt.toFixed(4),rate:+(dt>0?dls/dt:0).toFixed(4)});})()"},
+
+  {"op":"eval","js":"JSON.stringify({cfgClimb:(__dbg.config&&__dbg.config.climbSpeed),cfgMount:(__dbg.config&&__dbg.config.mountSpeed),fullClimbSeconds:+((__rig.rig.ladder.length/((__dbg.config&&__dbg.config.climbSpeed)||2.3))).toFixed(2),routeStep:__rig.step,errs:(window.__errs||[])})"}
+]

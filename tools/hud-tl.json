@@ -1,0 +1,17 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.atmos)"},
+  {"op":"wait","ms":2200},
+  {"op":"eval","js":"(function(){function r(s){var e=document.querySelector(s);if(!e)return null;var b=e.getBoundingClientRect();if(!b.width&&!b.height)return null;return [Math.round(b.x),Math.round(b.y),Math.round(b.right),Math.round(b.bottom)];}var v={w:innerWidth,h:innerHeight,hud:r('#hud-tl'),title:r('.overlay'),h1:r('.overlay h1'),p:r('.overlay p'),bgm:r('#bgm'),modes:r('#modes'),sceneUI:r('#scene-ui'),hint:r('#mode-hint'),jump:r('#jump-btn')};function ov(a,b){return !!(a&&b&&!(a[2]<=b[0]||b[2]<=a[0]||a[3]<=b[1]||b[3]<=a[1]));}v.撞_title_bgm=ov(v.title,v.bgm);v.撞_title_modes=ov(v.title,v.modes);v.撞_bgm_modes=ov(v.bgm,v.modes);v.撞_bgm_sceneUI=ov(v.bgm,v.sceneUI);v.撞_sceneUI_hint=ov(v.sceneUI,v.hint);v.撞_sceneUI_jump=ov(v.sceneUI,v.jump);v.撞_title_sceneUI=ov(v.title,v.sceneUI);v.bgmParent=(document.getElementById('bgm').parentNode.id||'(body)');return JSON.stringify(v);})()"},
+  {"op":"shot","file":"hudtl-下午.png"},
+  {"op":"eval","js":"(function(){__dbg.postfx.set('dream');__dbg.atmos.apply('night');var b=document.querySelectorAll('#scene-ui button');b[1]&&b[1].click();return 'night+dream';})()"},
+  {"op":"wait","ms":900},
+  {"op":"shot","file":"hudtl-夜间.png"},
+  {"op":"eval","js":"(function(){__dbg.atmos.apply('afternoon');__dbg.postfx.set('off');document.querySelector('.mode-btn[data-mode=\"roam\"]').click();return 'roam';})()"},
+  {"op":"wait","ms":1500},
+  {"op":"eval","js":"(function(){function r(s){var e=document.querySelector(s);if(!e)return null;var b=e.getBoundingClientRect();if(!b.width&&!b.height)return null;return [Math.round(b.x),Math.round(b.y),Math.round(b.right),Math.round(b.bottom)];}var v={w:innerWidth,h:innerHeight,title:r('.overlay'),bgm:r('#bgm'),modes:r('#modes'),sceneUI:r('#scene-ui'),hint:r('#mode-hint'),jump:r('#jump-btn')};function ov(a,b){return !!(a&&b&&!(a[2]<=b[0]||b[2]<=a[0]||a[3]<=b[1]||b[3]<=a[1]));}v.撞_title_bgm=ov(v.title,v.bgm);v.撞_title_modes=ov(v.title,v.modes);v.撞_bgm_sceneUI=ov(v.bgm,v.sceneUI);v.撞_sceneUI_hint=ov(v.sceneUI,v.hint);v.撞_sceneUI_jump=ov(v.sceneUI,v.jump);return JSON.stringify(v);})()"},
+  {"op":"shot","file":"hudtl-漫游.png"},
+  {"op":"eval","js":"(function(){document.querySelector('.mode-btn[data-mode=\"free\"]').click();window.dispatchEvent(new KeyboardEvent('keydown',{key:'1'}));return 'hint';})()"},
+  {"op":"wait","ms":250},
+  {"op":"eval","js":"(function(){var h=document.getElementById('mode-hint');var b=h.getBoundingClientRect();var t=document.querySelector('#scene-ui .ui-tip').getBoundingClientRect();return JSON.stringify({hintText:h.textContent,hint:[Math.round(b.x),Math.round(b.y),Math.round(b.right),Math.round(b.bottom)],hintOpacity:getComputedStyle(h).opacity,tip:[Math.round(t.x),Math.round(t.y),Math.round(t.right),Math.round(t.bottom)]});})()"},
+  {"op":"eval","js":"JSON.stringify(window.__errs||[])"}
+]

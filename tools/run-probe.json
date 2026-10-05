@@ -1,0 +1,8 @@
+[
+  {"op":"wait","ms":2500},
+  {"op":"eval","js":"'errs='+(window.__errs?window.__errs.length:'undef')"},
+  {"op":"eval","js":"'camera='+(typeof __dbg.camera)+' audioObj='+(typeof __audio)+' stateFn='+(window.__audio?typeof window.__audio.state:'-')"},
+  {"op":"eval","js":"'camPos='+__dbg.camera.position.x.toFixed(1)+','+__dbg.camera.position.y.toFixed(1)+','+__dbg.camera.position.z.toFixed(1)"},
+  {"op":"eval","js":"(function(){try{var a=window.__audio;if(!a)return 'no __audio';return 'state='+a.state()+' idx='+a.index()+' title='+a.title()+' vol='+(a.el?+a.el.volume.toFixed(2):'-');}catch(e){return 'ERR '+e.message;}})()"},
+  {"op":"eval","js":"(function(){try{return JSON.stringify({errs:(window.__errs||[]).slice(0,2),cloud:__dbg.cloudStat()});}catch(e){return 'ERR '+e.message+' | '+e.stack.split('\\n')[1];}})()"}
+]

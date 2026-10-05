@@ -1,0 +1,993 @@
+{
+  "scene": {
+    "_说明": "scene.fog 是「默认那一档雾」—— 也就是「下午」的常雾（其它时相各自写了自己的 near/far，只有下午沿用这里）。用户要求「默认的小雾稍微调强一点：far 减半、near 减半」，所以从 25/5200 改成 12.5/2600。⚠ 这一改动影响的主要是远景：环山三层在 2200/2950/3400 米，far 5200 时最近那层只吃到 42% 的雾，far 2600 时吃到 84.5%，最远两层直接越过 far 全被雾吃掉 —— 天际线会明显更淡。要回调就在 config.json 的 fog 里改。",
+    "fog": {
+      "color": "#93aef2",
+      "near": 3.5,
+      "far": 1800
+    }
+  },
+  "sky": {
+    "background": "#93aef2",
+    "radius": 3600,
+    "gradient": {
+      "top": "#c58ae0",
+      "mid": "#9a93ea",
+      "horizon": "#8fb6f4",
+      "glow": "#ffc7ed",
+      "glowAmp": 0.16,
+      "glowY": 0.06,
+      "topRange": 0.22,
+      "horRange": 0.3
+    },
+    "noise": {
+      "scale": 1,
+      "amp": 0.09
+    },
+    "ridgeBands": [
+      {
+        "radius": 2200,
+        "y": -92,
+        "height": 385,
+        "base": 0.18,
+        "segments": 480,
+        "rows": 12,
+        "noiseRadius": 0.75,
+        "gain": 2.5,
+        "sharp": 1.95,
+        "detailFreq": 0.004,
+        "gradPow": 1.5,
+        "seed": 3.1,
+        "colors": {
+          "bottom": "#2f2c66",
+          "top": "#8b80cf"
+        },
+        "detailAmp": 0.19
+      },
+      {
+        "radius": 2950,
+        "y": -102,
+        "height": 590,
+        "base": 0.17,
+        "segments": 480,
+        "rows": 12,
+        "noiseRadius": 0.72,
+        "gain": 2.3,
+        "sharp": 1.7,
+        "detailFreq": 0.0032,
+        "gradPow": 1.45,
+        "seed": 11.7,
+        "colors": {
+          "bottom": "#4f4b96",
+          "top": "#a89fdc"
+        },
+        "detailAmp": 0.16
+      },
+      {
+        "radius": 3400,
+        "y": -130,
+        "height": 780,
+        "base": 0.2,
+        "segments": 480,
+        "rows": 10,
+        "noiseRadius": 1,
+        "gain": 2,
+        "sharp": 1.4,
+        "detailFreq": 0.0028,
+        "gradPow": 1.4,
+        "seed": 24.5,
+        "colors": {
+          "bottom": "#6e68b4",
+          "top": "#b0a4e0"
+        },
+        "detailAmp": 0.12
+      }
+    ],
+    "farClouds": [
+      {
+        "count": 22,
+        "radius": [
+          1250,
+          2150
+        ],
+        "y": [
+          200,
+          760
+        ],
+        "size": [
+          220,
+          480
+        ],
+        "aspect": 2,
+        "opacity": [
+          0.26,
+          0.56
+        ],
+        "color": "#fdf2ff",
+        "haze": "#a9c0f2",
+        "hazeMix": 0.26,
+        "rotationJitter": 0.4,
+        "seeds": [
+          0,
+          1.7,
+          3.3,
+          5.1
+        ],
+        "textureSize": 512
+      },
+      {
+        "count": 24,
+        "radius": [
+          1700,
+          2900
+        ],
+        "y": [
+          110,
+          420
+        ],
+        "size": [
+          260,
+          470
+        ],
+        "aspect": 3,
+        "maxHalfRatio": 0.5,
+        "opacity": [
+          0.12,
+          0.3
+        ],
+        "color": "#f0dcf8",
+        "haze": "#9fb8f2",
+        "hazeMix": 0.36,
+        "rotationJitter": 0.12,
+        "seeds": [
+          2.2,
+          6.4
+        ],
+        "textureSize": 512,
+        "texture": {
+          "sx": 0.55,
+          "dy": 2.2,
+          "body": [
+            1.5,
+            0.12
+          ]
+        }
+      }
+    ]
+  },
+  "roam": {
+    "lookAim": 2.4,
+    "autoWalk": true,
+    "route": [
+      {
+        "fly": "ladder",
+        "look": "ladder",
+        "turn": 1.4,
+        "speed": 12,
+        "max": 45
+      },
+      {
+        "climbLadder": 1,
+        "look": "ladderTop",
+        "max": 45,
+        "fovBoost": 8
+      },
+      {
+        "hold": true,
+        "onJump": true,
+        "look": "bed",
+        "hint": "爬到顶了 · 点「跳」翻下床"
+      },
+      {
+        "leap": "bed",
+        "leapOff": [
+          0.15,
+          -0.8
+        ],
+        "rise": 4.6,
+        "look": "bed",
+        "hint": "翻个身，落到床上"
+      },
+      {
+        "wait": 2.6,
+        "look": "bed",
+        "hint": "落在床上了"
+      }
+    ]
+  },
+  "walk": {
+    "eyeHeight": 1.68,
+    "speed": 4.2,
+    "lookSpeed": 1.7,
+    "gravity": 18,
+    "jumpSpeed": 6.4,
+    "stepUp": 0.62,
+    "climbUp": 0.95,
+    "_说明": "climbSpeed 是**沿梯子**往上/往下的速度（用户要求减慢 50%：2.3 → 1.15）。mountSpeed 是「爬上床面」那一段（movePlayer 里 state==='bed' 时 P.foot 抬到床顶）用的速度，刻意**不跟着减半** —— 它只有一米多高、原速 2.3 走完约 1 秒，减半会变成两秒多的「慢慢浮上去」，看着像卡住。两个值分开之后「梯子变慢」不会把上床也拖慢。",
+    "climbSpeed": 1.15,
+    "mountSpeed": 2.3,
+    "ladderGrab": 1.15,
+    "landDip": 0.34,
+    "ySmooth": 5.5,
+    "stickRadius": 62
+  },
+  "renderer": {
+    "toneExposure": 1.35,
+    "shadows": true,
+    "pixelRatioMax": 2,
+    "mobile": {
+      "enabled": true,
+      "pixelRatioMax": 1.5,
+      "quality": 0.45,
+      "cloudPuffs": 0.55,
+      "shadowMapSize": 1024
+    }
+  },
+  "postfx": {
+    "_说明": "屏幕后处理（bloom 泛光 + 梦核调色）。四档预设的具体数值**不在 JSON 里**，而是写死在 postfx.js 的 PRESETS 里 —— 那里每个数字旁边都跟着「为什么是这个数」的注释，JSON 放不下也不该抄一份（抄两份迟早不一致）。要改数值：在 config.json 的 postfx.presets.<档名>.bloom / .grade 里写，只覆盖写到的键，其余沿用代码里的默认值。",
+    "enabled": true,
+    "default": "dream",
+    "samples": 4,
+    "bloom": true,
+    "bloomScale": 1
+  },
+  "atmosphere": {
+    "_说明": "时相（下午 / 清晨 / 日落 / 夜间）+ 月亮星空 + 雾档切换。四档的具体数值同样写死在 atmosphere.js 的 DEFAULTS 里（含注释）。要在面板里微调：config.json 的 atmosphere.states.<档名> 下写 sun / hemi / ambient / fog / fogDense / sky / tint / bloom / orb / stars 的任意子集。「下午」是空覆盖 = scene.json 原样，所以它只给 fogDense（让「超大雾」按钮在任何时相下都有反应）。",
+    "enabled": true,
+    "default": "afternoon",
+    "fogModeDefault": "light",
+    "fogAnimMs": 2000
+  },
+  "camera": {
+    "fov": 56,
+    "near": 0.1,
+    "far": 5000,
+    "position": [
+      16,
+      9,
+      30
+    ]
+  },
+  "controls": {
+    "target": "ladderMid",
+    "dampingFactor": 0.06,
+    "minDistance": 6,
+    "maxDistance": 120,
+    "maxPolarAngleDeg": 99
+  },
+  "lights": {
+    "hemisphere": {
+      "sky": "#b7a8ee",
+      "ground": "#575c9c",
+      "intensity": 1.1
+    },
+    "sun": {
+      "color": "#ffe0ec",
+      "intensity": 1.5,
+      "position": [
+        43.67,
+        56.53,
+        31.19
+      ],
+      "shadow": {
+        "mapSize": 4096,
+        "bias": -0.0006,
+        "normalBias": 0.05,
+        "camera": {
+          "left": -175,
+          "right": 175,
+          "top": 175,
+          "bottom": -175,
+          "near": 0.5,
+          "far": 800
+        }
+      }
+    },
+    "ambient": {
+      "color": "#93a0e4",
+      "intensity": 1
+    }
+  },
+  "cloud": {
+    "center": [
+      2.6,
+      14.87,
+      1.6
+    ],
+    "radii": [
+      10.5,
+      5.6,
+      8.4
+    ],
+    "puffCount": 360,
+    "puffSize": [
+      2.8,
+      5.6
+    ],
+    "puffScale": [
+      1.8,
+      0.85
+    ],
+    "textureSeeds": [
+      0,
+      1.7,
+      3.3,
+      5.1
+    ],
+    "textureSize": 320,
+    "colors": {
+      "top": "#fff6fb",
+      "mid": "#ee8ebb",
+      "bottom": "#c74a88",
+      "backlit": "#7d56b6"
+    },
+    "opacity": [
+      0.7,
+      1
+    ],
+    "shadow": {
+      "size": 63,
+      "color": "#3a2a5c",
+      "opacity": 0.035,
+      "falloff": 0.42,
+      "midAlpha": 0.94
+    },
+    "texture": {
+      "body": [
+        1.12,
+        0.22
+      ],
+      "detail": [
+        0.9,
+        0.45
+      ]
+    },
+    "wind": {
+      "dir": [
+        1,
+        0.55
+      ],
+      "drift": 0.3,
+      "rate": 0.3,
+      "rot": 0.25,
+      "rotRate": 0.15,
+      "breathe": 0.03,
+      "inner": [
+        0.55,
+        0.95,
+        2
+      ]
+    },
+    "poke": {
+      "enabled": true,
+      "radius": 5.6,
+      "amount": 4.2,
+      "minCount": 40,
+      "dirBias": 0.55,
+      "inner": [
+        0.2,
+        1.0
+      ],
+      "yScale": 0.85,
+      "thin": 0,
+      "contact": true,
+      "contactAmount": 1.0,
+      "contactRadius": 5.4,
+      "interval": 0.8,
+      "idleInterval": 2.2,
+      "travel": 0.6,
+      "inside": 0.94,
+      "spring": 7.0,
+      "damp": 3.5,
+      "maxRel": 1.0,
+      "absMax": 3.8,
+      "ripple": true,
+      "chime": true,
+      "tapRadius": 5.6,
+      "tapAmount": 4.2
+    }
+  },
+  "audio": {
+    "enabled": true,
+    "autoplay": true,
+    "volume": 0.55,
+    "fadeIn": 3.2,
+    "fadeOut": 0.8,
+    "loop": true,
+    "base": "./audio/",
+    "tracks": [
+      {
+        "file": "bgm-1-dream-ambience.mp3",
+        "title": "Dream (Ambience)",
+        "author": "TokyoGeisha",
+        "license": "CC0",
+        "gain": 1
+      },
+      {
+        "file": "bgm-2-i-want-to-go-home.mp3",
+        "title": "I Want to Go Home",
+        "author": "Eldritch Grim",
+        "license": "CC0",
+        "gain": 1
+      }
+    ],
+    "sfx": {
+      "enabled": true,
+      "volume": 0.32,
+      "root": 440
+    }
+  },
+  "terrain": {
+    "size": 2000,
+    "segments": 400,
+    "mound": {
+      "top": 0.8,
+      "drop": 14,
+      "innerRadius": 38,
+      "outerRadius": 260,
+      "power": 0.6,
+      "above": 0.15,
+      "fadeStart": 90,
+      "fadeEnd": 210,
+      "roll": {
+        "amp": 11,
+        "detail": 0.45,
+        "freq": 0.0075,
+        "start": 24,
+        "full": 100
+      }
+    },
+    "micro": {
+      "freq": 0.035,
+      "amp": 0.5,
+      "start": 8,
+      "full": 34
+    },
+    "broad": {
+      "amp": 22,
+      "start": 480,
+      "full": 1400,
+      "freq": 0.002
+    },
+    "ranges": {
+      "start": 650,
+      "full": 1400,
+      "height": 110,
+      "base": 0.12,
+      "freq": 0.0016,
+      "octaves": 4,
+      "freq2": 0.0055,
+      "octaves2": 3,
+      "mix2": 0.34,
+      "sectorFreq": 0.8,
+      "sectorAmp": 0.6,
+      "sectorGain": 2.4,
+      "farGain": 0.85,
+      "farFull": 2000,
+      "rimMin": 34,
+      "rimStart": 1750,
+      "rimFull": 1995
+    },
+    "peakRange": [
+      85,
+      135
+    ],
+    "detail": {
+      "midFreq": 0.02,
+      "midAmp": 0.42,
+      "fineFreq": 0.05,
+      "fineAmp": 0.26
+    },
+    "colors": {
+      "deepG": "#2f5c30",
+      "meadow": "#5c9c3d",
+      "dry": "#8fbf4e",
+      "light": "#9ed45a",
+      "rock": "#8b9670",
+      "peak": "#cfe0b8"
+    },
+    "texture": {
+      "size": 512,
+      "tile": 2.8,
+      "seed": 7.7,
+      "meanTarget": null,
+      "macroScale": 0.13,
+      "macroMix": 0.4,
+      "debug": true,
+      "palette": {
+        "base": "#627846",
+        "dark": "#384d2a",
+        "mid": "#7f9854",
+        "light": "#b1bc74",
+        "tip": "#e0e2ad",
+        "soil": "#6b6948",
+        "speck": "#dad6c6"
+      },
+      "patchCells": 3,
+      "soilCells": 5,
+      "soilAmt": 0.22,
+      "lightAmt": 0.3,
+      "grain": 0.12,
+      "blades": 1500,
+      "shadeBlades": 420,
+      "speckles": 180,
+      "bladeLen": [
+        0.09,
+        0.28
+      ],
+      "bladeWidth": [
+        0.06,
+        0.15
+      ]
+    }
+  },
+  "mountains": [],
+  "grass": {
+    "count": 15000,
+    "radius": 24,
+    "bladeHeight": 0.62,
+    "bladeWidth": 0.075,
+    "feather": 0.5,
+    "colors": {
+      "a": "#5f9c3a",
+      "b": "#c8e98a"
+    },
+    "tint": {
+      "h": [
+        0.20,
+        0.29
+      ],
+      "s": [
+        0.28,
+        0.49
+      ],
+      "l": [
+        0.42,
+        0.6
+      ]
+    },
+    "avoid": {
+      "x": -2,
+      "z": 1.2,
+      "margin": 0.45,
+      "corner": 0.7
+    },
+    "tuft": {
+      "count": 16000,
+      "radius": 120,
+      "feather": 0.45,
+      "size": [
+        0.5,
+        1.05
+      ],
+      "textureSize": 128,
+      "alphaTest": 0.4,
+      "tint": {
+        "h": [
+          0.20,
+          0.28
+        ],
+        "s": [
+          0.25,
+          0.42
+        ],
+        "l": [
+          0.6,
+          0.8
+        ]
+      },
+      "blade": [
+        "#99b544",
+        "#b3d086",
+        "#d8ee9a"
+      ]
+    },
+    "lavender": {
+      "count": 4200,
+      "radius": 34,
+      "size": [
+        0.62,
+        1.35
+      ],
+      "clusters": [
+        {
+          "center": [
+            -2,
+            6.2
+          ],
+          "rx": 3.2,
+          "rz": 1.6,
+          "count": 150,
+          "feather": 0.5
+        },
+        {
+          "center": [
+            -2,
+            -4.2
+          ],
+          "rx": 3.2,
+          "rz": 1.6,
+          "count": 150,
+          "feather": 0.5
+        },
+        {
+          "center": [
+            4,
+            1.2
+          ],
+          "rx": 1.4,
+          "rz": 4,
+          "count": 130,
+          "feather": 0.5
+        },
+        {
+          "center": [
+            -8,
+            1.2
+          ],
+          "rx": 1.4,
+          "rz": 4,
+          "count": 130,
+          "feather": 0.5
+        }
+      ],
+      "clusterSize": [
+        0.5,
+        1
+      ],
+      "patchFreq": 0.075,
+      "patchThreshold": 0.6,
+      "patchSoft": 0.05,
+      "textureSize": 128,
+      "alphaTest": 0.42,
+      "stems": 7,
+      "stemColor": "#6f9c52",
+      "flowerColor": "#9a7bd4",
+      "flowerLight": "#cbb2f2",
+      "tint": {
+        "h": [
+          0.7,
+          0.8
+        ],
+        "s": [
+          0.16,
+          0.38
+        ],
+        "l": [
+          0.64,
+          0.86
+        ]
+      }
+    }
+  },
+  "bed": {
+    "position": [
+      -2,
+      null,
+      1.2
+    ],
+    "scale": [
+      1.8,
+      1.44,
+      1.8
+    ],
+    "terrainOffset": 0.05,
+    "surfaceY": 1.44,
+    "model": {
+      "url": "./models/bed2.glb.json",
+      "rotationY": 1.5708,
+      "topFrac": 0.64,
+      "smoothAngle": 0
+    },
+    "rotationY": -3.1415732,
+    "rotationZ": 0,
+    "materials": {
+      "wood": "#4d4f7a",
+      "sheet": "#f3f1f9",
+      "blanket": "#9a9dd6"
+    },
+    "pillows": [
+      {
+        "color": "#f6f4fa",
+        "pos": [
+          -1.55,
+          1.78,
+          -0.95
+        ],
+        "rot": [
+          -1.15,
+          0.15,
+          0
+        ],
+        "s": 1
+      },
+      {
+        "color": "#f3c9d4",
+        "pos": [
+          -1.45,
+          1.62,
+          -0.35
+        ],
+        "rot": [
+          -0.55,
+          -0.25,
+          0
+        ],
+        "s": 0.95
+      },
+      {
+        "color": "#f6f4fa",
+        "pos": [
+          -1.15,
+          1.58,
+          -1.35
+        ],
+        "rot": [
+          -0.8,
+          0.35,
+          0
+        ],
+        "s": 0.9
+      }
+    ]
+  },
+  "projector": {
+    "_说明": "夜间专属的床前投影幕布。screen 是幕布平面；light 是幕布前方的点光源（模拟投影仪/电视辉光）；video 配置视频纹理。若 video.src 留空或不存在，则用程序化画布动画（老电影/噪波/梦境字样）作为回退。",
+    "enabled": true,
+    "screen": {
+      "_position说明": "床的长轴在 X（床心 x=-2，半长 4.23 ⇒ 床尾在 x=-6.23），幕布旋转 90° 后正对床尾、并向 -X 再退 2 米 ⇒ x=-8.23；z 取床心 z=1.2，让幕布横过来正对床面中央。",
+      "position": [-8.23, 3.95, 1.2],
+      "rotationY": 1.5708,
+      "width": 5.25,
+      "height": 2.955,
+      "emissive": 0.85,
+      "falloff": 0.38,
+      "frameColor": "#2a2a40",
+      "frameThickness": 0.06
+    },
+    "light": {
+      "position": [-7.68, 4.35, 1.2],
+      "color": "#ffd9b8",
+      "intensity": 1.1,
+      "distance": 13,
+      "decay": 1.7
+    },
+    "video": {
+      "src": "./video/night.mp4",
+      "canvasWidth": 512,
+      "canvasHeight": 288,
+      "fps": 16
+    }
+  },
+  "daisies": {
+    "clusters": [
+      {
+        "center": [
+          1.55,
+          1.2
+        ],
+        "rx": 1.15,
+        "rz": 2.4,
+        "count": 95,
+        "feather": 0.45,
+        "size": [
+          0.3,
+          0.58
+        ]
+      },
+      {
+        "center": [
+          -5.45,
+          1.2
+        ],
+        "rx": 1.15,
+        "rz": 2.4,
+        "count": 95,
+        "feather": 0.45,
+        "size": [
+          0.3,
+          0.58
+        ]
+      }
+    ],
+    "_说明": "clusters 里的 center 是「先按 bedScale=1 设计、再被 bedScale 外推」的坐标；写在 config.json 的 daisies.clusters 则是最终世界坐标，不再外推。",
+    "_说明_grow": "grow = 整株长高倍率（只作用于 Y）。花头在纹理里先按 1/grow 压扁、实例再按 grow 拉长，两次相乘=1 ⇒ 花头大小与形状不变，只有茎变长、花头离地更高。1 = 原样。注意与 sizes.daisyScale 区别：后者等比放大整株（花头一起变大）。",
+    "grow": 1.3,
+    "count": 90,
+    "center": [
+      1.7,
+      1.6
+    ],
+    "radius": 1.1,
+    "size": [
+      0.3,
+      0.58
+    ],
+    "textureSize": 128,
+    "alphaTest": 0.42,
+    "castShadow": true,
+    "receiveShadow": true,
+    "petal": "#ffffff",
+    "petalShade": "#e3e9f8",
+    "heart": "#f0b43a",
+    "stem": "#5f8f4a"
+  },
+  "bedShadow": {
+    "enabled": true,
+    "grass": 2600,
+    "ringWidth": 0.55,
+    "falloff": 3.2,
+    "inset": 0.02,
+    "heightScale": 1.0,
+    "size": [
+      0.3,
+      0.6
+    ],
+    "edgeBoost": 0,
+    "tint": {
+      "h": [
+        0.27,
+        0.35
+      ],
+      "s": [
+        0.22,
+        0.48
+      ],
+      "l": [
+        0.16,
+        0.3
+      ]
+    },
+    "ao": {
+      "opacity": 0.62,
+      "spread": 0.6,
+      "lift": 0.035,
+      "color": "#2f3a26",
+      "textureSize": 256,
+      "seg": 36
+    }
+  },
+  "butterflies": {
+    "count": 4,
+    "center": null,
+    "flight": "flowers",
+    "flowerRadius": [
+      0.5,
+      0.9
+    ],
+    "flowerHeight": [
+      0.95,
+      1.45
+    ],
+    "flowerDrift": 0.32,
+    "speedFlower": [
+      0.3,
+      0.64
+    ],
+    "radiusX": [
+      1.9,
+      3.05
+    ],
+    "radiusZ": [
+      2.7,
+      3.9
+    ],
+    "height": [
+      0.5,
+      2
+    ],
+    "size": [
+      0.16,
+      0.3
+    ],
+    "speed": [
+      0.11,
+      0.2
+    ],
+    "flap": [
+      4.5,
+      6
+    ],
+    "tilt": 0.42,
+    "textureSize": 128,
+    "alphaTest": 0.34,
+    "glow": 0.22,
+    "glowColor": "#ffe4f2",
+    "tint": {
+      "h": [
+        0.88,
+        0.97
+      ],
+      "s": [
+        0.3,
+        0.62
+      ],
+      "l": [
+        0.82,
+        0.96
+      ]
+    },
+    "wing": "#ffffff",
+    "wingTip": "#ffd9ec",
+    "wingShade": "#8c4468",
+    "vein": "rgba(130,62,96,0.5)",
+    "body": "#6e3151"
+  },
+  "fireflies": {
+    "count": 22,
+    "radiusX": [3.2, 5.6],
+    "radiusZ": [3.4, 6.0],
+    "height": [0.3, 2.9],
+    "size": [0.10, 0.20],
+    "speed": [0.12, 0.34],
+    "bob": [0.6, 1.4],
+    "textureSize": 128,
+    "drift": 0.9,
+    "palette": ["#d8ff7a", "#b6ff5a", "#eaffb0", "#9bff66"],
+    "flicker": { "sharp": 5.5, "base": 0.12, "gain": 1.9 }
+  },
+  "glints": {
+    "textureSize": 128,
+    "size": [
+      0.2,
+      0.42
+    ],
+    "speed": [
+      1.6,
+      4.6
+    ],
+    "sharp": 3.2,
+    "base": 0.22,
+    "gain": 2,
+    "palette": [
+      "#ffe6a8",
+      "#ffd6a8",
+      "#dcd0ff",
+      "#cfeaff"
+    ],
+    "bed": {
+      "count": 16,
+      "yFrom": 0.3,
+      "yTo": 0.9,
+      "outset": 0.03,
+      "spread": 0.78,
+      "drift": 0.09,
+      "snap": true,
+      "snapOutset": 0.035
+    },
+    "ladder": {
+      "count": 10,
+      "span": 9,
+      "outset": 0.025,
+      "drift": 0.16,
+      "chase": 0.85,
+      "scale": 0.55,
+      "bright": 0.7
+    }
+  },
+  "ladder": {
+    "length": 12.9,
+    "color": "#e0611f",
+    "roughness": 0.45,
+    "metalness": 0.04,
+    "railWidth": 0.17,
+    "railDepth": 0.13,
+    "taper": 0.28,
+    "railSegments": 16,
+    "railRings": 14,
+    "rungRadius": 0.045,
+    "rungSegments": 14,
+    "rotationOrder": "YXZ",
+    "rotation": [
+      0.48,
+      1.52,
+      0
+    ],
+    "bottom": [
+      -2,
+      null,
+      1.4
+    ],
+    "bottomOffsetY": -0.06
+  }
+}

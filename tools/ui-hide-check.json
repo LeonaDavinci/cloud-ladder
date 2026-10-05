@@ -1,0 +1,37 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__rig && !!window.__ui)"},
+  {"op":"wait","ms":2500},
+
+  {"op":"eval","js":"(function(){window.__probe=function(tag){function st(s){var e=document.querySelector(s);if(!e)return {miss:1};var b=e.getBoundingClientRect();var d=getComputedStyle(e).display;return {d:d,v:(d!=='none'&&(b.width>0||b.height>0))?1:0,x:Math.round(b.x),y:Math.round(b.y),r:Math.round(b.right),bt:Math.round(b.bottom)};}function hit(a,c){if(!a||!c||!a.v||!c.v)return false;return a.x<c.r&&c.x<a.r&&a.y<c.bt&&c.y<a.bt;}var T=st('#ui-toggle');var box={toggle:T,h1:st('.overlay h1'),sub:st('.overlay p'),modes:st('#modes'),panel:st('#scene-ui'),tip:st('#scene-ui .ui-tip'),fogRow:st('#ui-fog'),bgm:st('#bgm'),hint:st('#mode-hint'),jump:st('#jump-btn'),sticks:st('#sticks')};var names=Object.keys(box),pairs=[];for(var i=0;i<names.length;i++)for(var j=i+1;j<names.length;j++){if(hit(box[names[i]],box[names[j]]))pairs.push(names[i]+'x'+names[j]);}var btn=document.getElementById('ui-toggle');return {phase:tag,hidden:__ui.hidden,aria:btn.getAttribute('aria-pressed'),label:btn.textContent,cls:document.body.className,mode:__rig.mode,box:box,overlaps:pairs,panelBottomFromEdge:innerHeight-box.panel.bt,errs:(window.__errs||[]).length};};return 'ok';})()"},
+
+  {"op":"eval","js":"JSON.stringify(window.__probe('1-visible'))"},
+  {"op":"shot","file":"ui-hide-1-visible.png"},
+
+  {"op":"clickSel","sel":"#ui-toggle"},
+  {"op":"wait","ms":400},
+  {"op":"eval","js":"JSON.stringify(window.__probe('2-hidden'))"},
+  {"op":"shot","file":"ui-hide-2-hidden.png"},
+
+  {"op":"clickSel","sel":"#ui-toggle"},
+  {"op":"wait","ms":400},
+  {"op":"eval","js":"JSON.stringify(window.__probe('3-restored'))"},
+
+  {"op":"eval","js":"(function(){__rig.setMode('roam');return 'roam';})()"},
+  {"op":"wait","ms":900},
+  {"op":"eval","js":"JSON.stringify(window.__probe('4-roam-visible'))"},
+
+  {"op":"eval","js":"(function(){__ui.toggle();return 'hide';})()"},
+  {"op":"wait","ms":400},
+  {"op":"eval","js":"JSON.stringify(window.__probe('5-roam-hidden'))"},
+  {"op":"shot","file":"ui-hide-3-roam-hidden.png"},
+
+  {"op":"eval","js":"(function(){__ui.toggle();return 'show';})()"},
+  {"op":"wait","ms":400},
+  {"op":"eval","js":"JSON.stringify(window.__probe('6-roam-restored'))"},
+
+  {"op":"eval","js":"(function(){document.body.dispatchEvent(new KeyboardEvent('keydown',{key:'h',bubbles:true}));window.dispatchEvent(new KeyboardEvent('keydown',{key:'h',bubbles:true}));return 'keyH';})()"},
+  {"op":"wait","ms":400},
+  {"op":"eval","js":"JSON.stringify(window.__probe('7-keyH-hidden'))"},
+  {"op":"shot","file":"ui-hide-4-keyH.png"},
+  {"op":"eval","js":"JSON.stringify({errs:window.__errs||[]})"}
+]

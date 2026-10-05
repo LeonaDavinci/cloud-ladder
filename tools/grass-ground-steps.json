@@ -1,0 +1,16 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.terrain && window.__dbg.terrain.material.map)"},
+  {"op":"eval","js":"(()=>{const m=window.__dbg.terrain.material,t=m.map,u=t.userData;return {size:[t.image.width,t.image.height],rep:Math.round(t.repeat.x),aniso:t.anisotropy,lum:+u.meanLum.toFixed(4),gain:+u.gain.toFixed(3),comp:+u.brightComp.toFixed(4),genMs:Math.round(u.genMs),color:m.color.getHexString(),macro:!!m.customProgramCacheKey};})()"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,c=d.camera;c.position.set(4,6.5,8.5);d.controls.target.set(-1,1.25,0.6);d.controls.update();return 'bird';})()"},
+  {"op":"wait","ms":2800},
+  {"op":"shot","file":"g1-ground-bird.png"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,c=d.camera;c.position.set(6.2,2.05,11.5);d.controls.target.set(-1,1.55,0.6);d.controls.update();return 'low';})()"},
+  {"op":"wait","ms":2800},
+  {"op":"shot","file":"g2-ground-low.png"},
+  {"op":"eval","js":"(()=>{const t=window.__dbg.terrain.material.map.image;const c=document.createElement('canvas');c.width=c.height=t.width*2;const g=c.getContext('2d');for(let i=0;i<2;i++)for(let j=0;j<2;j++)g.drawImage(t,i*t.width,j*t.height);c.id='tile-preview';c.style.cssText='position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:99999;background:#000';document.body.appendChild(c);return c.width;})()"},
+  {"op":"wait","ms":900},
+  {"op":"shot","file":"g3-tile-seam.png"},
+  {"op":"eval","js":"(()=>{const e=document.getElementById('tile-preview');if(e)e.remove();return 'removed';})()"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,c=d.camera;c.position.set(16,9,30);d.controls.target.set(1.5,11.5,-2);d.controls.update();return 'default';})()"},
+  {"op":"wait","ms":2800}
+]

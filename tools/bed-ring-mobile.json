@@ -1,0 +1,8 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.scene.getObjectByName('bedShadow'))"},
+  {"op":"wait","ms":2200},
+  {"op":"eval","js":"(()=>{const d=window.__dbg;const g=d.scene.getObjectByName('bedShadow');const m=g.children.find(o=>o.isInstancedMesh);return {q:d.quality,ring:m?m.count:0,ao:g.userData.aoSize,fp:g.userData.footprint};})()"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,b=d.bed.position,c=d.camera;c.position.set(b.x+1.9,b.y+1.62,b.z+2.1);d.controls.target.set(b.x,b.y+0.35,b.z);d.controls.update();return 'player';})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"m1-ring-mobile.png"}
+]

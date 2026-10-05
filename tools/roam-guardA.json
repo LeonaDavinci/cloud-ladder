@@ -1,0 +1,15 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__rig && window.__rig.steps>4)"},
+  {"op":"wait","ms":2500},
+  {"op":"eval","js":"(function(){__rig.setMode('roam');return 'roam';})()"},
+  {"op":"wait","ms":400},
+  {"op":"eval","js":"(function(){var k=__rig.rig.ladder;__rig.P.state='ladder';__rig.P.ls=3;__rig.P.lsq=3;__rig.P.vy=0;__rig.goto(1);return 'step1 ls=3';})()"},
+  {"op":"wait","ms":900},
+  {"op":"eval","js":"(function(){document.getElementById('jump-btn').click();return 'clicked';})()"},
+  {"op":"wait","ms":1200},
+  {"op":"eval","js":"'RAW step='+__rig.step+' state='+__rig.P.state+' leapOn='+__rig.leap.on+' ls='+__rig.P.ls.toFixed(2)"},
+  {"op":"eval","js":"JSON.stringify({step:__rig.step,state:__rig.P.state,leapOn:__rig.leap.on,ls:+__rig.P.ls.toFixed(2)})"},
+  {"op":"wait","ms":2000},
+  {"op":"eval","js":"JSON.stringify({step:__rig.step,state:__rig.P.state,leapOn:__rig.leap.on,ls:+__rig.P.ls.toFixed(2),verdict:(__rig.step===1&&!__rig.leap.on)?'OK 爬梯途中按跳被丢弃':'BAD'})"},
+  {"op":"eval","js":"JSON.stringify({errs:window.__errs||[]})"}
+]

@@ -1,0 +1,11 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__rig)"},
+  {"op":"wait","ms":2400},
+  {"op":"eval","js":"(function(){function r(s){var e=document.querySelector(s);if(!e)return null;var b=e.getBoundingClientRect();if(b.width===0&&b.height===0)return null;return {x:Math.round(b.x),y:Math.round(b.y),r:Math.round(b.right),b:Math.round(b.bottom)};}function hit(a,c){if(!a||!c)return false;return a.x<c.r&&c.x<a.r&&a.y<c.b&&c.y<a.b;}var box={panel:r('#scene-ui'),tip:r('#scene-ui .ui-tip'),rowFog:r('#ui-fog'),hint:r('#mode-hint'),jump:r('#jump-btn'),hud:r('#hud-tl'),overlay:r('.overlay'),bgm:r('#bgm'),modes:r('#modes')};var names=Object.keys(box),pairs=[];for(var i=0;i<names.length;i++)for(var j=i+1;j<names.length;j++){if(hit(box[names[i]],box[names[j]]))pairs.push(names[i]+'×'+names[j]);}var he=document.getElementById('mode-hint');var op=he?getComputedStyle(he).opacity:'?';var row=box.rowFog?{fromBottom:innerHeight-box.rowFog.b}:null;return JSON.stringify({w:innerWidth,h:innerHeight,mode:__rig.mode,box:box,fogRowFromBottom:row?row.fromBottom:null,pairs:pairs,errs:(window.__errs||[]).length});})()"},
+  {"op":"shot","file":"ui-free.png"},
+  {"op":"eval","js":"(function(){__rig.setMode('roam');return 'roam';})()"},
+  {"op":"wait","ms":1500},
+  {"op":"eval","js":"(function(){function r(s){var e=document.querySelector(s);if(!e)return null;var b=e.getBoundingClientRect();if(b.width===0&&b.height===0)return null;return {x:Math.round(b.x),y:Math.round(b.y),r:Math.round(b.right),b:Math.round(b.bottom)};}function hit(a,c){if(!a||!c)return false;return a.x<c.r&&c.x<a.r&&a.y<c.b&&c.y<a.b;}var box={panel:r('#scene-ui'),rowFog:r('#ui-fog'),jump:r('#jump-btn'),hud:r('#hud-tl'),modes:r('#modes')};var names=Object.keys(box),pairs=[];for(var i=0;i<names.length;i++)for(var j=i+1;j<names.length;j++){if(hit(box[names[i]],box[names[j]]))pairs.push(names[i]+'×'+names[j]);}return JSON.stringify({mode:__rig.mode,pairs:pairs,panel:box.panel,jump:box.jump,gapPanelToJump:(box.panel&&box.jump)?(box.panel.y-box.jump.b):null});})()"},
+  {"op":"shot","file":"ui-roam.png"},
+  {"op":"eval","js":"JSON.stringify({errs:window.__errs||[]})"}
+]

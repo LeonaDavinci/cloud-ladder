@@ -1,0 +1,7 @@
+[
+  { "op": "waitFor", "js": "!!(window.__dbg && window.__dbg.daisies && window.__dbg.bed)", "timeout": 90000 },
+  { "op": "wait", "ms": 1500 },
+  { "op": "eval", "js": "(()=>{const d=window.__dbg;const out={};const box=(o)=>{const b=new d.THREE.Box3().setFromObject(o);return {min:[+b.min.x.toFixed(3),+b.min.y.toFixed(3),+b.min.z.toFixed(3)],max:[+b.max.x.toFixed(3),+b.max.y.toFixed(3),+b.max.z.toFixed(3)]};};out.bedBox=box(d.bed);out.daisyBox=box(d.daisies);out.ladderBox=box(d.ladder);out.rig=d.__rig?d.__rig.rig.ladder:null;out.clusters=d.config&&d.config.counts?d.config.counts.daisy:null;out.bedPos=[d.bed.position.x,d.bed.position.y,d.bed.position.z];out.bedScale=d.bed.scale.x;out.effBed=d.config&&d.config.bed;return JSON.stringify(out);})()" },
+  { "op": "eval", "js": "(()=>{const d=window.__dbg;const m=d.daisies;const M=new d.THREE.Matrix4();const v=new d.THREE.Vector3();let mnx=1e9,mxx=-1e9,mnz=1e9,mxz=-1e9;const pts=[];for(let i=0;i<m.count;i++){m.getMatrixAt(i,M);v.setFromMatrixPosition(M);mnx=Math.min(mnx,v.x);mxx=Math.max(mxx,v.x);mnz=Math.min(mnz,v.z);mxz=Math.max(mxz,v.z);if(i%40===0)pts.push([+v.x.toFixed(2),+v.z.toFixed(2)]);}return JSON.stringify({count:m.count,x:[+mnx.toFixed(2),+mxx.toFixed(2)],z:[+mnz.toFixed(2),+mxz.toFixed(2)],sample:pts});})()" },
+  { "op": "shot", "file": "dp-raw.png" }
+]

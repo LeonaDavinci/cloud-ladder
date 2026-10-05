@@ -1,0 +1,13 @@
+[
+  {"op":"wait","ms":3000},
+  {"op":"eval","js":"(function(){var a=window.__audio;return JSON.stringify({errs:(window.__errs||[]).length,model:__dbg.camera?1:0,audio:a?{state:a.state,idx:a.index,title:a.title,vol:a.el?+a.el.volume.toFixed(2):null,t:a.el?+(a.el.currentTime||0).toFixed(2):null,dur:a.el?+(a.el.duration||0).toFixed(1):null,blocked:!!a.blocked}:null,cloud:__dbg.cloudStat()});})()"},
+  {"op":"shot","file":"run-0-idle.png"},
+  {"op":"eval","js":"'hit='+!!__dbg.cloudHit(innerWidth*0.50, innerHeight*0.52)"},
+  {"op":"clickAt","js":"[innerWidth*0.50, innerHeight*0.52]"},
+  {"op":"wait","ms":1300},
+  {"op":"eval","js":"JSON.stringify(__dbg.cloudStat())"},
+  {"op":"shot","file":"run-1-peak.png"},
+  {"op":"wait","ms":7000},
+  {"op":"eval","js":"(function(){var a=window.__audio;return JSON.stringify({stat:__dbg.cloudStat(),audio:a?{state:a.state,idx:a.index,t:+(a.el.currentTime||0).toFixed(2),vol:+a.el.volume.toFixed(2)}:null,errs:window.__errs});})()"},
+  {"op":"shot","file":"run-2-after.png"}
+]

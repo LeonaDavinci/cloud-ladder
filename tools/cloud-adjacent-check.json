@@ -1,0 +1,15 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__rig && window.__rig.steps>4)"},
+  {"op":"wait","ms":2500},
+
+  {"op":"eval","js":"(function(){__dbg.postfx.set('off');__dbg.atmos.apply('night');__dbg.atmos.settleFog();return JSON.stringify({state:__dbg.atmos.state});})()"},
+  {"op":"wait","ms":600},
+
+  {"op":"eval","js":"(function(){var rs=__dbg.cloud.userData.ripples;var r0=rs[0].sp.material;var pl=__dbg.cloud.userData.puffs[0];var sp=pl.sp.material;return JSON.stringify({投影板:{colorWrite:pl.plate.material.colorWrite,inTintReg:!!pl.plate.material.userData.__tintBase,side:pl.plate.material.side,opacity:pl.plate.material.opacity},云片:{color:'#'+sp.color.getHexString(),inTintReg:!!sp.userData.__tintBase},涟漪:{count:rs.length,color:'#'+r0.color.getHexString(),inTintReg:!!r0.userData.__tintBase,blending:r0.blending,additive:r0.blending===__dbg.THREE.AdditiveBlending,depthTest:r0.depthTest,idleOpacity:r0.opacity,idleVisible:rs[0].sp.visible}});})()"},
+
+  {"op":"eval","js":"(function(){var n=__dbg.poke(2.6,13.5,1.6);var rs=__dbg.cloud.userData.ripples;var live=rs.filter(function(r){return r.life>=0;});return JSON.stringify({poked:n,liveRipples:live.length,liveOpacity:live.length?+live[0].sp.material.opacity.toFixed(3):null,liveColor:live.length?'#'+live[0].sp.material.color.getHexString():null});})()"},
+  {"op":"wait","ms":300},
+  {"op":"shot","file":"night-ripple.png"},
+
+  {"op":"eval","js":"JSON.stringify({renderCalls:__dbg.renderer.info.render.calls,triangles:__dbg.renderer.info.render.triangles,errs:(window.__errs||[])})"}
+]

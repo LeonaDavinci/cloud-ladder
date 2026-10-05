@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>GLB 单模型检视器</title>
+<style>
+  html,body{margin:0;height:100%;background:#141418;color:#e6e6ee;
+            font:13px/1.6 system-ui,"Microsoft YaHei",sans-serif;overflow:hidden}
+  #grid{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;
+        width:100vw;height:100vh;gap:2px;background:#2a2a34}
+  .cell{position:relative;background:#141418}
+  .cell canvas{display:block;width:100%;height:100%}
+  .cap{position:absolute;left:8px;top:6px;padding:2px 8px;border-radius:6px;
+       background:rgba(0,0,0,.45);color:#ffd98a;font-size:12px}
+  #info{position:absolute;left:8px;bottom:8px;z-index:5;padding:6px 10px;border-radius:8px;
+        background:rgba(0,0,0,.55);color:#bfe6c8;font-size:12px;white-space:pre}
+</style>
+</head>
+<body>
+<div id="grid">
+  <div class="cell"><div class="cap">正面（−Z 看）</div></div>
+  <div class="cell"><div class="cap">侧面（+X 看）</div></div>
+  <div class="cell"><div class="cap">俯视（+Y 看）</div></div>
+  <div class="cell"><div class="cap">3/4 视角</div></div>
+</div>
+<div id="info">loading…</div>
+<script type="importmap">
+{ "imports": { "three": "../vendor/three/three.module.js", "three/addons/": "../vendor/three/addons/" } }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+const src = new URLSearchParams(location.search).get('src') || '../models/bed2.glb';
+const info = document.getElementById('info');
+const cells = [...document.querySelectorAll('.cell')];
+
+const gltf = await new GLTFLoader().loadAsync(src);
+const model = gltf.scene;
+/* 内嵌贴图是异步解码的：不等一会儿就渲染，四张图全是没贴图的白模。 */
+await new Promise(r => setTimeout(r, 900));
+model.updateMatrixWorld(true);
+const box = new THREE.Box3().setFromObject(model);
+const size = box.getSize(new THREE.Vector3());
+const ctr  = box.getCenter(new THREE.Vector3());
+info.textContent = 'src=' + src +
+  '\n世界包围盒 min=[' + box.min.toArray().map(v => v.toFixed(3)).join(', ') + ']' +
+  '\n            max=[' + box.max.toArray().map(v => v.toFixed(3)).join(', ') + ']' +
+  '\n            dim=[' + size.toArray().map(v => v.toFixed(3)).join(', ') + ']';
+
+/* 每格一个独立的 renderer（无头 Chrome 里 context 少一点更稳），
+   相机固定成 4 个正交方向，摆在地面网格上方，方便一眼判断「哪根轴朝上」。 */
+const span = Math.max(size.x, size.z) * 1.6 + 1;
+const views = [
+  { pos: [0, ctr.y, ctr.z + span],   name: '正面' },
+  { pos: [ctr.x + span, ctr.y, ctr.z], name: '侧面' },
+  { pos: [ctr.x + 0.001, box.max.y + span, ctr.z], name: '俯视' },
+  { pos: [ctr.x + span * 0.7, ctr.y + span * 0.6, ctr.z + span * 0.7], name: '3/4' }
+];
+const rendered = [];
+for (let i = 0; i < cells.length; i++){
+  const cell = cells[i];
+  const rn = new THREE.WebGLRenderer({ antialias: true });
+  rn.setPixelRatio(1);
+  const w = cell.clientWidth || 640, h = cell.clientHeight || 360;
+  rn.setSize(w, h, false);
+  rn.outputColorSpace = THREE.SRGBColorSpace;
+  rn.toneMapping = THREE.ACESFilmicToneMapping;
+  rn.toneMappingExposure = 1.0;
+  cell.appendChild(rn.domElement);
+
+  const sc = new THREE.Scene();
+  sc.background = new THREE.Color(0x1b1b22);
+  sc.add(new THREE.HemisphereLight(0xdfe8ff, 0x2b2b38, 1.15));
+  const dl = new THREE.DirectionalLight(0xffffff, 2.4); dl.position.set(4, 8, 5); sc.add(dl);
+  const dl2 = new THREE.DirectionalLight(0xbfd0ff, 0.8); dl2.position.set(-5, 4, -4); sc.add(dl2);
+
+  sc.add(new THREE.GridHelper(Math.ceil(span) * 2, Math.ceil(span) * 2, 0x4a4a5c, 0x33333f));
+  /* 三根轴：X 红 / Y 绿 / Z 蓝，各 1 米长，摆在包围盒角上 */
+  const org = new THREE.Vector3(box.min.x, box.min.y, box.min.z);
+  const mk = (dir, col) => {
+    const g = new THREE.BufferGeometry().setFromPoints([org, org.clone().add(dir)]);
+    sc.add(new THREE.Line(g, new THREE.LineBasicMaterial({ color: col })));
+  };
+  mk(new THREE.Vector3(1, 0, 0), 0xff5555);
+  mk(new THREE.Vector3(0, 1, 0), 0x55ff88);
+  mk(new THREE.Vector3(0, 0, 1), 0x6688ff);
+
+  sc.add(model.clone(true));
+  const cam = new THREE.PerspectiveCamera(35, w / h, 0.05, 200);
+  cam.position.set(...views[i].pos);
+  cam.lookAt(ctr.x, ctr.y, ctr.z);
+  rn.render(sc, cam);
+  rendered.push(views[i].name);
+}
+window.__viewer = { src, size: size.toArray(), min: box.min.toArray(), max: box.max.toArray(), cells: rendered.length };
+window.__done = true;
+</script>
+</body>
+</html>

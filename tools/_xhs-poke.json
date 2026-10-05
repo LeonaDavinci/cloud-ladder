@@ -1,0 +1,8 @@
+[
+  {"op": "wait", "ms": 4000},
+  {"op": "click", "x": 545, "y": 400},
+  {"op": "wait", "ms": 200},
+  {"op": "shot", "file": "_xhs-5-poke.png"},
+  {"op": "wait", "ms": 300},
+  {"op": "shot", "file": "_xhs-5-poke2.png"}
+]

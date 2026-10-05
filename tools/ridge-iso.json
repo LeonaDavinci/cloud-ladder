@@ -1,0 +1,13 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.atmos)"},
+  {"op":"wait","ms":2000},
+  {"op":"eval","js":"(function(){var s=__dbg.scene;window.__bands=[s.children[7],s.children[8],s.children[9]];window.__bands.forEach(function(b,i){b.visible=true;});return 'bands ok '+window.__bands.map(function(b){return b.geometry.attributes.position.count;}).join(',');})()"},
+  {"op":"shot","file":"ridge-iso-all.png"},
+  {"op":"eval","js":"(function(){window.__bands[2].visible=false;return 'hid far(3400)';})()"},
+  {"op":"wait","ms":600},
+  {"op":"shot","file":"ridge-iso-no3400.png"},
+  {"op":"eval","js":"(function(){window.__bands[1].visible=false;window.__bands[2].visible=false;return 'hid 2950+3400';})()"},
+  {"op":"wait","ms":600},
+  {"op":"shot","file":"ridge-iso-no2far.png"},
+  {"op":"eval","js":"(function(){window.__bands.forEach(function(b){b.visible=true;});return 'restored';})()"}
+]

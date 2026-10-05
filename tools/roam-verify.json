@@ -1,0 +1,33 @@
+[
+  { "op": "waitFor", "js": "!!(window.__rig && window.__rig.P && window.__dbg)" },
+  { "op": "wait", "ms": 2500 },
+  { "op": "fps" },
+
+  { "op": "eval", "js": "(()=>{const d=window.__dbg,c=d.camera;c.position.set(12,3.0,14);d.controls.target.set(-2,2.0,1.2);d.controls.update();return 'cam-placed';})()" },
+  { "op": "wait", "ms": 1500 },
+  { "op": "shot", "file": "r0-before.png" },
+
+  { "op": "eval", "js": "(()=>{const r=window.__rig;r.setMode('roam');const P=r.P;return {mode:r.mode,step:r.step,p:[+P.x.toFixed(2),+P.foot.toFixed(2),+P.z.toFixed(2)],yaw:+P.yaw.toFixed(2),hint:document.getElementById('mode-hint').textContent};})()" },
+  { "op": "wait", "ms": 9000 },
+  { "op": "shot", "file": "r1-turn.png" },
+  { "op": "eval", "js": "(()=>{const P=window.__rig.P;return {step:window.__rig.step,p:[+P.x.toFixed(2),+P.foot.toFixed(2),+P.z.toFixed(2)],yaw:+P.yaw.toFixed(2)};})()" },
+
+  { "op": "waitFor", "js": "window.__rig.step===1", "timeout": 240000 },
+  { "op": "eval", "js": "(()=>{const P=window.__rig.P;return {arrived:[+P.x.toFixed(2),+P.foot.toFixed(2),+P.z.toFixed(2)],state:P.state,ls:+P.ls.toFixed(2)};})()" },
+  { "op": "wait", "ms": 1200 },
+  { "op": "shot", "file": "r2-grabbed.png" },
+
+  { "op": "waitFor", "js": "window.__rig.step===2", "timeout": 300000 },
+  { "op": "wait", "ms": 1200 },
+  { "op": "shot", "file": "r3-top.png" },
+  { "op": "eval", "js": "(()=>{const P=window.__rig.P;const h=document.getElementById('mode-hint');return {step:window.__rig.step,p:[+P.x.toFixed(2),+P.foot.toFixed(2),+P.z.toFixed(2)],ls:+P.ls.toFixed(2),hint:h.textContent,cls:h.className,op:h.style.opacity};})()" },
+
+  { "op": "wait", "ms": 9000 },
+  { "op": "eval", "js": "(()=>{const P=window.__rig.P;const h=document.getElementById('mode-hint');return {after:9,step:window.__rig.step,p:[+P.x.toFixed(2),+P.foot.toFixed(2),+P.z.toFixed(2)],hint:h.textContent};})()" },
+  { "op": "shot", "file": "r4-top-later.png" },
+
+  { "op": "wait", "ms": 9000 },
+  { "op": "eval", "js": "(()=>{const P=window.__rig.P;return {after:18,step:window.__rig.step,p:[+P.x.toFixed(2),+P.foot.toFixed(2),+P.z.toFixed(2)]};})()" },
+
+  { "op": "eval", "js": "(()=>{const e=window.__errs||[];return {errs:e.length,list:e.slice(0,3)};})()" }
+]

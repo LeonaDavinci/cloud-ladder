@@ -1,0 +1,14 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.scene.getObjectByName('bedShadow'))"},
+  {"op":"wait","ms":2500},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,g=d.scene.getObjectByName('bedShadow'),ring=g.children.filter(c=>c.isInstancedMesh)[0];const c=new d.THREE.Color(1,0,0.6);for(let i=0;i<ring.count;i++)ring.setColorAt(i,c);ring.instanceColor.needsUpdate=true;g.userData._savedTint=1;return {painted:ring.count};})()"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,g=d.scene.getObjectByName('bedShadow'),f=g.userData.footprint,c=d.camera,y=d.terrainHeight(f.cx,f.cz);c.position.set(f.cx+2.1,y+1.55,f.cz-3.4);d.controls.target.set(f.cx+0.1,y+0.5,f.cz-0.6);d.controls.update();return 'B';})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"t1-debug-close.png"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,g=d.scene.getObjectByName('bedShadow'),f=g.userData.footprint,c=d.camera,y=d.terrainHeight(f.cx,f.cz);c.position.set(f.cx+0.6,y+10.5,f.cz+0.8);d.controls.target.set(f.cx,y,f.cz);d.controls.update();return 'top';})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"t2-debug-top.png"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,g=d.scene.getObjectByName('bedShadow'),patch=g.children.filter(c=>!c.isInstancedMesh)[0];patch.material.color.setRGB(1,0,0.5);patch.material.map=null;patch.material.needsUpdate=true;return 'patchRed';})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"t3-debug-ao-top.png"}
+]

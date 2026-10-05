@@ -1,0 +1,25 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__rig && window.__rig.steps>4)"},
+  {"op":"wait","ms":2500},
+  {"op":"eval","js":"(function(){__rig.setMode('roam');return 'roam';})()"},
+  {"op":"wait","ms":400},
+
+  {"op":"eval","js":"(function(){var k=__rig.rig.ladder;__rig.P.state='ladder';__rig.P.ls=3;__rig.P.lsq=3;__rig.P.vy=0;__rig.goto(1);return 'step1 爬梯中 ls=3';})()"},
+  {"op":"wait","ms":900},
+  {"op":"eval","js":"(function(){document.getElementById('jump-btn').click();return '爬梯途中点了一次跳';})()"},
+  {"op":"wait","ms":2500},
+  {"op":"eval","js":"JSON.stringify({case:'A 爬梯途中按跳',step:__rig.step,state:__rig.P.state,leapOn:__rig.leap.on,ls:+__rig.P.ls.toFixed(2),verdict:(__rig.step===1&&!__rig.leap.on)?'✔ 被丢弃，仍在爬梯':'✘ 被跳转')})"},
+
+  {"op":"eval","js":"(function(){var k=__rig.rig.ladder;__rig.P.state='ladder';__rig.P.ls=k.length;__rig.P.lsq=k.length;__rig.P.vy=0;__rig.goto(2);return 'step2 梯顶待跳';})()"},
+  {"op":"wait","ms":3500},
+  {"op":"eval","js":"JSON.stringify({case:'B 不按跳',step:__rig.step,state:__rig.P.state,leapOn:__rig.leap.on,verdict:(__rig.step===2&&!__rig.leap.on)?'✔ 一直等着，不会自己往下跳':'✘ 自己跑了'})"},
+
+  {"op":"eval","js":"(function(){document.getElementById('jump-btn').click();return '按跳';})()"},
+  {"op":"wait","ms":600},
+  {"op":"eval","js":"(function(){document.getElementById('jump-btn').click();document.getElementById('jump-btn').click();return '空中又连点两次';})()"},
+  {"op":"waitFor","js":"__rig.step===4 && __rig.leap.landed"},
+  {"op":"eval","js":"JSON.stringify({case:'C 落地后请求是否残留',step:__rig.step,onBed:Math.abs(__rig.P.foot-__rig.rig.bed.top)<0.02,verdict:(__rig.step===4)?'✔ 停在床上等人（请求没残留到下一轮）':'✘ 又跳了一次'})"},
+  {"op":"wait","ms":5000},
+  {"op":"eval","js":"JSON.stringify({case:'D 停留结束后回第一步',step:__rig.step,verdict:(__rig.step===0)?'✔ 2.6 秒后重新走向梯子':'其余: step='+__rig.step})"},
+  {"op":"eval","js":"JSON.stringify({errs:window.__errs||[]})"}
+]

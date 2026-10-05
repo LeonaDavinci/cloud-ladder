@@ -1,0 +1,14 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__rig)"},
+  {"op":"waitFor","js":"(function(){var n=0;__dbg.bed.traverse(function(o){if(!o.isMesh)return;var v=o.visible,p=o.parent;while(p&&v){if(!p.visible)v=false;p=p.parent;}if(v)n++;});return n>0&&n<6;})()","timeout":60000},
+  {"op":"wait","ms":1500},
+  {"op":"eval","js":"(function(){var bm=__dbg.bed.userData.bedModel||null;var b=__dbg.config.bed||{};var bs=__dbg.bed.scale;return JSON.stringify({bedModel:bm&&{url:bm.url,rotationY:+bm.rotationY.toFixed(4),topFrac:bm.topFrac,smoothAngle:bm.smoothAngle,rawDim:bm.rawDim,fit:bm.scale,worldSize:bm.worldSize},bedGroupScale:[+bs.x.toFixed(4),+bs.y.toFixed(4),+bs.z.toFixed(4)],cfgBedScale:b.scale,cfgSurfaceY:b.surfaceY,cfgAvoidHalf:b.avoidHalf,ladderClimbSpeed:(function(){var w=(__dbg.config&&__dbg.config.walk)||{};if(w.climbSpeed!=null)return w.climbSpeed;var sj=window.SCENE_JSON||{};return (sj.walk&&sj.walk.climbSpeed)||null;})(),mountSpeed:(function(){var w=(__dbg.config&&__dbg.config.walk)||{};if(w.mountSpeed!=null)return w.mountSpeed;var sj=window.SCENE_JSON||{};return (sj.walk&&sj.walk.mountSpeed)||null;})()});})()"},
+  {"op":"eval","js":"JSON.stringify({boot:window.__boot.state,bootVisible:(function(){var e=document.getElementById('boot-tip');if(!e)return 'no-el';var cs=getComputedStyle(e);return cs.display+'/'+cs.opacity+'/'+cs.visibility;})(),bootMarks:window.__boot.state.marks.length})"},
+  {"op":"eval","js":"(function(){var f=__dbg.scene.fog;var st=__dbg.atmos;return JSON.stringify({cloudPuffs:(__dbg.cloud.userData.puffs||[]).length,shade:__dbg.cloudShadeStats(),state:st.state,cloudShadeStates:Object.keys(st.states).filter(function(k){return !!st.states[k].cloudShade;}),fog:f?{near:+f.near.toFixed(2),far:+f.far.toFixed(1),color:'#'+f.color.getHexString()}:null,fogAnimMs:st.fogAnimMs,hemi:'#'+__dbg.hemi.color.getHexString(),ambient:'#'+__dbg.ambient.color.getHexString()});})()"},
+  {"op":"shot","file":"mini-3-newfeat-day.png"},
+  {"op":"eval","js":"(function(){var b=document.querySelectorAll('#ui-time button');if(!b.length)return 'no-time-buttons';b[b.length-1].click();return 'clicked '+(b[b.length-1].textContent||'').trim();})()"},
+  {"op":"wait","ms":1600},
+  {"op":"eval","js":"(function(){var st=__dbg.atmos;return JSON.stringify({state:st.state,shade:__dbg.cloudShadeStats(),fog:'#'+__dbg.scene.fog.color.getHexString()+' '+Math.round(__dbg.scene.fog.near)+'/'+Math.round(__dbg.scene.fog.far),hemi:'#'+__dbg.hemi.color.getHexString(),ambient:'#'+__dbg.ambient.color.getHexString()});})()"},
+  {"op":"shot","file":"mini-4-newfeat-night.png"},
+  {"op":"eval","js":"JSON.stringify({errs:(window.__errs||[]).slice(0,6)})"}
+]

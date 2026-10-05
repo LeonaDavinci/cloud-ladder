@@ -1,0 +1,6 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__rig)"},
+  {"op":"wait","ms":2500},
+  {"op":"eval","js":"(function(){function r(s){var e=document.querySelector(s);if(!e)return null;var b=e.getBoundingClientRect();return {x:Math.round(b.x),y:Math.round(b.y),w:Math.round(b.width),h:Math.round(b.height),r:Math.round(b.right),b:Math.round(b.bottom)};}return JSON.stringify({w:innerWidth,h:innerHeight,panel:r('#scene-ui'),tip:r('#scene-ui .ui-tip'),time:r('#ui-time'),filter:r('#ui-filter'),fog:r('#ui-fog'),hud:r('#hud-tl'),overlay:r('.overlay'),bgm:r('#bgm'),modes:r('#modes'),jump:r('#jump-btn')});})()"},
+  {"op":"shot","file":"_probe-now.png"}
+]

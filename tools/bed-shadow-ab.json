@@ -1,0 +1,20 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.scene.getObjectByName('bedShadow'))"},
+  {"op":"wait","ms":2500},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,g=d.scene.getObjectByName('bedShadow');const ring=g.children.filter(c=>c.isInstancedMesh)[0],patch=g.children.filter(c=>c.isInstancedMesh).length?g.children.filter(c=>!c.isInstancedMesh)[0]:g.children[0];const c=new d.THREE.Color();let lmin=9,lmax=0;for(let i=0;i<ring.count;i++){ring.getColorAt(i,c);const L=0.2126*c.r+0.7152*c.g+0.0722*c.b;if(L<lmin)lmin=L;if(L>lmax)lmax=L;}return {ringCount:ring.count,aoSize:g.userData.aoSize,ringLum:[+lmin.toFixed(3),+lmax.toFixed(3)],footprint:g.userData.footprint};})()"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg;const c=new d.THREE.Color();let lmin=9,lmax=0;for(let i=0;i<d.grass.count;i++){d.grass.getColorAt(i,c);const L=0.2126*c.r+0.7152*c.g+0.0722*c.b;if(L<lmin)lmin=L;if(L>lmax)lmax=L;}return {normalGrassLum:[+lmin.toFixed(3),+lmax.toFixed(3)]};})()"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,g=d.scene.getObjectByName('bedShadow');g.visible=true;const f=g.userData.footprint,c=d.camera,y=d.terrainHeight(f.cx,f.cz);c.position.set(f.cx+5.4,y+2.6,f.cz+4.6);d.controls.target.set(f.cx+0.2,y+0.75,f.cz+0.3);d.controls.update();return 'A';})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"s1-far-on.png"},
+  {"op":"eval","js":"window.__dbg.scene.getObjectByName('bedShadow').visible=false; 'ring off'"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"s2-far-off.png"},
+  {"op":"eval","js":"window.__dbg.scene.getObjectByName('bedShadow').visible=true; 'ring on'"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,g=d.scene.getObjectByName('bedShadow'),f=g.userData.footprint,c=d.camera,y=d.terrainHeight(f.cx,f.cz);c.position.set(f.cx+2.1,y+1.55,f.cz-3.4);d.controls.target.set(f.cx+0.1,y+0.5,f.cz-0.6);d.controls.update();return 'B';})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"s3-close-on.png"},
+  {"op":"eval","js":"window.__dbg.scene.getObjectByName('bedShadow').visible=false; 'ring off'"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"s4-close-off.png"},
+  {"op":"eval","js":"window.__dbg.scene.getObjectByName('bedShadow').visible=true; 'restore'"}
+]

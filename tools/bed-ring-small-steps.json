@@ -1,0 +1,15 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.config && window.__dbg.scene.getObjectByName('bedShadow'))"},
+  {"op":"wait","ms":2000},
+  {"op":"eval","js":"(()=>{const d=window.__dbg;return {cfgEff:d.config.bedShadow};})()"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg;const g=d.scene.getObjectByName('bedShadow');const fp=g.userData.footprint;const m=g.children.find(o=>o.isInstancedMesh);if(!m)return 'no ring';const M=new d.THREE.Matrix4(),P=new d.THREE.Vector3(),Q=new d.THREE.Quaternion(),S=new d.THREE.Vector3();let hMin=1e9,hMax=0,hSum=0,dMax=0,dMin=1e9,wSum=0;for(let i=0;i<m.count;i++){m.getMatrixAt(i,M);M.decompose(P,Q,S);const h=0.62*S.y;hMin=Math.min(hMin,h);hMax=Math.max(hMax,h);hSum+=h;wSum+=0.075*S.x;const qx=Math.abs(P.x-fp.cx)-fp.hx,qz=Math.abs(P.z-fp.cz)-fp.hz;const dd=Math.hypot(Math.max(qx,0),Math.max(qz,0))+Math.min(Math.max(qx,qz),0);dMax=Math.max(dMax,dd);dMin=Math.min(dMin,dd);}return {ringCount:m.count,bladeH_avg:+(hSum/m.count).toFixed(3),bladeH_min:+hMin.toFixed(3),bladeH_max:+hMax.toFixed(3),bladeW_avg:+(wSum/m.count).toFixed(3),distFromBedEdge_min:+dMin.toFixed(3),distFromBedEdge_max:+dMax.toFixed(3),normalGrassH:'0.62*[0.75..1.45]*[0.8..1.4] => 0.37~1.26'};})()"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,b=d.bed.position,c=d.camera;c.position.set(b.x+2.9,b.y+1.75,b.z+3.0);d.controls.target.set(b.x,b.y+0.75,b.z);d.controls.update();return 'hero';})()"},
+  {"op":"wait","ms":2800},
+  {"op":"shot","file":"n1-ring-hero.png"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,b=d.bed.position,c=d.camera;c.position.set(b.x+1.6,b.y+1.35,b.z+2.0);d.controls.target.set(b.x,b.y+0.45,b.z);d.controls.update();return 'close';})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"n2-ring-close.png"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,b=d.bed.position,c=d.camera;c.position.set(b.x+0.4,b.y+6.2,b.z+0.35);d.controls.target.set(b.x,b.y,b.z);d.controls.update();return 'top';})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"n3-ring-top.png"}
+]

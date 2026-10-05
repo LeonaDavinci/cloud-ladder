@@ -1,0 +1,7 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__rig && window.__loop)"},
+  {"op":"waitFor","js":"(function(){var n=0;__dbg.bed.traverse(function(o){if(!o.isMesh)return;var v=o.visible,p=o.parent;while(p&&v){if(!p.visible)v=false;p=p.parent;}if(v)n++;});return n>0&&n<6;})()","timeout":60000},
+  {"op":"wait","ms":2500},
+  {"op":"eval","js":"(function(){var R=__dbg.renderer,info=R.info,gl=R.getContext(),db=R.domElement;var out={};info.autoReset=false;info.reset();R.render(__dbg.scene,__dbg.camera);out.sceneCalls=info.render.calls;out.sceneTriangles=info.render.triangles;out.scenePoints=info.render.points;info.reset();__dbg.postfx.render(0.016);out.frameCalls=info.render.calls;out.frameTriangles=info.render.triangles;info.autoReset=true;out.geometries=info.memory.geometries;out.textures=info.memory.textures;out.programs=(info.programs||[]).length;out.pixelRatio=R.getPixelRatio();out.dpr=devicePixelRatio;out.drawingBuffer=[db.width,db.height];out.drawingPixels=db.width*db.height;out.cssSize=[db.clientWidth,db.clientHeight];out.maxTextureSize=gl.getParameter(gl.MAX_TEXTURE_SIZE);out.webgl2=(typeof WebGL2RenderingContext!=='undefined')&&(gl instanceof WebGL2RenderingContext);out.postfx=!!(__dbg.postfx&&__dbg.postfx.enabled);out.shadowMap=__dbg.quality.shadowMap;out.plantQ=__dbg.quality.plantQ;out.cloudQ=__dbg.quality.cloudQ;return JSON.stringify(out);})()"},
+  {"op":"eval","js":"JSON.stringify({errs:(window.__errs||[]).slice(0,6)})"}
+]

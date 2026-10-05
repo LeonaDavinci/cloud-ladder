@@ -1,0 +1,5 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.bed && window.__dbg.glints)"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,T=d.THREE,out=[];d.bed.updateMatrixWorld(true);d.bed.traverse(o=>{if(!o.isMesh)return;const b=new T.Box3().setFromObject(o);const sz=b.getSize(new T.Vector3());out.push({n:o.name||o.type,vis:o.visible,ymin:+b.min.y.toFixed(2),ymax:+b.max.y.toFixed(2),w:+sz.x.toFixed(2),h:+sz.y.toFixed(2),d:+sz.z.toFixed(2)});});return out.slice(0,24);})()"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,T=d.THREE;let n=0,box=new T.Box3();d.bed.traverse(o=>{if(o.isMesh&&o.visible){n++;box.union(new T.Box3().setFromObject(o));}});return {visibleMeshes:n,bedOriginY:+d.bed.position.y.toFixed(3),box:[+box.min.y.toFixed(2),+box.max.y.toFixed(2)]};})()"}
+]

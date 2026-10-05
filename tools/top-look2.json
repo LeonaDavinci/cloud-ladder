@@ -1,0 +1,27 @@
+[
+  { "op": "waitFor", "js": "!!(window.__dbg && window.__dbg.ladder)" },
+  { "op": "wait", "ms": 2600 },
+  { "op": "eval", "js": "(()=>{const d=window.__dbg;return {nearFade:d.config.cloudNearFade,puffs:(d.scene.children.filter(x=>x.userData&&x.userData.puffs)[0]||{userData:{}}).userData.puffs?d.scene.children.filter(x=>x.userData&&x.userData.puffs)[0].userData.puffs.length:0};})()" },
+
+  { "op": "eval", "js": "(()=>{const d=window.__dbg,c=d.camera;c.position.set(16,7,28);d.controls.target.set(-2,4,1.2);d.controls.update();return 'wide';})()" },
+  { "op": "wait", "ms": 2600 },
+  { "op": "shot", "file": "u1-cloud-wide.png" },
+
+  { "op": "eval", "js": "(()=>{const d=window.__dbg,r=d.ladder.userData.rig;const h=r.length;const p=[r.foot[0]+r.up[0]*h+r.off[0],r.foot[1]+r.up[1]*h+1.68,r.foot[2]+r.up[2]*h+r.off[1]];const c=d.camera;c.position.set(p[0],p[1],p[2]);d.controls.target.set(-2,1.6,1.2);d.controls.update();return p.map(v=>+v.toFixed(2));})()" },
+  { "op": "wait", "ms": 2600 },
+  { "op": "shot", "file": "u2-top-down.png" },
+
+  { "op": "eval", "js": "(()=>{const d=window.__dbg,c=d.camera;d.controls.target.set(c.position.x+2,d.position.y-0.4,c.position.z+22);d.controls.update();return 'out';})()" },
+  { "op": "wait", "ms": 2500 },
+  { "op": "shot", "file": "u3-top-out.png" },
+
+  { "op": "eval", "js": "(()=>{const d=window.__dbg,r=d.ladder.userData.rig;const h=r.length*0.62;const c=d.camera;c.position.set(r.foot[0]+r.up[0]*h+r.off[0],r.foot[1]+r.up[1]*h+1.68, r.foot[2]+r.up[2]*h+r.off[1]);d.controls.target.set(-2,1.2,1.2);d.controls.update();return 'mid-climb';})()" },
+  { "op": "wait", "ms": 2500 },
+  { "op": "shot", "file": "u4-mid-climb.png" },
+
+  { "op": "eval", "js": "(()=>{const d=window.__dbg,c=d.camera;c.position.set(12,3.0,14);d.controls.target.set(3,12,1.5);d.controls.update();return 'ground-ladder';})()" },
+  { "op": "wait", "ms": 2500 },
+  { "op": "shot", "file": "u5-ground-ladder.png" },
+
+  { "op": "eval", "js": "(()=>{const e=window.__errs||[];return {errs:e.length,list:e.slice(0,3)};})()" }
+]

@@ -1,0 +1,10 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.bed)"},
+  {"op":"wait","ms":3000},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,b=d.bed.position,c=d.camera;c.position.set(b.x+2.3,b.y+1.9,b.z+1.5);d.controls.target.set(b.x+0.1,b.y+1.35,b.z-0.6);d.controls.update();return 'tight';})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"d1-smooth.png"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,T=d.THREE;let n=0;d.bed.traverse(o=>{if(!o.isMesh||!o.visible)return;const g=o.geometry,p=g.attributes.position,na=g.attributes.normal;const A=new T.Vector3(),B=new T.Vector3(),C=new T.Vector3(),u=new T.Vector3(),w=new T.Vector3(),fn=new T.Vector3();for(let f=0;f<p.count/3;f++){A.fromBufferAttribute(p,f*3);B.fromBufferAttribute(p,f*3+1);C.fromBufferAttribute(p,f*3+2);u.subVectors(B,A);w.subVectors(C,A);fn.crossVectors(u,w).normalize();for(let k=0;k<3;k++)na.setXYZ(f*3+k,fn.x,fn.y,fn.z);}na.needsUpdate=true;n++;});return 'flattened '+n;})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"d2-flat.png"}
+]

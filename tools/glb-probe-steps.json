@@ -1,0 +1,6 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.bed)"},
+  {"op":"wait","ms":2500},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,out=[];d.bed.traverse(o=>{if(!o.isMesh||!o.visible)return;const g=o.geometry,m=o.material;out.push({name:o.name,parent:o.parent&&o.parent.name,parentOfParent:o.parent&&o.parent.parent&&o.parent.parent.name,idx:!!g.index,v:g.attributes.position.count,tri:(g.index?g.index.count:g.attributes.position.count)/3,hasN:!!g.attributes.normal,hasUV:!!g.attributes.uv,flat:Array.isArray(m)?m.map(x=>x.flatShading):m.flatShading,mat:Array.isArray(m)?m.map(x=>x.name||x.type):(m.name||m.type)});});return out;})()"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,n=[];d.bed.traverse(o=>n.push({n:o.name,t:o.type,ch:o.children.length,vis:o.visible}));return n.slice(0,14);})()"}
+]

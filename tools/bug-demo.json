@@ -1,0 +1,21 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.sceneUI && window.__dbg.atmos && window.__dbg.postfx)"},
+  {"op":"wait","ms":1600},
+  {"op":"eval","js":"(function(){window.__pinT=9;try{Object.defineProperty(__dbg.uTime,'value',{configurable:true,get:function(){return window.__pinT;},set:function(){}});}catch(e){}if(__dbg.cloud&&__dbg.cloud.userData&&__dbg.cloud.userData.flow)__dbg.cloud.userData.flow.gain=0;__dbg.postfx.pinTime(3.0);return '冻结: uTime=9 postfx.t=3';})()"},
+
+  {"op":"eval","js":"(function(){var h=document.getElementById('mode-hint');if(h)h.style.visibility='hidden';var b=document.getElementById('bgm');if(b)b.style.display='none';return '隐藏 mode-hint(文案随点击变) + bgm(播放指示在动)';})()"},
+
+  {"op":"eval","js":"(function(){__dbg.sceneUI.click('afternoon');__dbg.sceneUI.click('dream');return '下午 + 梦境';})()"},
+  {"op":"wait","ms":900},
+  {"op":"shot","file":"bug-1-afternoon.png"},
+
+  {"op":"eval","js":"(function(){__dbg.sceneUI.click('night');return '夜间';})()"},
+  {"op":"wait","ms":900},
+  {"op":"shot","file":"bug-2-night.png"},
+
+  {"op":"eval","js":"(function(){__dbg.sceneUI.click('afternoon');return '切回下午: state='+__dbg.atmos.state;})()"},
+  {"op":"wait","ms":900},
+  {"op":"shot","file":"bug-3-back-to-afternoon.png"},
+
+  {"op":"eval","js":"(function(){var c=[];__dbg.scene.traverse(function(o){if(o.isSprite&&o.material&&o.material.color&&c.length<3)c.push('#'+o.material.color.getHexString());});return '云当前色 '+c.join(' ')+' | errs='+JSON.stringify(window.__errs);})()"}
+]

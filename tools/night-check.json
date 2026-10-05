@@ -1,0 +1,11 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.sceneUI)"},
+  {"op":"wait","ms":1400},
+  {"op":"eval","js":"(function(){['.overlay','#modes','#sticks','#jump-btn','#mode-hint','#bgm','#scene-ui'].forEach(function(s){var e=document.querySelector(s);if(e)e.style.display='none';});window.__pinT=9;try{Object.defineProperty(__dbg.uTime,'value',{configurable:true,get:function(){return window.__pinT;},set:function(){}});}catch(e){}if(__dbg.cloud&&__dbg.cloud.userData&&__dbg.cloud.userData.flow)__dbg.cloud.userData.flow.gain=0;__dbg.postfx.set('off');__dbg.atmos.apply('night');__dbg.scene.children[5].visible=false;__dbg.scene.children[6].visible=false;return 'night off, far hidden';})()"},
+  {"op":"wait","ms":800},
+  {"op":"shot","file":"ni-0-nofar.png"},
+  {"op":"eval","js":"(function(){__dbg.scene.children[5].visible=true;__dbg.scene.children[6].visible=true;return 'far back';})()"},
+  {"op":"wait","ms":800},
+  {"op":"shot","file":"ni-1-far.png"},
+  {"op":"eval","js":"(function(){return JSON.stringify({sun:{i:__dbg.sun.intensity,c:'#'+__dbg.sun.color.getHexString()},hemi:{i:__dbg.hemi.intensity,c:'#'+__dbg.hemi.color.getHexString()},amb:{i:__dbg.ambient.intensity},exp:__dbg.renderer.toneMappingExposure,fog:'#'+__dbg.scene.fog.color.getHexString(),far:__dbg.scene.fog.far});})()"}
+]

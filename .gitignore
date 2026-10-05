@@ -1,0 +1,16 @@
+# 云端工程只进源码 + 运行必需资源；构建/打包/截图/日志不进仓库
+dist/
+dist-minitool/
+cloud-ladder-minitool/
+cloud-ladder-minitool.zip
+cloud-ladder.rar
+shots/
+*.log
+.workbuddy/
+tools/_backup/
+tools/_ab_*
+tools/_gen/
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db

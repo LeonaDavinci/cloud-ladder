@@ -1,0 +1,20 @@
+[
+  {"op":"eval","js":"__dbg.camera.position.set(21, 15.2, 12)"},
+  {"op":"eval","js":"__dbg.controls.target.set(2.6, 12.87, 1.6)"},
+  {"op":"eval","js":"__dbg.cloud.userData.flow.gain = 0; __dbg.pokeCfg.ripple = true"},
+  {"op":"wait","ms":3000},
+  {"op":"eval","js":"window.__hits=[]; 'ok'"},
+  {"op":"clickAt","js":"(()=>{const {THREE,camera}=__dbg;const p=new THREE.Vector3(2.6,12.87,1.6).project(camera);return [ (p.x*0.5+0.5)*innerWidth, (-p.y*0.5+0.5)*innerHeight ];})()"},
+  {"op":"wait","ms":2500},
+  {"op":"eval","js":"(()=>{const s=__dbg.cloudStat();window.__hits.push({n:s.lastN,peak:s.peak});return JSON.stringify(s.peak);})()"},
+  {"op":"clickAt","js":"(()=>{const {THREE,camera}=__dbg;const p=new THREE.Vector3(2.6,12.87,1.6).project(camera);const q=p.clone();q.x-=0.10;q.y-=0.09;return [ (q.x*0.5+0.5)*innerWidth, (-q.y*0.5+0.5)*innerHeight ];})()"},
+  {"op":"wait","ms":6000},
+  {"op":"eval","js":"(()=>{const s=__dbg.cloudStat();window.__hits.push({n:s.lastN,peak:s.peak});return JSON.stringify(s.peak);})()"},
+  {"op":"clickAt","js":"(()=>{const {THREE,camera}=__dbg;const p=new THREE.Vector3(2.6,12.87,1.6).project(camera);const q=p.clone();q.x+=0.09;q.y-=0.30;return [ (q.x*0.5+0.5)*innerWidth, (-q.y*0.5+0.5)*innerHeight ];})()"},
+  {"op":"wait","ms":6000},
+  {"op":"eval","js":"(()=>{const s=__dbg.cloudStat();window.__hits.push({n:s.lastN,peak:s.peak});return JSON.stringify(s.peak);})()"},
+  {"op":"clickAt","js":"(()=>{const {THREE,camera}=__dbg;const p=new THREE.Vector3(2.6,12.87,1.6).project(camera);const q=p.clone();q.x-=0.16;q.y+=0.06;return [ (q.x*0.5+0.5)*innerWidth, (-q.y*0.5+0.5)*innerHeight ];})()"},
+  {"op":"wait","ms":6000},
+  {"op":"eval","js":"JSON.stringify(window.__hits)"},
+  {"op":"eval","js":"JSON.stringify(__dbg.cloudStat())"}
+]

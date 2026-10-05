@@ -1,0 +1,16 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.atmos)"},
+  {"op":"wait","ms":2200},
+
+  {"op":"eval","js":"(function(){__dbg.atmos.apply('afternoon');__dbg.atmos.settleFog();__dbg.atmos.setFogAnimMs(2000);var f=__dbg.scene.fog;window.__tr=[];__dbg.atmos.toggleFog();window.__tr.push(['0.0',+f.near.toFixed(2),+f.far.toFixed(1)]);for(var i=1;i<=24;i++){__dbg.atmos.update(0.1);window.__tr.push([(i*0.1).toFixed(1),+f.near.toFixed(2),+f.far.toFixed(1)]);}var s=__dbg.atmos.stats();return JSON.stringify({动画时长ms:__dbg.atmos.fogAnimMs,起点:{near:25,far:5200},目标:{near:s.fogAnim.toNear,far:s.fogAnim.toFar},时刻_near_far:window.__tr});})()"},
+
+  {"op":"eval","js":"(function(){var f=__dbg.scene.fog;var before=[f.near,f.far];__dbg.atmos.update(0.5);__dbg.atmos.update(0.5);return JSON.stringify({到位后继续调update:true,near_before:before[0],now_near:f.near,far_before:before[1],now_far:f.far,未到位:__dbg.atmos.fogTarget.animating});})()"},
+
+  {"op":"eval","js":"(function(){__dbg.atmos.settleFog();__dbg.atmos.setFogAnimMs(0);var f=__dbg.scene.fog;var a=[f.near,f.far];__dbg.atmos.toggleFog();return JSON.stringify({硬切_fogAnimMs0:{切前:a,切后立刻:[f.near,f.far]}});})()"},
+
+  {"op":"eval","js":"(function(){__dbg.atmos.settleFog();__dbg.atmos.setFogAnimMs(2000);var f=__dbg.scene.fog;var a=[f.near,f.far];__dbg.atmos.toggleFog();return JSON.stringify({渐变_fogAnimMs2000:{切前:a,切后立刻:[f.near,f.far],目标:[__dbg.atmos.fogTarget.near,__dbg.atmos.fogTarget.far]}});})()"},
+
+  {"op":"eval","js":"(function(){__dbg.atmos.settleFog();__dbg.atmos.setFogAnimMs(2000);var f=__dbg.scene.fog;__dbg.atmos.apply('dawn');__dbg.atmos.update(1.0);var mid=[+f.near.toFixed(2),+f.far.toFixed(1)];__dbg.atmos.settleFog();return JSON.stringify({切时相_清晨_1秒时:mid,到位后:[f.near,f.far]});})()"},
+
+  {"op":"eval","js":"JSON.stringify({state:__dbg.atmos.state,fogHeavy:__dbg.atmos.fogHeavy,errs:window.__errs||[]})"}
+]

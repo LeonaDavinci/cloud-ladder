@@ -1,0 +1,29 @@
+[
+  { "op": "waitFor", "js": "!!(window.__dbg && window.__dbg.daisies && window.__dbg.config && window.__dbg.config.bed)" },
+  { "op": "wait", "ms": 2600 },
+
+  { "op": "eval", "js": "(()=>{const d=window.__dbg;const e=d.config;const b=new d.THREE.Box3().setFromObject(d.bed);return {avoidHalf:e.bed.avoidHalf,fromPanel:e.daisyClustersFromPanel,bedX:[+b.min.x.toFixed(2),+b.max.x.toFixed(2)],bedZ:[+b.min.z.toFixed(2),+b.max.z.toFixed(2)],avoidMargin:e.bed.avoidMargin};})()" },
+  { "op": "eval", "js": "(()=>{const d=window.__dbg;const M=new d.THREE.Matrix4(),v=new d.THREE.Vector3();const B=d.bed;const box=new d.THREE.Box3().setFromObject(B);let inBed=0,tot=0;const scan=(oNode)=>{if(!oNode||!oNode.isInstancedMesh)return;for(let i=0;i<oNode.count;i++){oNode.getMatrixAt(i,M);v.setFromMatrixPosition(M);tot++;if(v.x>box.min.x&&v.x<box.max.x&&v.z>box.min.z&&v.z<box.max.z)inBed++;}};scan(d.grass);scan(d.tufts);const lv=d.lavender;let lvIn=0;if(lv)lv.traverse(o=>{if(o.isInstancedMesh){for(let i=0;i<o.count;i++){o.getMatrixAt(i,M);v.setFromMatrixPosition(M);if(v.x>box.min.x&&v.x<box.max.x&&v.z>box.min.z&&v.z<box.max.z)lvIn++;}}});return JSON.stringify({bladeTuft:tot,insideBedBox:inBed,lavenderInside:lvIn});})()" },
+
+  { "op": "eval", "js": "(()=>{const d=window.__dbg,c=d.camera;c.position.set(-2,7.2,13);d.controls.target.set(-2,1.6,1.0);d.controls.update();return 'front';})()" },
+  { "op": "wait", "ms": 2600 },
+  { "op": "shot", "file": "z1-front.png" },
+
+  { "op": "eval", "js": "(()=>{const d=window.__dbg,c=d.camera;c.position.set(1.5,4.4,9.5);d.controls.target.set(-2,1.7,1.5);d.controls.update();return 'hero';})()" },
+  { "op": "wait", "ms": 2600 },
+  { "op": "shot", "file": "z2-hero.png" },
+
+  { "op": "eval", "js": "(()=>{const d=window.__dbg,c=d.camera;c.position.set(-2,4.6,-8.4);d.controls.target.set(-2,1.8,1.2);d.controls.update();return 'back';})()" },
+  { "op": "wait", "ms": 2600 },
+  { "op": "shot", "file": "z3-back.png" },
+
+  { "op": "eval", "js": "(()=>{const d=window.__dbg;d.grass.visible=false;if(d.tufts)d.tufts.visible=false;d.lavender.visible=false;const s=d.scene.getObjectByName('bedShadow');if(s)s.visible=false;const c=d.camera;c.position.set(-2,8.0,6.6);d.controls.target.set(-2,1.4,1.05);d.controls.update();return 'top-iso';})()" },
+  { "op": "wait", "ms": 2600 },
+  { "op": "shot", "file": "z4-top-iso.png" },
+
+  { "op": "eval", "js": "(()=>{const d=window.__dbg;d.grass.visible=true;if(d.tufts)d.tufts.visible=true;d.lavender.visible=true;const s=d.scene.getObjectByName('bedShadow');if(s)s.visible=true;const c=d.camera;c.position.set(-9,2.6,6.4);d.controls.target.set(-2,1.7,1.6);d.controls.update();return 'q';})()" },
+  { "op": "wait", "ms": 2600 },
+  { "op": "shot", "file": "z5-q.png" },
+
+  { "op": "eval", "js": "(()=>{const e=window.__errs||[];return {errs:e.length,list:e.slice(0,3)};})()" }
+]

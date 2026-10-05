@@ -1,0 +1,4 @@
+[
+  {"op":"wait","ms":2500},
+  {"op":"eval","js":"JSON.stringify({state:__audio.state,idx:__audio.index,title:__audio.title,t:+__audio.el.currentTime.toFixed(2),paused:__audio.el.paused,vol:+__audio.el.volume.toFixed(3),src:__audio.el.currentSrc.split('/').pop()})"}
+]

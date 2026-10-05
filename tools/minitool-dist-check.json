@@ -1,0 +1,14 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__rig)"},
+  {"op":"wait","ms":2600},
+  {"op":"eval","js":"(function(){function visMeshes(root){var n=0;root.traverse(function(o){if(!o.isMesh)return;var v=o.visible,p=o.parent;while(p&&v){if(!p.visible)v=false;p=p.parent;}if(v)n++;});return n;}function cnt(sel){return document.querySelectorAll(sel).length;}var a=__dbg.audio,s=null;try{s=(typeof a.state==='function')?a.state:((a.state&&a.state.get)?a.state.get():a.state);}catch(e){s='ERR:'+e.message;}return JSON.stringify({rev:(window.THREE&&window.THREE.REVISION)||null,hasAPP:!!window.__APP,hasM:!!window.__M,sceneChildren:__dbg.scene.children.length,quality:__dbg.quality,counts:__dbg.config?__dbg.config.counts:null,audioTracks:__dbg.config?__dbg.config.audio:null,bedMeshesTotal:function(){var n=0;__dbg.bed.traverse(function(o){if(o.isMesh)n++;});return n;}(),bedMeshesVisible:visMeshes(__dbg.bed),ladderLen:+__dbg.ladder.userData.rig.length.toFixed(3),cloudPuffs:(__dbg.cloud.userData.puffs||[]).length,autoWalk:__rig.autoWalk,vpMeta:(window.__vp&&window.__vp.meta||'').indexOf('user-scalable=no')>=0,modeBtns:cnt('.mode-btn'),resetBtn:cnt('#reset-btn'),uiRows:[cnt('#ui-time button'),cnt('#ui-filter button'),cnt('#ui-fog button')],atmosBtns:cnt('#ui-time button')+cnt('#ui-filter button')+cnt('#ui-fog button'),audioState:s,cfgFromData:(__dbg.config&&__dbg.config.cloudPuffCount)||null});})()"},
+  {"op":"shot","file":"mini-1-boot.png"},
+  {"op":"eval","js":"(function(){__rig.setMode('roam');__rig.goto(3);return 'roam@goto3';})()"},
+  {"op":"waitFor","js":"__rig.mode==='walk'","timeout":120000},
+  {"op":"eval","js":"JSON.stringify({endMode:__rig.mode,endStep:__rig.step,foot:+__rig.P.foot.toFixed(3),bedTop:+__rig.rig.bed.top.toFixed(3)})"},
+  {"op":"clickSel","sel":"#reset-btn"},
+  {"op":"wait","ms":600},
+  {"op":"eval","js":"(function(){var h=__rig.home,c=__dbg.camera;var d=Math.abs(c.position.x-h.pos.x)+Math.abs(c.position.y-h.pos.y)+Math.abs(c.position.z-h.pos.z);return JSON.stringify({afterResetMode:__rig.mode,posErr:+d.toFixed(9),cam:[+c.position.x.toFixed(3),+c.position.y.toFixed(3),+c.position.z.toFixed(3)]});})()"},
+  {"op":"shot","file":"mini-2-reset.png"},
+  {"op":"eval","js":"JSON.stringify({errs:(window.__errs||[]).slice(0,6)})"}
+]

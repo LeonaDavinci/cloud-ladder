@@ -1,0 +1,26 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__rig && !!window.__ui)"},
+  {"op":"wait","ms":2200},
+
+  {"op":"eval","js":"(function(){window.__snap=function(tag){var b=document.getElementById('ui-toggle');var st=function(s){var e=document.querySelector(s);if(!e)return{m:1};var d=getComputedStyle(e).display;var r=e.getBoundingClientRect();return {d:d,v:(d!=='none'&&(r.width>0||r.height>0))?1:0,x:Math.round(r.x),y:Math.round(r.y),r:Math.round(r.right),bt:Math.round(r.bottom)};};return {tag:tag,hidden:__ui.hidden,aria:__ui.el.getAttribute('aria-pressed'),alabel:__ui.el.getAttribute('aria-label'),visibleText:(function(){var n=document.querySelector('#ui-toggle .ui-on'),f=document.querySelector('#ui-toggle .ui-off');return (getComputedStyle(n).display!=='none'?n.textContent:'')+(getComputedStyle(f).display!=='none'?f.textContent:'');})(),toggle:st('#ui-toggle'),h1:st('.overlay h1'),panel:st('#scene-ui'),modes:st('#modes'),bgm:st('#bgm')};};return 'ok';})()"},
+
+  {"op":"eval","js":"JSON.stringify(window.__snap('A-初始'))"},
+
+  {"op":"eval","js":"(function(){window.dispatchEvent(new KeyboardEvent('keydown',{key:'h',bubbles:true}));return 'H×1';})()"},
+  {"op":"wait","ms":300},
+  {"op":"eval","js":"JSON.stringify(window.__snap('B-按一下H'))"},
+
+  {"op":"eval","js":"(function(){window.dispatchEvent(new KeyboardEvent('keydown',{key:'H',bubbles:true}));return 'H×2';})()"},
+  {"op":"wait","ms":300},
+  {"op":"eval","js":"JSON.stringify(window.__snap('C-再按一下H'))"},
+
+  {"op":"eval","js":"(function(){window.dispatchEvent(new KeyboardEvent('keydown',{key:'h',bubbles:true}));return 'H×3';})()"},
+  {"op":"wait","ms":300},
+  {"op":"eval","js":"JSON.stringify(window.__snap('D-第三次H'))"},
+
+  {"op":"eval","js":"(function(){window.dispatchEvent(new KeyboardEvent('keydown',{key:'h',bubbles:true}));window.dispatchEvent(new KeyboardEvent('keydown',{key:'3',bubbles:true}));window.dispatchEvent(new KeyboardEvent('keydown',{key:'8',bubbles:true}));window.dispatchEvent(new KeyboardEvent('keydown',{key:'f',bubbles:true}));return '隐藏态下用键盘切档';})()"},
+  {"op":"wait","ms":600},
+  {"op":"eval","js":"JSON.stringify({tag:'E-收起时按键仍生效',hidden:__ui.hidden,time:__dbg.atmos.state,fx:__dbg.postfx.name,fogHeavy:__dbg.atmos.fogHeavy,errs:(window.__errs||[]).length})"},
+  {"op":"shot","file":"ui-hide-5-keyboard.png"},
+  {"op":"eval","js":"JSON.stringify(window.__snap('F-收尾'))"}
+]

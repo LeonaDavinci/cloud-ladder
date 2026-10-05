@@ -1,0 +1,12 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.sceneUI)"},
+  {"op":"wait","ms":1400},
+  {"op":"eval","js":"(function(){['#scene-ui'].forEach(function(s){var e=document.querySelector(s);if(e)e.style.display='none';});window.__pinT=9;try{Object.defineProperty(__dbg.uTime,'value',{configurable:true,get:function(){return window.__pinT;},set:function(){}});}catch(e){}if(__dbg.cloud&&__dbg.cloud.userData&&__dbg.cloud.userData.flow)__dbg.cloud.userData.flow.gain=0;__dbg.camera.position.set(16,9,30);__dbg.controls.target.set(1.5,11.5,-2);__dbg.controls.update();__dbg.postfx.set('off');__dbg.atmos.apply('dawn');return 'dawn';})()"},
+  {"op":"wait","ms":700},{"op":"shot","file":"dg-0-dawn.png"},
+  {"op":"eval","js":"(function(){__dbg.scene.fog.far=6000;return 'fog off(far 6000)';})()"},
+  {"op":"wait","ms":600},{"op":"shot","file":"dg-1-nofog.png"},
+  {"op":"eval","js":"(function(){__dbg.cloud.visible=false;return 'cloud off';})()"},
+  {"op":"wait","ms":600},{"op":"shot","file":"dg-2-nofog-nocloud.png"},
+  {"op":"eval","js":"(function(){__dbg.cloud.visible=true;__dbg.atmos.apply('dawn');return JSON.stringify({fog:{c:'#'+__dbg.scene.fog.color.getHexString(),near:__dbg.scene.fog.near,far:__dbg.scene.fog.far},exp:__dbg.renderer.toneMappingExposure,sun:{i:__dbg.sun.intensity,c:'#'+__dbg.sun.color.getHexString()},hemi:{i:__dbg.hemi.intensity},amb:{i:__dbg.ambient.intensity},skyTop:'#'+__dbg.sky.material.uniforms.cTop.value.getHexString(),skyHor:'#'+__dbg.sky.material.uniforms.cHor.value.getHexString()});})()"},
+  {"op":"eval","js":"(function(){return JSON.stringify({errs:window.__errs});})()"}
+]

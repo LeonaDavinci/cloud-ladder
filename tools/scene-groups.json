@@ -1,0 +1,5 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.atmos)"},
+  {"op":"wait","ms":1500},
+  {"op":"eval","js":"(function(){function d(o){var c=o.children||[];if(!c.length)return null;var t={};c.forEach(function(k){var key=k.type+':'+(k.material?k.material.type:'-')+':'+(k.geometry?k.geometry.type:'-');t[key]=(t[key]||0)+1;});var s=c[0];return {kids:c.length,types:t,sample:{t:s.type,scale:s.scale?[+s.scale.x.toFixed(2),+s.scale.y.toFixed(2),+s.scale.z.toFixed(2)]:null,pos:[+s.position.x.toFixed(1),+s.position.y.toFixed(1),+s.position.z.toFixed(1)],mat:s.material?s.material.type:'',fog:s.material?(s.material.fog):null,ro:s.renderOrder}};}var out={};[4,5,6,15,16].forEach(function(i){out[i]=d(__dbg.scene.children[i]);});out.cloudTag=(__dbg.cloud?__dbg.scene.children.indexOf(__dbg.cloud):-1);out.numCloudKids=(__dbg.cloud?__dbg.cloud.children.length:-1);return JSON.stringify(out);})()"}
+]

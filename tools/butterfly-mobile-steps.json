@@ -1,0 +1,8 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.butterflies && window.__dbg.glints)"},
+  {"op":"wait","ms":2500},
+  {"op":"eval","js":"(()=>{const d=window.__dbg;return {q:d.quality,bf:d.butterflies.count,gl:d.glints.count,dead:d.glints.userData.anchors.filter(a=>a.dead).length};})()"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,b=d.bed.position,c=d.camera;c.position.set(b.x+4.6,b.y+2.0,b.z+3.2);d.controls.target.set(b.x,b.y+1.0,b.z);d.controls.update();return 'over';})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"m1-mobile-butterfly.png"}
+]

@@ -1,0 +1,16 @@
+[
+  { "op": "waitFor", "js": "!!(window.__rig && window.__dbg && window.__dbg.daisies)" },
+  { "op": "wait", "ms": 2200 },
+  { "op": "eval", "js": "(()=>{const r=window.__rig;r.setMode('walk');const P=r.P;return {mode:r.mode,p:[+P.x.toFixed(2),+P.z.toFixed(2)]};})()" },
+  { "op": "wait", "ms": 1200 },
+  { "op": "eval", "js": "(()=>{const P=window.__rig.P;return {yaw:+P.yaw.toFixed(3),p:[+P.x.toFixed(2),+P.z.toFixed(2)]};})()" },
+  { "op": "eval", "js": "window.dispatchEvent(new KeyboardEvent('keydown',{code:'KeyW'}));'W down'" },
+  { "op": "wait", "ms": 7000 },
+  { "op": "eval", "js": "(()=>{const P=window.__rig.P;window.dispatchEvent(new KeyboardEvent('keyup',{code:'KeyW'}));return {afterW:[+P.x.toFixed(2),+P.z.toFixed(2)],state:P.state,foot:+P.foot.toFixed(2)};})()" },
+  { "op": "eval", "js": "window.dispatchEvent(new KeyboardEvent('keydown',{code:'KeyD'}));'D down'" },
+  { "op": "wait", "ms": 5000 },
+  { "op": "eval", "js": "(()=>{const P=window.__rig.P;window.dispatchEvent(new KeyboardEvent('keyup',{code:'KeyD'}));return {afterD:[+P.x.toFixed(2),+P.z.toFixed(2)]};})()" },
+  { "op": "shot", "file": "w1-walk.png" },
+  { "op": "eval", "js": "(()=>{const r=window.__rig;r.setMode('free');return {mode:r.mode,hint:document.getElementById('mode-hint').style.opacity};})()" },
+  { "op": "eval", "js": "(()=>{const e=window.__errs||[];return {errs:e.length,list:e.slice(0,4)};})()" }
+]

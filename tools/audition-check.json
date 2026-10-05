@@ -1,0 +1,7 @@
+[
+  {"op":"wait","ms":1500},
+  {"op":"eval","js":"(function(){var a=[].slice.call(document.querySelectorAll('audio'));return JSON.stringify({n:a.length,srcs:a.map(function(e){return (e.getAttribute('src')||'').split('/').pop();})});})()"},
+  {"op":"eval","await":true,"js":"(async function(){var a=[].slice.call(document.querySelectorAll('audio'));function meta(e){return new Promise(function(r){if(e.readyState>=1&&e.duration)return r();var done=false;function fin(){if(done)return;done=true;r();}e.addEventListener('loadedmetadata',fin,{once:true});e.addEventListener('error',fin,{once:true});setTimeout(fin,12000);});}var out=[];for(var i=0;i<a.length;i++){await meta(a[i]);out.push({f:(a[i].getAttribute('src')||'').split('/').pop(),err:a[i].error?a[i].error.code:null,dur:+((a[i].duration||0).toFixed(2)),rs:a[i].readyState});}return JSON.stringify(out);})()"},
+  {"op":"shot","file":"audition.png"},
+  {"op":"eval","js":"JSON.stringify({errs:window.__errs||[]})"}
+]

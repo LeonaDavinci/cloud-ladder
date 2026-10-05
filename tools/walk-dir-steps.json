@@ -1,0 +1,23 @@
+[
+  {"op":"waitFor","js":"!!(window.__rig && window.__rig.P && window.__dbg)"},
+  {"op":"eval","js":"(()=>{const r=window.__rig;r.P.yaw=0.7;r.P.pitch=0;r.P.state='ground';r.P.x=0;r.P.z=0;window.__f0=window.__dbg.renderer.info.render.frame;return 'set yaw=0.7';})()"},
+  {"op":"waitFor","js":"window.__dbg.renderer.info.render.frame > window.__f0 + 3"},
+  {"op":"eval","js":"(()=>{const T=window.__dbg.THREE,c=window.__dbg.camera,r=window.__rig;const f=new T.Vector3();c.getWorldDirection(f);const L=Math.hypot(f.x,f.z)||1;window.__T={f:[f.x/L,f.z/L]};return {P_yaw:+r.P.yaw.toFixed(4),cam_rotY:+c.rotation.y.toFixed(4),camInSync:Math.abs(c.rotation.y-r.P.yaw)<1e-6,camFwd:[+(f.x/L).toFixed(3),+(f.z/L).toFixed(3)],expectFromYaw:[-+Math.sin(r.P.yaw).toFixed(3),-+Math.cos(r.P.yaw).toFixed(3)]};})()"},
+
+  {"op":"eval","js":"(()=>{const r=window.__rig;r.P.x=0;r.P.z=0;window.__T.p0=[0,0];window.__f0=window.__dbg.renderer.info.render.frame;window.dispatchEvent(new KeyboardEvent('keydown',{code:'KeyW'}));return 'W↓';})()"},
+  {"op":"waitFor","js":"window.__dbg.renderer.info.render.frame > window.__f0 + 2"},
+  {"op":"eval","js":"(()=>{window.dispatchEvent(new KeyboardEvent('keyup',{code:'KeyW'}));const t=window.__T,P=window.__rig.P;const dx=P.x-t.p0[0],dz=P.z-t.p0[1];const L=Math.hypot(dx,dz)||1;const rx=-t.f[1],rz=t.f[0];return {key:'W',dist:+L.toFixed(3),alongFwd:+((dx/L)*t.f[0]+(dz/L)*t.f[1]).toFixed(3),alongRight:+((dx/L)*rx+(dz/L)*rz).toFixed(3)};})()"},
+
+  {"op":"eval","js":"(()=>{const r=window.__rig;r.P.x=0;r.P.z=0;window.__T.p0=[0,0];window.__f0=window.__dbg.renderer.info.render.frame;window.dispatchEvent(new KeyboardEvent('keydown',{code:'KeyS'}));return 'S↓';})()"},
+  {"op":"waitFor","js":"window.__dbg.renderer.info.render.frame > window.__f0 + 2"},
+  {"op":"eval","js":"(()=>{window.dispatchEvent(new KeyboardEvent('keyup',{code:'KeyS'}));const t=window.__T,P=window.__rig.P;const dx=P.x-t.p0[0],dz=P.z-t.p0[1];const L=Math.hypot(dx,dz)||1;const rx=-t.f[1],rz=t.f[0];return {key:'S',dist:+L.toFixed(3),alongFwd:+((dx/L)*t.f[0]+(dz/L)*t.f[1]).toFixed(3),alongRight:+((dx/L)*rx+(dz/L)*rz).toFixed(3)};})()"},
+
+  {"op":"eval","js":"(()=>{const r=window.__rig;r.P.x=0;r.P.z=0;window.__T.p0=[0,0];window.__f0=window.__dbg.renderer.info.render.frame;window.dispatchEvent(new KeyboardEvent('keydown',{code:'KeyD'}));return 'D↓';})()"},
+  {"op":"waitFor","js":"window.__dbg.renderer.info.render.frame > window.__f0 + 2"},
+  {"op":"eval","js":"(()=>{window.dispatchEvent(new KeyboardEvent('keyup',{code:'KeyD'}));const t=window.__T,P=window.__rig.P;const dx=P.x-t.p0[0],dz=P.z-t.p0[1];const L=Math.hypot(dx,dz)||1;const rx=-t.f[1],rz=t.f[0];return {key:'D',dist:+L.toFixed(3),alongFwd:+((dx/L)*t.f[0]+(dz/L)*t.f[1]).toFixed(3),alongRight:+((dx/L)*rx+(dz/L)*rz).toFixed(3)};})()"},
+
+  {"op":"eval","js":"(()=>{const r=window.__rig;r.P.x=0;r.P.z=0;window.__T.p0=[0,0];window.__f0=window.__dbg.renderer.info.render.frame;window.dispatchEvent(new KeyboardEvent('keydown',{code:'KeyA'}));return 'A↓';})()"},
+  {"op":"waitFor","js":"window.__dbg.renderer.info.render.frame > window.__f0 + 2"},
+  {"op":"eval","js":"(()=>{window.dispatchEvent(new KeyboardEvent('keyup',{code:'KeyA'}));const t=window.__T,P=window.__rig.P;const dx=P.x-t.p0[0],dz=P.z-t.p0[1];const L=Math.hypot(dx,dz)||1;const rx=-t.f[1],rz=t.f[0];return {key:'A',dist:+L.toFixed(3),alongFwd:+((dx/L)*t.f[0]+(dz/L)*t.f[1]).toFixed(3),alongRight:+((dx/L)*rx+(dz/L)*rz).toFixed(3)};})()"},
+  {"op":"shot","file":"k1-keys.png"}
+]

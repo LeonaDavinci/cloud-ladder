@@ -1,0 +1,22 @@
+[
+  { "op": "waitFor", "js": "!!(window.__dbg && window.__dbg.daisies && window.__dbg.bed)" },
+  { "op": "wait", "ms": 2500 },
+
+  { "op": "eval", "js": "(()=>{const d=window.__dbg,c=d.camera;c.position.set(-2,7.2,13);d.controls.target.set(-2,1.6,1.0);d.controls.update();return 'front';})()" },
+  { "op": "wait", "ms": 2600 },
+  { "op": "shot", "file": "dv1-front.png" },
+
+  { "op": "eval", "js": "(()=>{const d=window.__dbg,c=d.camera;c.position.set(-2,11.5,4.6);d.controls.target.set(-2,1.5,1.0);d.controls.update();return 'top';})()" },
+  { "op": "wait", "ms": 2600 },
+  { "op": "shot", "file": "dv2-top.png" },
+
+  { "op": "eval", "js": "(()=>{const d=window.__dbg;d.grass.visible=false;if(d.tufts)d.tufts.visible=false;d.lavender.visible=false;const s=d.scene.getObjectByName('bedShadow');if(s)s.visible=false;const c=d.camera;c.position.set(-2,11.5,4.6);d.controls.target.set(-2,1.5,1.0);d.controls.update();return 'top-iso';})()" },
+  { "op": "wait", "ms": 2600 },
+  { "op": "shot", "file": "dv3-top-iso.png" },
+
+  { "op": "eval", "js": "(()=>{const d=window.__dbg,c=d.camera;c.position.set(-11.5,4.4,-2.4);d.controls.target.set(-2,1.6,1.0);d.controls.update();return 'left';})()" },
+  { "op": "wait", "ms": 2600 },
+  { "op": "shot", "file": "dv4-left.png" },
+
+  { "op": "eval", "js": "(()=>{const d=window.__dbg;d.grass.visible=true;if(d.tufts)d.tufts.visible=true;d.lavender.visible=true;const s=d.scene.getObjectByName('bedShadow');if(s)s.visible=true;return 1;})()" }
+]

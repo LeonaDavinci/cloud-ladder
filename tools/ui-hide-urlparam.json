@@ -1,0 +1,6 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__rig && !!window.__ui)"},
+  {"op":"wait","ms":2000},
+  {"op":"eval","js":"JSON.stringify({tag:'URL ?ui=0 开场即收起',hidden:__ui.hidden,cls:document.body.className,panel:getComputedStyle(document.getElementById('scene-ui')).display,h1:getComputedStyle(document.querySelector('.overlay h1')).display,label:(function(){var f=document.querySelector('#ui-toggle .ui-off');return getComputedStyle(f).display!=='none'?f.textContent:'';})(),errs:(window.__errs||[]).length})"},
+  {"op":"shot","file":"ui-hide-6-urlparam.png"}
+]

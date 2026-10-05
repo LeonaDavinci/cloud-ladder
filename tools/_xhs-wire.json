@@ -1,0 +1,6 @@
+[
+  {"op": "wait", "ms": 3000},
+  {"op": "eval", "js": "(()=>{const D=window.__dbg,T=D.THREE;const clearIC=o=>{if(o.isInstancedMesh&&o.instanceColor)o.instanceColor=null};const main=new T.MeshBasicMaterial({color:0xb8f0ff,wireframe:true,transparent:true,opacity:0.9});const grassM=new T.MeshBasicMaterial({color:0x7fd0e0,wireframe:true,transparent:true,opacity:0.4});const faint=new T.MeshBasicMaterial({color:0x3f6bb0,wireframe:true,transparent:true,opacity:0.26});[D.bed,D.ladder].forEach(r=>r&&r.traverse(o=>{if(o.isMesh){clearIC(o);o.material=main}}));if(D.grass)D.grass.traverse(o=>{if(o.isMesh){clearIC(o);o.material=grassM}});if(D.terrain)D.terrain.traverse(o=>{if(o.isMesh){clearIC(o);o.material=faint}});if(D.sky)D.sky.visible=false;if(D.cloud)D.cloud.visible=false;[D.tufts,D.lavender,D.daisies].forEach(o=>{if(o)o.visible=false});D.scene.traverse(o=>{if(o.name==='bedShadow')o.visible=false});D.scene.background=new T.Color(0x070c17);D.scene.fog=null;D.postfx.set('off');return 'wire ok, instanceColor cleared'})()"},
+  {"op": "wait", "ms": 2500},
+  {"op": "shot", "file": "_xhs-7-wire.png"}
+]

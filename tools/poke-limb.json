@@ -1,0 +1,20 @@
+[
+  {"op":"eval","js":"__dbg.camera.position.set(21.5, 15.4, 12.4)"},
+  {"op":"eval","js":"__dbg.controls.target.set(2.6, 12.87, 1.6)"},
+  {"op":"eval","js":"__dbg.cloud.userData.flow.gain = 0; __dbg.pokeCfg.ripple = false"},
+  {"op":"eval","js":"['.overlay','#modes','#sticks','#jump-btn','#mode-hint','#bgm'].forEach(s=>{const e=document.querySelector(s); if(e) e.style.display='none';}); 'ui-hidden'"},
+  {"op":"wait","ms":4000},
+  {"op":"eval","js":"__dbg.cloudPeakReset(); JSON.stringify(__dbg.cloudStat())"},
+  {"op":"shot","file":"lb-0-before.png"},
+  {"op":"eval","js":"(()=>{const {THREE,camera}=__dbg;const c=new THREE.Vector3(2.6,12.87,1.6);const rad=[8.5,4.6,6.4];const d=camera.position.clone().sub(c).normalize();const q=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),0.75);const dd=d.clone().applyQuaternion(q);const t=1/Math.sqrt((dd.x/rad[0])**2+(dd.y/rad[1])**2+(dd.z/rad[2])**2);const p=c.clone().addScaledVector(dd,t);return __dbg.poke(p.x,p.y,p.z,{radial:true,dir:dd.clone().negate(),radius:4.6,amount:2.6});})()"},
+  {"op":"wait","ms":900},
+  {"op":"shot","file":"lb-1-poked.png"},
+  {"op":"eval","js":"JSON.stringify(__dbg.cloudStat())"},
+  {"op":"wait","ms":900},
+  {"op":"shot","file":"lb-2-poked.png"},
+  {"op":"eval","js":"JSON.stringify(__dbg.cloudStat())"},
+  {"op":"wait","ms":40000},
+  {"op":"eval","js":"JSON.stringify(__dbg.cloudStat())"},
+  {"op":"shot","file":"lb-3-back.png"},
+  {"op":"eval","js":"__dbg.pokeCfg.ripple = true; JSON.stringify(window.__errs)"}
+]

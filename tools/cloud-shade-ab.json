@@ -1,0 +1,60 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__rig && window.__rig.steps>4)"},
+  {"op":"wait","ms":3000},
+
+  {"op":"eval","js":"(function(){var T=__dbg.THREE;window.__orbit=function(azD,elD,r){var ps=__dbg.cloud.userData.puffs,c=new T.Vector3();for(var i=0;i<ps.length;i++)c.add(ps[i].home);c.multiplyScalar(1/ps.length);window.__cc=c;var a=azD*Math.PI/180,e=(elD||0)*Math.PI/180;var pos=new T.Vector3(c.x+r*Math.cos(e)*Math.sin(a),c.y+r*Math.sin(e),c.z+r*Math.cos(e)*Math.cos(a));var ctl=__dbg.controls;ctl.enableDamping=false;__dbg.camera.position.copy(pos);ctl.target.copy(c);ctl.update();ctl.update();return __dbg.camera.position.toArray().map(function(v){return +v.toFixed(2);});};window.__cloudbox=function(){var q=new T.Vector3();var x0=1e9,y0=1e9,x1=-1e9,y1=-1e9,any=false;for(var i=0;i<__dbg.cloud.userData.puffs.length;i++){q.copy(__dbg.cloud.userData.puffs[i].home).project(__dbg.camera);if(q.z<1){any=true;x0=Math.min(x0,q.x);x1=Math.max(x1,q.x);y0=Math.min(y0,q.y);y1=Math.max(y1,q.y);}}if(!any)return null;var W=innerWidth,H=innerHeight;return {x:Math.round((x0*0.5+0.5)*W),y:Math.round((-y1*0.5+0.5)*H),w:Math.round((x1-x0)*0.5*W),h:Math.round((y1-y0)*0.5*H)};};window.__shadeProbe=function(){var ps=__dbg.cloud.userData.puffs;var b0=[0,0,0],b1=[0,0,0],b2=[0,0,0];var sum=0,minK=9,maxK=-9,eq=0,litLo=9,litHi=-9;for(var i=0;i<ps.length;i++){var p=ps[i],m=p.sp.material,c=m.color,t=m.userData.__tintColor||m.userData.__tintBase;var L=c.r+c.g+c.b;var b=p.lit<0.34?b0:(p.lit<0.67?b1:b2);b[0]++;b[1]+=L;b[2]+=p.shadeK;sum+=L;if(p.shadeK<minK)minK=p.shadeK;if(p.shadeK>maxK)maxK=p.shadeK;if(c.r===t.r&&c.g===t.g&&c.b===t.b)eq++;if(p.lit<litLo)litLo=p.lit;if(p.lit>litHi)litHi=p.lit;}function pack(b){return {n:b[0],lum:+(b[1]/Math.max(1,b[0])).toFixed(4),k:+(b[2]/Math.max(1,b[0])).toFixed(4)};}var n=ps.length;return {n:n,meanLum:+(sum/n).toFixed(4),kMin:+minK.toFixed(4),kMax:+maxK.toFixed(4),litMin:+litLo.toFixed(4),litMax:+litHi.toFixed(4),byteIdentical:eq,untouched:(__dbg.cloudShadeStats()||{}).untouched,back:pack(b0),mid:pack(b1),front:pack(b2)};};window.__setShade=function(S){var st=__dbg.atmos.state,stt=__dbg.atmos.states[st]||{};var use=(S&&typeof S==='object')?S:(stt.cloudShade||null);var n=__dbg.shadeCloud(__dbg.sun.position,use);var s=__dbg.cloudShadeStats();return {state:st,use:use,n:n,kMin:s.kMin,litMin:s.litMin,litMax:s.litMax,dir:s.dir};};return 'helpers ready';})()"},
+
+  {"op":"eval","js":"(function(){__dbg.postfx.set('off');return JSON.stringify({fx:__dbg.postfx.name,states:Object.keys(__dbg.atmos.states),shades:Object.keys(__dbg.atmos.states).map(function(k){var c=__dbg.atmos.states[k].cloudShade;return k+':'+(c?('backDark='+c.backDark+',curve='+c.curve):'none');})});})()"},
+  {"op":"wait","ms":400},
+
+  {"op":"eval","js":"(function(){__dbg.atmos.apply('afternoon');__dbg.atmos.settleFog();__rig.reset();return 'afternoon home';})()"},
+  {"op":"wait","ms":1000},
+  {"op":"eval","js":"(function(){return JSON.stringify({case:'A afternoon-home before(no shade)',r:__setShade({backDark:0,curve:1}),p:__shadeProbe(),box:__cloudbox(),boxON:__cloudbox()});})()"},
+  {"op":"shot","file":"afternoon-home-A.png"},
+  {"op":"eval","js":"(function(){return JSON.stringify({case:'B afternoon-home after(own shade)',r:__setShade(null),p:__shadeProbe()});})()"},
+  {"op":"shot","file":"afternoon-home-B.png"},
+
+  {"op":"eval","js":"(function(){__dbg.atmos.apply('sunset');__dbg.atmos.settleFog();__rig.reset();return 'sunset home';})()"},
+  {"op":"wait","ms":1000},
+  {"op":"eval","js":"(function(){return JSON.stringify({case:'A sunset-home before(no shade)',r:__setShade({backDark:0,curve:1}),p:__shadeProbe()});})()"},
+  {"op":"shot","file":"sunset-home-A.png"},
+  {"op":"eval","js":"(function(){return JSON.stringify({case:'B sunset-home after(own shade)',r:__setShade(null),p:__shadeProbe()});})()"},
+  {"op":"shot","file":"sunset-home-B.png"},
+
+  {"op":"eval","js":"(function(){__dbg.atmos.apply('night');__dbg.atmos.settleFog();__rig.reset();return 'night home';})()"},
+  {"op":"wait","ms":1000},
+  {"op":"eval","js":"(function(){return JSON.stringify({case:'A night-home before(no shade)',r:__setShade({backDark:0,curve:1}),p:__shadeProbe()});})()"},
+  {"op":"shot","file":"night-home-A.png"},
+  {"op":"eval","js":"(function(){return JSON.stringify({case:'B night-home after(own shade)',r:__setShade(null),p:__shadeProbe()});})()"},
+  {"op":"shot","file":"night-home-B.png"},
+
+  {"op":"eval","js":"(function(){return JSON.stringify({cam:__orbit(16,8,34)});})()"},
+  {"op":"wait","ms":1000},
+
+  {"op":"eval","js":"(function(){__dbg.atmos.apply('afternoon');__dbg.atmos.settleFog();return 'afternoon side';})()"},
+  {"op":"wait","ms":900},
+  {"op":"eval","js":"(function(){return JSON.stringify({case:'A afternoon-side before(no shade)',r:__setShade({backDark:0,curve:1}),p:__shadeProbe(),box:__cloudbox()});})()"},
+  {"op":"shot","file":"afternoon-side-A.png"},
+  {"op":"eval","js":"(function(){return JSON.stringify({case:'B afternoon-side after(own shade)',r:__setShade(null),p:__shadeProbe()});})()"},
+  {"op":"shot","file":"afternoon-side-B.png"},
+
+  {"op":"eval","js":"(function(){__dbg.atmos.apply('sunset');__dbg.atmos.settleFog();return 'sunset side';})()"},
+  {"op":"wait","ms":900},
+  {"op":"eval","js":"(function(){return JSON.stringify({case:'A sunset-side before(no shade)',r:__setShade({backDark:0,curve:1}),p:__shadeProbe(),box:__cloudbox()});})()"},
+  {"op":"shot","file":"sunset-side-A.png"},
+  {"op":"eval","js":"(function(){return JSON.stringify({case:'B sunset-side after(own shade)',r:__setShade(null),p:__shadeProbe()});})()"},
+  {"op":"shot","file":"sunset-side-B.png"},
+
+  {"op":"eval","js":"(function(){__dbg.atmos.apply('night');__dbg.atmos.settleFog();return 'night side';})()"},
+  {"op":"wait","ms":900},
+  {"op":"eval","js":"(function(){return JSON.stringify({case:'A night-side before(no shade)',r:__setShade({backDark:0,curve:1}),p:__shadeProbe(),box:__cloudbox()});})()"},
+  {"op":"shot","file":"night-side-A.png"},
+  {"op":"eval","js":"(function(){return JSON.stringify({case:'B night-side after(own shade)',r:__setShade(null),p:__shadeProbe()});})()"},
+  {"op":"shot","file":"night-side-B.png"},
+
+  {"op":"eval","js":"(function(){var st=__dbg.atmos.states.night;st.sun.azimuth=-40;__dbg.atmos.apply('night');__dbg.atmos.settleFog();return JSON.stringify({case:'moon moved to -40 => dark side must rotate',moon:__dbg.sun.position.toArray().map(function(v){return +v.toFixed(2);}),r:__setShade(null),p:__shadeProbe()});})()"},
+  {"op":"shot","file":"night-moon40-B.png"},
+  {"op":"eval","js":"(function(){var st=__dbg.atmos.states.night;st.sun.azimuth=-104;__dbg.atmos.apply('night');__dbg.atmos.settleFog();return JSON.stringify({case:'moon restored -104',r:__setShade(null),p:__shadeProbe()});})()"},
+
+  {"op":"eval","js":"JSON.stringify({errs:(window.__errs||[])})"}
+]

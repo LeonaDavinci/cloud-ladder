@@ -1,0 +1,7 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__rig)"},
+  {"op":"wait","ms":2400},
+  {"op":"eval","js":"(function(){var T=__dbg.THREE;var k=__rig.rig.ladder;function pr(x,y,z){var v=new T.Vector3(x,y,z).project(__dbg.camera);return [Math.round((v.x*0.5+0.5)*innerWidth),Math.round((-v.y*0.5+0.5)*innerHeight)];}function at(h){return [k.foot[0]+k.up[0]*h,k.foot[1]+k.up[1]*h,k.foot[2]+k.up[2]*h];}var B=__rig.rig.bed;var t=__dbg.controls.target;return JSON.stringify({screen:{w:innerWidth,h:innerHeight,center:[Math.round(innerWidth/2),Math.round(innerHeight/2)]},fov:__dbg.camera.fov,aspect:+__dbg.camera.aspect.toFixed(3),ladderFoot:pr.apply(null,at(0)),ladderMid:pr.apply(null,at(k.length*0.5)),ladderTop:pr.apply(null,at(k.length)),bedTopCenter:pr(B.x,B.top,B.z),target:pr(t.x,t.y,t.z),targetWorld:[+t.x.toFixed(3),+t.y.toFixed(3),+t.z.toFixed(3)],camPos:[+__dbg.camera.position.x.toFixed(2),+__dbg.camera.position.y.toFixed(2),+__dbg.camera.position.z.toFixed(2)],camQuat:[+__dbg.camera.rotation.x.toFixed(4),+__dbg.camera.rotation.y.toFixed(4),+__dbg.camera.rotation.z.toFixed(4)]});})()"},
+  {"op":"shot","file":"probe-free.png"},
+  {"op":"eval","js":"JSON.stringify({errs:window.__errs||[]})"}
+]

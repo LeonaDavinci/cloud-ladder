@@ -1,0 +1,18 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__rig)"},
+  {"op":"waitFor","js":"(function(){var n=0;__dbg.bed.traverse(function(o){if(!o.isMesh)return;var v=o.visible,p=o.parent;while(p&&v){if(!p.visible)v=false;p=p.parent;}if(v)n++;});return n>0&&n<6;})()","timeout":60000},
+  {"op":"wait","ms":2000},
+  {"op":"eval","js":"(function(){var bm=__dbg.bed.userData.bedModel||null;return JSON.stringify({bedSrc:window.__bedSrc||null,bedModelUrl:bm&&bm.url,rawDim:bm&&bm.rawDim,fit:bm&&bm.scale,worldSize:bm&&bm.worldSize});})()"},
+  {"op":"eval","js":"(function(){var a=window.__audio;return JSON.stringify({n:a.tracks.length,ok:a.ok,files:a.tracks.map(function(t){return t.file;})});})()"},
+  {"op":"eval","js":"(function(){__audio.start(0);return 'go0';})()"},
+  {"op":"waitFor","js":"window.__audio.index===0 && (window.__audio.el.duration>0 || !!window.__audio.el.error)"},
+  {"op":"eval","js":"JSON.stringify({i:0,src:__audio.el.currentSrc.split('/').pop(),err:__audio.el.error?__audio.el.error.code:null,dur:+__audio.el.duration.toFixed(2),rs:__audio.el.readyState})"},
+  {"op":"eval","js":"(function(){__audio.start(1);return 'go1';})()"},
+  {"op":"waitFor","js":"window.__audio.index===1 && (window.__audio.el.duration>0 || !!window.__audio.el.error)"},
+  {"op":"eval","js":"JSON.stringify({i:1,src:__audio.el.currentSrc.split('/').pop(),err:__audio.el.error?__audio.el.error.code:null,dur:+__audio.el.duration.toFixed(2),rs:__audio.el.readyState})"},
+  {"op":"eval","js":"(function(){__audio.start(2);return 'go2';})()"},
+  {"op":"waitFor","js":"window.__audio.index===2 && (window.__audio.el.duration>0 || !!window.__audio.el.error)"},
+  {"op":"eval","js":"JSON.stringify({i:2,src:__audio.el.currentSrc.split('/').pop(),err:__audio.el.error?__audio.el.error.code:null,dur:+__audio.el.duration.toFixed(2),rs:__audio.el.readyState})"},
+  {"op":"eval","js":"JSON.stringify({boot:window.__boot?window.__boot.state:null,errs:(window.__errs||[]).slice(0,6)})"},
+  {"op":"shot","file":"mini-assets.png"}
+]

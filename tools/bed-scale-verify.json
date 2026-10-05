@@ -1,0 +1,21 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.bed && window.__dbg.config && window.__dbg.config.bed)"},
+  {"op":"wait","ms":3200},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,TH=d.THREE;d.bed.updateMatrixWorld(true);const b=new TH.Box3().setFromObject(d.bed);const c=b.getCenter(new TH.Vector3());const th=d.terrainHeight(c.x,c.z);let n=0;d.bed.traverse(o=>{if(o.isMesh&&o.visible)n++;});const e=d.config.bed;return {bedScale:d.bed.scale.x,cfgBedScale:e.scale,bedTopRel:e.surfaceY,avoidRadius:e.avoidRadius,boxMin:[+b.min.x.toFixed(3),+b.min.y.toFixed(3),+b.min.z.toFixed(3)],boxSize:[+(b.max.x-b.min.x).toFixed(3),+(b.max.y-b.min.y).toFixed(3),+(b.max.z-b.min.z).toFixed(3)],groundUnder:+th.toFixed(3),gapAboveGround:+(b.min.y-th).toFixed(4),visibleMeshes:n};})()"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg;const bt=d.bed.position.y+d.config.bed.surfaceY;const bf=d.scene.getObjectByName('bedShadow');const out={bedTopY:+bt.toFixed(3),ladderFoot:[+d.ladder.userData.rig.foot[0].toFixed(3),+d.ladder.userData.rig.foot[1].toFixed(3),+d.ladder.userData.rig.foot[2].toFixed(3)],butterflyRX:d.config.butterflies?null:null};return out;})()"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,g=d.config.grass;return {avoid:g.avoid,lavenderClusters:g.lavender.clusters.map(c=>c.center),daisyClusters:d.config.daisies.clusters.map(c=>c.center)};})()"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg;let alive=0,tot=0;d.glints.traverse(o=>{if(o.isInstancedMesh){tot+=o.count;}});return {glintInstances:tot,bedShadowChildren:d.scene.getObjectByName('bedShadow')?d.scene.getObjectByName('bedShadow').children.length:0};})()"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,c=d.camera;c.position.set(4.6,1.6,9.2);d.controls.target.set(-2,1.6,1.2);d.controls.update();return 'side';})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"s1-side.png"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,c=d.camera;c.position.set(-2,8.6,14);d.controls.target.set(-2,1.6,1.2);d.controls.update();return 'top';})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"s2-top.png"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,c=d.camera;c.position.set(-2,1.5,10.5);d.controls.target.set(-2,1.9,0.6);d.controls.update();return 'low';})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"s3-low.png"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,c=d.camera;c.position.set(6,2.6,10);d.controls.target.set(-2,1.7,1.2);d.controls.update();return 'hero';})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"s4-hero.png"},
+  {"op":"eval","js":"(()=>{const e=window.__errs||[];return {errs:e.length,list:e.slice(0,3)};})()"}
+]

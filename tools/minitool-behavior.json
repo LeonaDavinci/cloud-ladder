@@ -1,0 +1,24 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__rig && window.__loop)"},
+  {"op":"wait","ms":2600},
+
+  {"op":"eval","js":"(function(){function r(s){var e=document.querySelector(s);if(!e)return null;var b=e.getBoundingClientRect();return [Math.round(b.x),Math.round(b.y),Math.round(b.right),Math.round(b.bottom)];}var rows={};['#ui-time','#ui-filter','#ui-fog'].forEach(function(s){rows[s]=r(s);});return JSON.stringify({modes:r('#modes'),reset:r('#reset-btn'),roam:r('.mode-btn[data-mode=roam]'),walk:r('.mode-btn[data-mode=walk]'),free:r('.mode-btn[data-mode=free]'),hud:r('#hud-tl'),bgm:r('#bgm'),toggle:r('#ui-toggle'),panel:r('#scene-ui'),rows:rows,gapResetToRoam:Math.round(document.querySelector('.mode-btn[data-mode=roam]').getBoundingClientRect().x-document.getElementById('reset-btn').getBoundingClientRect().right),hudGap:Math.round(document.getElementById('bgm').getBoundingClientRect().y-document.querySelector('.overlay').getBoundingClientRect().bottom),rowGap:Math.round(r('#ui-filter')[1]-r('#ui-time')[3])});})()"},
+
+  {"op":"eval","js":"(function(){var t0=__dbg.time;var before=__loop.running;Object.defineProperty(document,'hidden',{configurable:true,get:function(){return true;}});document.dispatchEvent(new Event('visibilitychange'));return JSON.stringify({before:before,afterHiddenRunning:__loop.running,t0:+t0.toFixed(3)});})()"},
+  {"op":"wait","ms":1500},
+  {"op":"eval","js":"(function(){var t=__dbg.time;var st=__loop.running;Object.defineProperty(document,'hidden',{configurable:true,get:function(){return false;}});document.dispatchEvent(new Event('visibilitychange'));window.__visT={t:t};return JSON.stringify({whileHiddenRunning:st,timeWhileHidden:+t.toFixed(3)});})()"},
+  {"op":"wait","ms":1500},
+  {"op":"eval","js":"JSON.stringify({afterVisibleRunning:__loop.running,timeAfterVisible:+__dbg.time.toFixed(3),timeFrozeWhileHidden:Math.abs(__dbg.time-window.__visT.t)<0.001,clockResumed:__dbg.time>window.__visT.t})"},
+
+  {"op":"eval","js":"(function(){__rig.setMode('roam');__rig.goto(3);return JSON.stringify({mode:__rig.mode,step:__rig.step});})()"},
+  {"op":"waitFor","js":"__rig.leap.landed","timeout":60000},
+  {"op":"eval","js":"JSON.stringify({atLanding_mode:__rig.mode,foot:+__rig.P.foot.toFixed(3),bedTop:+__rig.rig.bed.top.toFixed(3)})"},
+  {"op":"waitFor","js":"__rig.mode==='walk'","timeout":120000},
+  {"op":"wait","ms":800},
+  {"op":"eval","js":"JSON.stringify({afterWait_mode:__rig.mode,afterWait_step:__rig.step,onBed:__rig.P.state==='ground'&&Math.abs(__rig.P.foot-__rig.rig.bed.top)<0.06,jumpBtnOn:document.getElementById('jump-btn').classList.contains('on')})"},
+  {"op":"shot","file":"mini-auto-walk.png"},
+  {"op":"clickSel","sel":"#reset-btn"},
+  {"op":"wait","ms":700},
+  {"op":"eval","js":"(function(){var h=__rig.home,c=__dbg.camera,o=__dbg.controls;var dp=Math.abs(c.position.x-h.pos.x)+Math.abs(c.position.y-h.pos.y)+Math.abs(c.position.z-h.pos.z);var dt=Math.abs(o.target.x-h.target.x)+Math.abs(o.target.y-h.target.y)+Math.abs(o.target.z-h.target.z);return JSON.stringify({mode:__rig.mode,step:__rig.step,posErr:+dp.toFixed(9),targetErr:+dt.toFixed(9),cam:[+c.position.x.toFixed(3),+c.position.y.toFixed(3),+c.position.z.toFixed(3)]});})()"},
+  {"op":"eval","js":"JSON.stringify({errs:(window.__errs||[]).slice(0,6)})"}
+]

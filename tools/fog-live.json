@@ -1,0 +1,22 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.atmos)"},
+  {"op":"wait","ms":2200},
+  {"op":"fps"},
+
+  {"op":"eval","js":"(function(){__dbg.atmos.apply('afternoon');__dbg.atmos.settleFog();__dbg.atmos.setFogAnimMs(2000);__dbg.atmos.toggleFog();__dbg.atmos.settleFog();__dbg.atmos.toggleFog();return JSON.stringify({就绪:true,当前雾:[__dbg.scene.fog.near,__dbg.scene.fog.far],目标:__dbg.atmos.fogTarget,时长ms:__dbg.atmos.fogAnimMs});})()"},
+
+  {"op":"eval","js":"(function(){window.__tr=[];window.__t0=performance.now();(function s(){var t=__dbg.atmos.stats().fogAnim;if(t.t<1||window.__tr.length===0)__tr.push([Math.round(performance.now()-window.__t0),t.t,+__dbg.scene.fog.far.toFixed(1),+__dbg.scene.fog.near.toFixed(2)]);requestAnimationFrame(s);})();return 'trace on';})()"},
+
+  {"op":"eval","js":"(function(){__dbg.sceneUI.toggleFog();return '按钮点了 → 目标 '+JSON.stringify(__dbg.atmos.fogTarget)+' 当前 '+JSON.stringify([__dbg.scene.fog.near,__dbg.scene.fog.far]);})()"},
+  {"op":"shot","file":"fog-1-切之前.png"},
+  {"op":"wait","ms":700},
+  {"op":"shot","file":"fog-2-渐变中.png"},
+  {"op":"wait","ms":700},
+  {"op":"shot","file":"fog-3-渐变中后段.png"},
+  {"op":"waitFor","js":"!__dbg.atmos.fogTarget.animating"},
+  {"op":"shot","file":"fog-4-到位.png"},
+
+  {"op":"eval","js":"(function(){var tr=window.__tr;var pick=[];for(var i=0;i<tr.length;i+=Math.max(1,Math.round(tr.length/14)))pick.push(tr[i]);var last=tr[tr.length-1];return JSON.stringify({帧数:tr.length,最后一帧:last,目标:[__dbg.atmos.fogTarget.near,__dbg.atmos.fogTarget.far],当前:[__dbg.scene.fog.near,__dbg.scene.fog.far],采样:pick});})()"},
+
+  {"op":"eval","js":"JSON.stringify({errs:window.__errs||[],hint:document.getElementById('mode-hint').textContent,panelBottom:Math.round(innerHeight-document.getElementById('scene-ui').getBoundingClientRect().bottom)})"}
+]

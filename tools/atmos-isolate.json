@@ -1,0 +1,19 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.atmos)"},
+  {"op":"wait","ms":1200},
+  {"op":"eval","js":"(function(){['.overlay','#modes','#sticks','#jump-btn','#mode-hint','#bgm'].forEach(function(s){var e=document.querySelector(s);if(e)e.style.display='none';});window.__fc=0;(function f(){window.__fc++;requestAnimationFrame(f);})();window.__far=__dbg.scene.children.filter(function(o){return o.isGroup&&o.children.length>6&&o.children[0].isSprite;});window.__ridge=__dbg.scene.children.filter(function(o){return o.isMesh&&o.geometry&&o.geometry.attributes&&o.geometry.attributes.color&&o.material&&o.material.isMeshBasicMaterial;});__dbg.postfx.set('off');__dbg.atmos.apply('sunset');return JSON.stringify({far:window.__far.length,ridge:window.__ridge.length});})()"},
+  {"op":"waitFor","js":"window.__fc>2"},
+  {"op":"shot","file":"iso-0-all.png"},
+  {"op":"eval","js":"(function(){window.__far.forEach(function(g){g.visible=false;});window.__fc=0;return 'far off';})()"},
+  {"op":"waitFor","js":"window.__fc>2"},
+  {"op":"shot","file":"iso-1-nofar.png"},
+  {"op":"eval","js":"(function(){window.__far.forEach(function(g){g.visible=true;});window.__ridge.forEach(function(g){g.visible=false;});window.__fc=0;return 'ridge off';})()"},
+  {"op":"waitFor","js":"window.__fc>2"},
+  {"op":"shot","file":"iso-2-noridge.png"},
+  {"op":"eval","js":"(function(){window.__ridge.forEach(function(g){g.visible=true;});__dbg.atmos.orb.visible=false;window.__fc=0;return 'orb off';})()"},
+  {"op":"waitFor","js":"window.__fc>2"},
+  {"op":"shot","file":"iso-3-noorb.png"},
+  {"op":"eval","js":"(function(){__dbg.atmos.orb.visible=true;__dbg.cloud.visible=false;window.__fc=0;return 'cloud off';})()"},
+  {"op":"waitFor","js":"window.__fc>2"},
+  {"op":"shot","file":"iso-4-nocloud.png"}
+]

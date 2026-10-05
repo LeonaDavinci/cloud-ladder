@@ -1,0 +1,21 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.atmos)"},
+  {"op":"wait","ms":1500},
+  {"op":"eval","js":"(function(){window.__fc=0;(function f(){window.__fc++;requestAnimationFrame(f);})();return 'tick';})()"},
+  {"op":"eval","js":"(function(){__dbg.postfx.set('off');__dbg.atmos.apply('afternoon');window.__fc=0;return 'afternoon';})()"},
+  {"op":"waitFor","js":"window.__fc>3"},
+  {"op":"shot","file":"ridge-final-1-下午.png"},
+  {"op":"eval","js":"(function(){__dbg.atmos.apply('dawn');window.__fc=0;return 'dawn';})()"},
+  {"op":"waitFor","js":"window.__fc>3"},
+  {"op":"shot","file":"ridge-final-2-清晨.png"},
+  {"op":"eval","js":"(function(){__dbg.atmos.apply('sunset');window.__fc=0;return 'sunset';})()"},
+  {"op":"waitFor","js":"window.__fc>3"},
+  {"op":"shot","file":"ridge-final-3-日落.png"},
+  {"op":"eval","js":"(function(){__dbg.atmos.apply('night');window.__fc=0;return 'night';})()"},
+  {"op":"waitFor","js":"window.__fc>3"},
+  {"op":"shot","file":"ridge-final-4-夜间.png"},
+  {"op":"eval","js":"(function(){__dbg.atmos.apply('afternoon');window.__fc=0;return 'back';})()"},
+  {"op":"waitFor","js":"window.__fc>3"},
+  {"op":"shot","file":"ridge-final-5-回下午.png"},
+  {"op":"eval","js":"JSON.stringify(window.__errs||[])"}
+]

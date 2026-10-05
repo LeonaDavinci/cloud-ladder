@@ -1,0 +1,10 @@
+[
+  {"op":"waitFor","js":"!!(window.__dbg && window.__dbg.scene.getObjectByName('bedShadow'))"},
+  {"op":"wait","ms":2000},
+  {"op":"eval","js":"(()=>{const d=window.__dbg;d.grass.visible=false;if(d.tufts)d.tufts.visible=false;if(d.lavender)d.lavender.visible=false;if(d.daisies)d.daisies.visible=false;const b=d.bed.position,c=d.camera;c.position.set(b.x+2.9,b.y+1.75,b.z+3.0);d.controls.target.set(b.x,b.y+0.75,b.z);d.controls.update();return 'isolated';})()"},
+  {"op":"wait","ms":2800},
+  {"op":"shot","file":"iso1-ring-only.png"},
+  {"op":"eval","js":"(()=>{const d=window.__dbg,b=d.bed.position,c=d.camera;c.position.set(b.x+0.4,b.y+7.0,b.z+0.35);d.controls.target.set(b.x,b.y,b.z);d.controls.update();return 'top';})()"},
+  {"op":"wait","ms":2600},
+  {"op":"shot","file":"iso2-ring-only-top.png"}
+]
