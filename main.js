@@ -122,7 +122,7 @@ function resolveViewTarget(t, rig, cfg){
      · 漫游：按 scene.json 的 route 自动演出「走到床 → 上床 → 爬梯 → 云端跳下」
      · 步行：左半屏摇杆移动、右半屏摇杆转视角，右下角按钮或空格跳跃
    ============================================================ */
-function setupModes(cfg, camera, controls, renderer, rig, AUD, ladder){
+function setupModes(cfg, camera, controls, renderer, rig, AUD, ladder, tvHooks){
   const WALK = cfg.walk || {}, ROAM = cfg.roam || {};
   /* 音效出口。传不进来（老调用点、无头脚本）时给个空壳 —— 漫游落地那声「噗」
      是演出的一部分，不该因为它把整段动画带崩。 */
@@ -824,16 +824,26 @@ function setupModes(cfg, camera, controls, renderer, rig, AUD, ladder){
 
   /* 复位 = 回到刚打开时的样子。复位的是**玩法状态**（机位 / 焦点 / 模式 /
      角色 / 漫游进度 / 跳跃请求），不动画面风格 —— 时相、滤镜、雾档归它们
-     自己的按钮（要回原片按 0）。两件事分开，复位才不会把刚调好的天色一块抹掉。 */
+     自己的按钮（要回原片按 0）。两件事分开，复位才不会把刚调好的天色一块抹掉。
+    2026-10-05 又补一条：**时相跟着回到「下午」** —— 用户点复位要的是「回到刚打开时
+    的样子」，不是留下夜间那一档。滤镜 / 雾档仍归它们自己的按钮（要回原片按 0）。 */
   function resetView(){
     if(mode !== 'free') setMode('free');   // 先退出漫游 / 步行（顺便清掉摇杆）
-    /* 若正处在「看电视」位姿，先清掉这个状态再复位 */
-    if(tvState || fly){
-      tvState = false; fly = null;
-      closeProjector();            // 幕布淡出 + 停视频（这条退路不经过 projBtn）
+    /* 若正处在「看电视」位姿，先把这个状态连同它绑住的每一样东西一起清掉再复位。
+       ⚠ 原来这里直接调 closeProjector() —— 它是 createSceneUI **内部**的函数，
+         setupModes 这一层看不见 ⇒ 一调就是 ReferenceError，而且抛在下面相机归位之前：
+         复位看着像「点了没反应」，人还留在床上（fp.on 为真、controls.enabled 为 false，
+         于是摄像机完全动不了）、梯子也不出来、幕布和视频还开着。现在走 tvHooks，
+         真身由 build 在 createSceneUI 之后接进来。 */
+    if(tvState || fly || fp.on){
+      tvState = false;
+      if(fly){ fly = null; controls.enabled = true; }   // 丢掉正在跑的飞行动画
       fp.on = false; fp.dragId = null;          // 第一人称先收，否则复位后还攥着相机
-      if(ladder) ladder.visible = true;
+      applyTVLimits(false);                     // 轨道约束收回（看电视时为落位临时放松过）
+      btns.forEach(b => { b.disabled = false; });      // 三个玩法按钮跟着交还（落地时锁过）
+      if(ladder) ladder.visible = true;         // 梯子回来（看电视时藏过）
       controls.enabled = true;
+      if(tvHooks && tvHooks.closeProjector) tvHooks.closeProjector();   // 幕布淡出 + 停视频
     }
     /* 角色状态清零。P.foot 归 0 就够 —— 切模式时 syncFromCamera() 会按当时的
        相机位置重算一次，这里只是别让「复位后立刻切步行」沿用旧坐标。 */
@@ -863,6 +873,13 @@ function setupModes(cfg, camera, controls, renderer, rig, AUD, ladder){
     controls.update();
     controls.enableDamping = damp;
     fovReset();                            // 视场角回原值（爬梯那一段可能正拉到 64°）
+    /* 「复位 = 打开页面时的样子」也包含时相：回到「下午」这一档（首屏）。
+       ⚠ 必须放在**最末**：atmos.apply → onPhase 会顺手再走一次 closeProjector /
+       tvEnter(false)，那时 tvState 已是 false、幕布也早关了，两条都是空操作；
+       要是放在最前，tvEnter(false) 会立刻起飞 4s 往回飞，跟下面的硬归位互相拉扯，
+       相机就停在半路上了。 */
+    try{ if(tvHooks && tvHooks.applyPhase) tvHooks.applyPhase(tvHooks.defaultPhase || 'afternoon'); }catch(_){}
+    try{ if(tvHooks && tvHooks.syncUi) tvHooks.syncUi(); }catch(_){}
     refreshHint();
   }
 
@@ -1821,6 +1838,7 @@ function createSceneUI(atmos, postfx, flashHint, projector, step){
     click(name){ if(timeBtns[name]) timeBtns[name].click(); else if(fxBtns[name]) fxBtns[name].click(); },
     toggleFog(){ fogBtn.click(); },
     setProjectorAvailable,
+    closeProjector(){ closeProjector(); },        // 复位用（tvHooks.closeProjector 转发进来）
     dispose(){ removeEventListener('keydown', onKey); }
   };
 }
@@ -2034,7 +2052,11 @@ function build(cfg){
 
   /* 相机模式（自由 / 漫游 / 步行） */
   camera.rotation.order = 'YXZ';
-  const step = setupModes(cfg, camera, controls, renderer, rig, AUD, ladder);
+  /* 复位要从 setupModes 那头关幕布 / 切时相，可这两个出口一个藏在 createSceneUI 内部
+     （closeProjector）、一个要到 build 后面才建出来（atmos）。先挂个空壳，
+     等走到那两步再填真身（见下方 ATMOS-FAIL 与 window.__sceneUI 那两处）。 */
+  const tvHooks = { applyPhase: null, closeProjector: null, syncUi: null, defaultPhase: 'afternoon' };
+  const step = setupModes(cfg, camera, controls, renderer, rig, AUD, ladder, tvHooks);
 
   /* 碰云：点击戳一下 + 钻进云里让云让开（漫游爬到梯顶就正好在云里） */
   const pokeStep = setupCloudPoke(scene, cloudGrp, camera, renderer.domElement, cfg, AUD);
@@ -2062,6 +2084,10 @@ function build(cfg){
     });
   } catch(e){ console.error('ATMOS-FAIL ' + (e && e.stack ? e.stack : e)); throw e; }
 
+  /* 复位切「下午」的出口（tvHooks.applyPhase 见 resetView 末尾那几行） */
+  tvHooks.applyPhase = (name) => { try{ if(atmos) atmos.apply(name); }catch(_){} };
+  tvHooks.defaultPhase = ((atmos && atmos.names && atmos.names[0]) || 'afternoon');
+
   /* 时相交互钩子：切到夜间 → 收起蝴蝶、放出萤火虫、显示投影按钮；其余时相反之。
      投影幕布只由按钮显隐控制：钩子把「夜间可用」状态记下来，按钮据此切开关。
      初始 apply 在 createAtmosphere 内部已跑过一次（那时 onPhase 还没挂上，是空操作），
@@ -2086,6 +2112,11 @@ function build(cfg){
      投影按钮也在这里生成，需要 projector 引用。 */
   const sceneUI = createSceneUI(atmos, postfx, window.__hintFlash, projector, step);
   window.__sceneUI = sceneUI;
+  /* resetView（在 setupModes 里）要从外面关幕布：closeProjector 是 createSceneUI 内部的函数，
+     这里转发一份出去 —— 千万别在 setupModes 里按名字直接调它（会 ReferenceError）。
+     同步时相/滤镜/雾档按钮的高亮也一并交给 UI 的 sync()。 */
+  tvHooks.closeProjector = () => { try{ if(window.__sceneUI && window.__sceneUI.closeProjector) window.__sceneUI.closeProjector(); }catch(_){} };
+  tvHooks.syncUi = () => { try{ if(window.__sceneUI && window.__sceneUI.sync) window.__sceneUI.sync(); }catch(_){} };
 
   /* 调试出口：场景 / 渲染器 / 太阳（核对阴影开关与绘制统计；无头脚本也用它） */
   window.__dbg = { THREE, scene, renderer, camera, sun: RT.sun, controls, terrain, grass, tufts, lavender, bed, ladder,
