@@ -51,6 +51,12 @@ let SHADOW_SZ = null;  // 阴影贴图边长（null = 用 JSON 里的值）
 
 let CFG_EFF   = {};    // config.json 的生效值快照（applyConfig 返回；无 config.json 时为空对象）
 
+/* 进来看电视那会儿 BGM 在不在放 —— 复位 / 退出时照原样接回来。
+   ★ 必须**模块级**：setupModes 和 createSceneUI 是同一个模块里的并列顶层函数，
+   谁都看不见对方的 let。早先放在 setupModes 里，createSceneUI 那句赋值就成了
+   ReferenceError，被 try/catch 吞掉，AUD.pause() 连跑都没跑（2026-10-06 实测）。 */
+let bgmBefore = false;
+
 /* ============================================================
    2b. 可行走面查询：地形 / 床垫顶面
    ------------------------------------------------------------
@@ -772,8 +778,8 @@ function setupModes(cfg, camera, controls, renderer, rig, AUD, ladder, tvHooks){
     if(m > 1e-3){ fp.x += wx*spd*dt; fp.z += wz*spd*dt; }
     fpToCamera();
   }
-  /* 进来看电视时 BGM 在不在放 —— 复位时照原样接回来，没在放就别自作主张起播。 */
-  let bgmBefore = false;
+  /* 进来看电视时 BGM 在不在放用的是模块级 bgmBefore（见文件头）——
+     这里再声明一次会让外面那次赋值又变成未声明赋值（= ReferenceError）。 */
 
   function setTVMode(on, done){
     if(!!on === tvState){ if(done) done(); return; }
@@ -812,6 +818,8 @@ function setupModes(cfg, camera, controls, renderer, rig, AUD, ladder, tvHooks){
       if(ladder) ladder.visible = true;
       fp.on = false; fp.dragId = null;          // 交还给 OrbitControls 之前先收掉第一人称
       controls.enabled = true;
+      /* bgmBefore 是「进来看电视前在不在放」，照原样接回来；没在放就别自作主张起播。
+         AUD 是空壳 / 老版本没这个 api 时空转不报错。 */
       try{ if(AUD && bgmBefore && AUD.state !== 'playing' && AUD.resume) AUD.resume(); }catch(_){}
       startFly(tvHome.pos.clone(), tvHome.target.clone(), 4.0, false, ()=>{
         tvState = false;
@@ -1667,7 +1675,7 @@ Promise.all([
    雾档按钮的文案显示的是「当前 → 点击后」，因为这一个按钮承担两个方向，
    只写「雾」会让人分不清现在是哪一档。
    ============================================================ */
-function createSceneUI(atmos, postfx, flashHint, projector, step){
+function createSceneUI(atmos, postfx, flashHint, projector, step, AUD){
   const box = document.getElementById('scene-ui');
   if(!box) return null;
   const rowTime   = document.getElementById('ui-time');
@@ -1765,7 +1773,7 @@ function createSceneUI(atmos, postfx, flashHint, projector, step){
     if(isWatching){
       closeProjector();                          // 幕布淡出 + 停视频 + 收声音
       step.tvEnter(false, ()=>{ isWatching = false; syncProj(); });
-      hint('已复位', 900);
+      hint('已退出看电视 · 梯子回来了', 1100);
     } else {
       /* 声音必须在**这次点击**里开：WebAudio 增益链路要用户手势才起得来
          （createMediaElementSource 接上后音频只走这条图，上下文不上就是静音）。 */
@@ -1773,8 +1781,12 @@ function createSceneUI(atmos, postfx, flashHint, projector, step){
         /* 幕布一亮就把 BGM 让给视频声（2026-10-05「播视频时就要关掉正在播的音乐」）：
            放在**这次点击**里做，而不是 4.7s 飞行动画落地后 —— 用户说的是「播视频时」，
            幕布出现就该静下来。bgmBefore 也在这里记，复位靠它决定要不要接回来。 */
-        try{ if(AUD){ bgmBefore = (AUD.state === 'playing');
-                      if(bgmBefore && AUD.pause) AUD.pause(); } }catch(_){}
+        try{ if(AUD){ const st = AUD.state;
+                      bgmBefore = (st === 'playing' || st === 'proc');
+                      /* ★ 无条件 pause()：早先写成 if(bgmBefore) AUD.pause()，
+                         音乐还在 loading / proc 那几拍里就会整个跳过，人听着 BGM
+                         没停。pause() 自己在状态不对时是空操作，多调一次无所谓。 */
+                      if(AUD.pause) AUD.pause(); } }catch(e){ console.warn('[cloud-ladder] BGM 暂停失败:', e); }
         projectorOn = true;
         if(projector && projector.userData.setOn) projector.userData.setOn(true);
       }
@@ -1783,10 +1795,10 @@ function createSceneUI(atmos, postfx, flashHint, projector, step){
       hint('靠在床上看电视 · 拖屏转头 / WASD 走动', 1600);
     }
   });
-  projBtn.title = '夜间专属：靠在床上看电视（第一人称：拖屏转头 · WASD/方向键走动） / 复位（快捷键 P）';
+  projBtn.title = '夜间专属：靠在床上看电视（第一人称：拖屏转头 · WASD/方向键走动） / 退出看电视（快捷键 P）';
   if(rowProj) rowProj.appendChild(projBtn);
   function syncProj(){
-    projBtn.textContent = isWatching ? '复位' : '看电视';
+    projBtn.textContent = isWatching ? '退出看电视' : '看电视';
     projBtn.classList.toggle('active', isWatching);
   }
   function setProjectorAvailable(v){
@@ -2110,7 +2122,11 @@ function build(cfg){
   /* 时相 / 滤镜 / 雾档 面板。放在最后：它要读 atmos.names、postfx.names。
      flashHint 是 setupModes 里的提示条，这里借来给按钮点按一点文字反馈。
      投影按钮也在这里生成，需要 projector 引用。 */
-  const sceneUI = createSceneUI(atmos, postfx, window.__hintFlash, projector, step);
+  /* ⚠ AUD 必须显式传进来：createSceneUI 和 build 是同一模块里的**并列**顶层函数，
+     不是嵌套关系 —— createSceneUI 里直接写 `if(AUD)` 会 ReferenceError
+     （2026-10-06 实测：BGM 一点没停，那行还套在 try/catch 里被吞了）。
+     同理，setupModes / createSceneUI 之间共享的状态（bgmBefore）得提到模块顶层。 */
+  const sceneUI = createSceneUI(atmos, postfx, window.__hintFlash, projector, step, AUD);
   window.__sceneUI = sceneUI;
   /* resetView（在 setupModes 里）要从外面关幕布：closeProjector 是 createSceneUI 内部的函数，
      这里转发一份出去 —— 千万别在 setupModes 里按名字直接调它（会 ReferenceError）。
