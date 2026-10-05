@@ -2549,7 +2549,12 @@ export function buildProjectorScreen(cfg){
     emissiveIntensity: +(S.emissive !== undefined ? S.emissive : 0.35),
     roughness: 0.78,
     metalness: 0.0,
-    side: THREE.DoubleSide
+    side: THREE.DoubleSide,
+    /* 淡入淡出要用（用户 2026-10-05「电视的物体要慢慢淡入」）：
+       初始 opacity 0，setOn(true) 之后由 applyFade 推上去；不设成 transparent
+       的话 three 会走不透明分支，opacity 改了也不生效。 */
+    transparent: true,
+    opacity: 0
   });
 
   const screen = new THREE.Mesh(geo, mat);
@@ -2563,8 +2568,10 @@ export function buildProjectorScreen(cfg){
      幕布就成了悬空的三面框，没有落地托盘的实感，更贴「梦核 / 投影」的气质。
      保留三面是为了让画面有个框住视频的边，不是一张裸幕布。） */
   const thick = +(S.frameThickness !== undefined ? S.frameThickness : 0.06);
+  let frameMat = null;                       // 提到外层，applyFade 也要动它
   if(thick > 0){
-    const frameMat = new THREE.MeshStandardMaterial({ color: S.frameColor || '#2a2a40', roughness: 0.92 });
+    frameMat = new THREE.MeshStandardMaterial({ color: S.frameColor || '#2a2a40', roughness: 0.92,
+      transparent: true, opacity: 0 });      // 与幕布同步淡入淡出
     const top    = new THREE.Mesh(new THREE.BoxGeometry(w + thick*2, thick, thick), frameMat);
     const left   = new THREE.Mesh(new THREE.BoxGeometry(thick, h, thick), frameMat);
     const right  = new THREE.Mesh(new THREE.BoxGeometry(thick, h, thick), frameMat);
@@ -2651,6 +2658,13 @@ export function buildProjectorScreen(cfg){
   if(videoEl && videoEl.readyState >= 2) swapToVideo();
 
   group.userData.update = function(dt, now){
+    if(fadeT !== fadeTo){                    // 淡入淡出驱动（Group 隐藏时也要跑）
+      const fwd = fadeTo > fadeT;
+      fadeT += (fwd ? 1 : -1) * (dt / (fwd ? FADE_IN : FADE_OUT));
+      if((fwd && fadeT >= 1) || (!fwd && fadeT <= 0)) fadeT = fadeTo;
+      applyFade();
+      if(fadeT === 0){ group.visible = false; screen.visible = false; light.visible = false; }
+    }
     if(!group.visible) return;
     if(videoEl){
       if(videoEl.readyState >= 2 && videoEl.paused) videoEl.play().catch(()=>{});
@@ -2663,19 +2677,45 @@ export function buildProjectorScreen(cfg){
     texture.needsUpdate = true;
   };
 
+  /* ---- 淡入淡出（2026-10-05「电视的物体要慢慢淡入」）----
+     幕布不再「啪」一下现形：开 = 1.4s 渐显、关 = 0.9s 渐隐。
+     ⚠ opacity 和点光源强度**必须走同一条曲线** —— 只淡布不淡光会出现
+     「布已经半透、光还把周围照得刺眼」的穿帮。
+     淡到 0 之后才真正 visible=false；中途再点开时 setOn(true) 会重新推上来，
+     不会有「卡在半透明」的残留。 */
+  const FADE_IN  = +(S.fadeIn  !== undefined ? S.fadeIn  : 1.4);   // 秒（渐显）
+  const FADE_OUT = +(S.fadeOut !== undefined ? S.fadeOut : 0.9);   // 秒（渐隐）
+  const lightBase = +(L.intensity !== undefined ? L.intensity : 1.1);
+  let fadeT = 0, fadeTo = 0;                 // 0 = 全透，1 = 全显
+  function applyFade(){
+    const o = fadeT < 0 ? 0 : (fadeT > 1 ? 1 : fadeT);
+    mat.opacity = o;
+    if(frameMat) frameMat.opacity = o;
+    light.intensity = lightBase * o;
+  }
+  applyFade();                               // 初始：全透
   group.userData.setOn = function(on){
     const v = !!on;
-    if(group.visible === v) return;
-    group.visible = v;
-    screen.visible = v;
-    light.visible = v;
+    if(fadeTo === (v ? 1 : 0)) return;       // 已经在往这个方向走了，别重启
+    fadeTo = v ? 1 : 0;
+    if(v){
+      group.visible = true; screen.visible = true; light.visible = true;
+    }
     if(videoEl){
+      /* 关：视频立刻停（用户 2026-10-05「关闭视频播放」），停住的那一帧陪着淡出，
+         不必等 fade 跑完才停 —— 淡出总共才 0.9s。 */
       if(v){ videoEl.currentTime = 0; videoEl.play().catch(()=>{}); }
       else { videoEl.pause(); }
     }
     tvAudioOn(v);
   };
 
-  group.userData.setOn(false);
+  /* ⚠ 初始隐藏**不能**只靠 `setOn(false)`：那时 fadeTo 已经是 0，setOn 会
+     early return 直接走人，visible 还是构建期默认的 true。所以必须按 fadeT=0
+     的状态把可见性摆一遍（opacity 也是 0，但 visible=true 会让 update 里那句
+     `if(!group.visible) return` 之外的东西白跑，也别留着）。 */
+  applyFade();
+  group.visible = false; screen.visible = false; light.visible = false;
+  group.userData.setOn(false);      // 幂等：fadeTo 已是 0，只是把「关」这条路注册上
   return group;
 }

@@ -798,12 +798,8 @@ function setupModes(cfg, camera, controls, renderer, rig, AUD, ladder){
            放在状态机里而不是按钮回调里，是因为「看电视」还会从别的路退出：
            切非夜间时相、按 R 复位。锁挂在状态上，两条路都能解锁。 */
         btns.forEach(b => { b.disabled = true; });
-        /* 看电影时 BGM 让位给视频声音（2026-10-05）：淡出暂停，复位再接回来。
-           AUD 是空壳 / 老版本没 pause() 时整段空转，无头脚本照样跑得通。 */
-        try{
-          if(AUD){ bgmBefore = (AUD.state === 'playing');
-                   if(bgmBefore && AUD.pause) AUD.pause(); }
-        }catch(_){}
+        /* BGM 的暂停挪到点击那一刻（见上方 projBtn 分支），这里只管状态机；
+           复位那条路会原样把 BGM 接回来。AUD 是空壳 / 老版本没 pause() 时空转不报错。 */
         if(done) done();
       });
     } else {
@@ -834,6 +830,7 @@ function setupModes(cfg, camera, controls, renderer, rig, AUD, ladder){
     /* 若正处在「看电视」位姿，先清掉这个状态再复位 */
     if(tvState || fly){
       tvState = false; fly = null;
+      closeProjector();            // 幕布淡出 + 停视频（这条退路不经过 projBtn）
       fp.on = false; fp.dragId = null;          // 第一人称先收，否则复位后还攥着相机
       if(ladder) ladder.visible = true;
       controls.enabled = true;
@@ -1735,17 +1732,32 @@ function createSceneUI(atmos, postfx, flashHint, projector, step){
   function tvAudio(on){                          // 视频声音跟着幕布一起开合
     if(projector && projector.userData.tvAudio) projector.userData.tvAudio(on);
   }
+  /* 统一的「关幕布」：淡出 + 停视频 + 收声音。
+     专门抽出来是因为「看电视」有三条退路 —— 点复位按钮、按 R 复位、切到非夜间时相，
+     后两条根本不经过 projBtn，不抽出来就会留下「幕布亮着、视频还在放」的场。
+     函数声明会被提升到作用域顶部，所以 resetView（更早的位置）也能调它。 */
+  function closeProjector(){
+    if(!projectorOn) return;
+    projectorOn = false;
+    if(projector && projector.userData.setOn) projector.userData.setOn(false);
+    tvAudio(false);
+  }
   const projBtn = mkBtn('看电视', () => {
     if(!projectorAvailable || !step) return;
     if(step.tvActive() && !isWatching) return;   // 飞行途中忽略点击
     if(isWatching){
-      tvAudio(false);
+      closeProjector();                          // 幕布淡出 + 停视频 + 收声音
       step.tvEnter(false, ()=>{ isWatching = false; syncProj(); });
       hint('已复位', 900);
     } else {
       /* 声音必须在**这次点击**里开：WebAudio 增益链路要用户手势才起得来
          （createMediaElementSource 接上后音频只走这条图，上下文不上就是静音）。 */
       if(!projectorOn){
+        /* 幕布一亮就把 BGM 让给视频声（2026-10-05「播视频时就要关掉正在播的音乐」）：
+           放在**这次点击**里做，而不是 4.7s 飞行动画落地后 —— 用户说的是「播视频时」，
+           幕布出现就该静下来。bgmBefore 也在这里记，复位靠它决定要不要接回来。 */
+        try{ if(AUD){ bgmBefore = (AUD.state === 'playing');
+                      if(bgmBefore && AUD.pause) AUD.pause(); } }catch(_){}
         projectorOn = true;
         if(projector && projector.userData.setOn) projector.userData.setOn(true);
       }
@@ -1904,6 +1916,12 @@ function build(cfg){
      而戳云 / 近处淡出都读 C.center，所以 center 要跟着一起改，否则交互会错位。
      系数刻意给得很小（rate 0.22 ⇒ 时间常数约 4.5s），「慢慢移」才成立。 */
   const cloudHome = { x: cfg.cloud.center[0], z: cfg.cloud.center[2] };
+  const cloudHomeY = cloudGrp.position.y;      // 云整组原始高度（降 2m 的基准）
+  /* 云飞到幕布上方时要**往下压 2 米**（用户 2026-10-05）：原来只是平着挪到幕布正上方，
+     云离布太远，夜里看着像「天上一片白」而不是「飘到幕布跟前」。压下来才有贴上去的近感。
+     想改幅度：scene.json / config.json 写 projector.cloudDrop。 */
+  const CLOUD_DROP = +(cfg.projector && cfg.projector.cloudDrop !== undefined
+                       ? cfg.projector.cloudDrop : 2);
   const cloudGoal = { x: (cfg.projector && cfg.projector.screen ? cfg.projector.screen.position[0] : cloudHome.x),
                       z: (cfg.projector && cfg.projector.screen ? cfg.projector.screen.position[2] : cloudHome.z) };
   let cloudShift = 0;
@@ -2053,8 +2071,11 @@ function build(cfg){
     if(butterflies) butterflies.visible = !night;
     if(fireflies)  fireflies.visible  = night;
     if(window.__sceneUI) window.__sceneUI.setProjectorAvailable(night);
-    /* 离开夜间时，如果正在「看电视」，自动复位并显示梯子 */
-    if(!night && window.__rig && window.__rig.tvEnter) window.__rig.tvEnter(false);
+    /* 离开夜间时，如果正在「看电视」，自动复位并显示梯子（幕布一并淡出关掉） */
+    if(!night){
+      closeProjector();
+      if(window.__rig && window.__rig.tvEnter) window.__rig.tvEnter(false);
+    }
   };
   { const night = (atmos.state === 'night');
     if(butterflies) butterflies.visible = !night;
@@ -2155,13 +2176,15 @@ function build(cfg){
     if(glints) glints.userData.update(uTime.value);
     if(projector) projector.userData.update(dt, uTime.value);
     if(cloudGrp){
-      /* 云随「看电视」缓慢移到幕布正上方，直到点复位才挪回去 */
+      /* 云随「看电视」**快速**沉到幕布上方（原来 dt*0.22 ⇒ 时间常数 4.5s，慢得像在漂；
+         现在 dt*1.5 ⇒ 约 0.66s 到位），点复位就按同一条曲线飘回原位。 */
       const want = (step.tvState ? step.tvState() : false) || (window.__rig && window.__rig.tvState);
-      cloudShift += ((want ? 1 : 0) - cloudShift) * Math.min(1, dt*0.22);
+      cloudShift += ((want ? 1 : 0) - cloudShift) * Math.min(1, dt*1.5);
       const cx = cloudHome.x + (cloudGoal.x - cloudHome.x)*cloudShift;
       const cz = cloudHome.z + (cloudGoal.z - cloudHome.z)*cloudShift;
       cloudGrp.position.x = cx - cloudHome.x;
       cloudGrp.position.z = cz - cloudHome.z;
+      cloudGrp.position.y = cloudHomeY - CLOUD_DROP*cloudShift;   // 边飞边压 2m
       if(cfg.cloud && cfg.cloud.center){
         cfg.cloud.center[0] = cx;
         cfg.cloud.center[2] = cz;
@@ -2170,6 +2193,7 @@ function build(cfg){
       if(pokeStep && pokeStep.pick){
         const pk = pokeStep.pick;
         pk.position.x = cx; pk.position.z = cz;
+        pk.position.y = -CLOUD_DROP*cloudShift;  // pick 挂在 scene 上（绝对坐标），跟着一起沉
         pk.updateMatrix(); pk.updateMatrixWorld(true);
       }
       updateCloudFlow(cloudGrp, uTime.value, dt);

@@ -734,6 +734,7 @@
   "projector": {
     "_说明": "夜间专属的床前投影幕布。screen 是幕布平面；light 是幕布前方的点光源（模拟投影仪/电视辉光）；video 配置视频纹理。若 video.src 留空或不存在，则用程序化画布动画（老电影/噪波/梦境字样）作为回退。",
     "enabled": true,
+    "cloudDrop": 2,
     "screen": {
       "_position说明": "床的长轴在 X（床心 x=-2，半长 4.23 ⇒ 床尾在 x=-6.23），幕布旋转 90° 后正对床尾、并向 -X 再退 2 米 ⇒ x=-8.23；z 取床心 z=1.2，让幕布横过来正对床面中央。",
       "position": [-8.23, 3.95, 1.2],
@@ -744,6 +745,8 @@
       "brightness": 0.75,
       "emissive": 0.35,
       "falloff": 0.38,
+      "fadeIn": 1.4,
+      "fadeOut": 0.9,
       "frameColor": "#2a2a40",
       "frameThickness": 0.06
     },

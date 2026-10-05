@@ -138,8 +138,12 @@ const DEFAULTS = {
          让蓝通道的增量能压过材质对绿的放大。 */
     hemi:    { sky: '#485fd4', ground: '#1f3078', intensity: 0.66 },
     ambient: { color: '#3f57c8', intensity: 0.60 },
-    fog:      { color: '#1e2a4c', near: 18, far: 4200 },
-    fogDense: { color: '#242f52', near: 2.5, far: 58 },
+    /* 夜间雾色压暗（2026-10-05「晚上雾的颜色压暗一些」）：
+       #1e2a4c → #131b34，#242f52 → #161e3c。雾色就是 scene.fog 的颜色、**不吃灯**，
+       夜里远景的整块基调由它决定 —— 不压就永远是那层发灰的蓝雾，把月色糊掉、
+       远山也泛白。压暗之后月亮和云才有对比，夜里才像夜。（near/far 不动，只改色。） */
+    fog:      { color: '#131b34', near: 18, far: 4200 },
+    fogDense: { color: '#161e3c', near: 2.5, far: 58 },
     sky:     { top: '#080d24', mid: '#141f45', horizon: '#2b3a6b', glow: '#465b9c',
                glowAmp: 0.20, glowY: 0.03, noiseAmp: 0.06 },
     tint:    { bg: '#2f3860', bgMix: 0.80, cloud: '#46538c', cloudMix: 0.78 },
