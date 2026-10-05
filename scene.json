@@ -748,7 +748,11 @@
       "fadeIn": 1.4,
       "fadeOut": 0.9,
       "frameColor": "#2a2a40",
-      "frameThickness": 0.06
+      "frameThickness": 0.06,
+      "_glow说明": "幕布四周边缘的加性辉光（喂给 bloom 的那层光晕）。2026-10-06 新增 —— 夜里 bloom 阈值 0.45 是在线性空间取的，而 emissive×emissiveMap 只有 0.03~0.05，差一个数量级，屏幕上根本吃不到 bloom 像素，所以看着没光感。这层辉光中心全透明（加性混合 ⇒ 加 0，视频画面一个像素都不动），只有边缘一圈亮，跨过阈值后由 bloom 把它晕开。glow=0 即关闭。",
+      "glow": 0.325,
+      "glowScale": 1.55,
+      "glowColor": "#fff2dd"
     },
     "light": {
       "_position说明": "离幕布要 ≥1 米：幕布在 x=-8.23，这里 -7.15 是 1.08m。原先贴到 -7.68（0.55m）时衰减 1/d^1.7≈2.8，辐照度把幕布自己照爆成白墙。",

@@ -2581,6 +2581,72 @@ export function buildProjectorScreen(cfg){
     screen.add(top, left, right);
   }
 
+  /* ---- 幕布辉光（2026-10-06「电视屏幕应该带一点 bloom，现在去得太彻底了」）----
+     为什么必须**单独**加这一层：night 档的 bloom 阈值是 0.45，而且是**线性空间**
+     取阈值的。幕布自带的自发光 = emissiveIntensity × emissiveMap，算下来是
+     0.35 ×（程序化画布中心柔光的线性亮度 ~0.10）≈ 0.03~0.05 —— 比阈值低整整
+     一个数量级。所以把 emissive 往上调根本没用（要调到 4 才跨得过阈值），
+     屏幕上**一个 bloom 像素都吃不到**，看着就是一块不发光、缺光感的布。
+     这里补一层**加性**辉光面片：贴着幕布边缘向外画一圈递减的矩形环，峰值
+     0.325（线性）稳稳跨过 0.45 ⇒ bloom 会在幕布四周长出柔光晕。
+     ★ 中心刻意留成全透明：加性混合下「透明 = 加 0」，所以视频画面一个像素都不动。
+       早先「过曝 / 看不清」的老问题来自 emissive 与点光源的叠加，跟 bloom 无关；
+       走加性 + 透明中心这条路，那类问题一次都不会重演。
+     三个旋钮：glow（峰值亮度，0 = 关）、glowScale（面片 = 幕布 × 这个）、
+     glowColor（辉光颜色，默认跟着点光源的暖白）。 */
+  let glowMat = null;
+  if(+(S.glow !== undefined ? S.glow : 0.325) > 0){
+    const gScale = +(S.glowScale !== undefined ? S.glowScale : 1.55);
+    const gw = w*gScale, gh = h*gScale;
+    const peak = +(S.glow !== undefined ? S.glow : 0.325);
+
+    const gc = document.createElement('canvas');
+    gc.width = 256;
+    gc.height = Math.max(8, Math.round(256*gh/gw));
+    const gx = gc.getContext('2d');
+    const GW = gc.width, GH = gc.height;
+    gx.clearRect(0, 0, GW, GH);
+
+    /* 屏幕矩形在纹理里占正中间，四周（1/gScale）才是辉光的地盘 */
+    const mx = GW/(2*gScale), my = GH/(2*gScale);
+    const ext = Math.min(mx, my)*0.92;        // 向外延伸的带宽（纹素）
+    const N = 16;
+    for(let i=0;i<N;i++){
+      const k = i/(N-1), off = k*ext;
+      gx.strokeStyle = `rgba(255,244,226,${peak*Math.pow(1-k, 1.6)})`;
+      gx.lineWidth = (ext/N)*2 + 1;           // 环要互相搭上，不然会有同心条纹
+      const x0 = mx - off, y0 = my - off;
+      gx.strokeRect(x0, y0, GW - x0*2, GH - y0*2);
+    }
+    /* 再乘一层圆形渐隐（destination-in）把方板的四角磨掉，
+       否则会看见一块方辉光板的硬边。 */
+    const mask = gx.createRadialGradient(GW/2, GH/2, Math.min(GW, GH)*0.32,
+                                         GW/2, GH/2, Math.hypot(GW, GH)*0.5);
+    mask.addColorStop(0, 'rgba(255,255,255,1)');
+    mask.addColorStop(1, 'rgba(255,255,255,0)');
+    gx.globalCompositeOperation = 'destination-in';
+    gx.fillStyle = mask;
+    gx.fillRect(0, 0, GW, GH);
+    gx.globalCompositeOperation = 'source-over';
+
+    const gtex = new THREE.CanvasTexture(gc);
+    if(gtex.colorSpace !== undefined) gtex.colorSpace = THREE.SRGBColorSpace;
+    glowMat = new THREE.MeshBasicMaterial({
+      map: gtex,
+      color: new THREE.Color(S.glowColor || '#fff2dd'),
+      transparent: true,
+      opacity: 0,                             // 与幕布同步淡入淡出
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+    const glow = new THREE.Mesh(new THREE.PlaneGeometry(gw, gh), glowMat);
+    /* 局部 +Z 就是朝向床（观众）那一面；贴 3.5cm 免得跟幕布 z-fighting。
+       挂在 screen 下面 ⇒ 幕布 visible=false 时辉光一起消失，不用另外管。 */
+    glow.position.set(0, 0, 0.035);
+    glow.renderOrder = 2;
+    screen.add(glow);
+  }
+
   /* 点光源：幕布前方的投影仪辉光 */
   const light = new THREE.PointLight(
     new THREE.Color(L.color || '#ffd9b8'),
@@ -2691,6 +2757,7 @@ export function buildProjectorScreen(cfg){
     const o = fadeT < 0 ? 0 : (fadeT > 1 ? 1 : fadeT);
     mat.opacity = o;
     if(frameMat) frameMat.opacity = o;
+    if(glowMat) glowMat.opacity = o;        // 辉光跟着一起淡，不然半透的布配死亮的光晕
     light.intensity = lightBase * o;
   }
   applyFade();                               // 初始：全透
