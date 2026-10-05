@@ -2588,17 +2588,20 @@ export function buildProjectorScreen(cfg){
      一个数量级。所以把 emissive 往上调根本没用（要调到 4 才跨得过阈值），
      屏幕上**一个 bloom 像素都吃不到**，看着就是一块不发光、缺光感的布。
      这里补一层**加性**辉光面片：贴着幕布边缘向外画一圈递减的矩形环，峰值
-     0.325（线性）稳稳跨过 0.45 ⇒ bloom 会在幕布四周长出柔光晕。
+     取在阈值上下（线性）。2026-10-06 用户验收连降两次：0.65 → 0.325 → 0.1625。
+     ⚠ 现值 0.1625 **已经低于 night 档的 0.45 阈值** —— 纯 bloom 光晕基本不再出现，
+     看到的是辉光面片本身的加性微光（这正是用户要的「再弱一半」）。
+     若之后还想留一点 bloom：把 night 档 `bloom.threshold` 一起降到 0.20 左右即可。
      ★ 中心刻意留成全透明：加性混合下「透明 = 加 0」，所以视频画面一个像素都不动。
        早先「过曝 / 看不清」的老问题来自 emissive 与点光源的叠加，跟 bloom 无关；
        走加性 + 透明中心这条路，那类问题一次都不会重演。
      三个旋钮：glow（峰值亮度，0 = 关）、glowScale（面片 = 幕布 × 这个）、
      glowColor（辉光颜色，默认跟着点光源的暖白）。 */
   let glowMat = null;
-  if(+(S.glow !== undefined ? S.glow : 0.325) > 0){
+  if(+(S.glow !== undefined ? S.glow : 0.1625) > 0){
     const gScale = +(S.glowScale !== undefined ? S.glowScale : 1.55);
     const gw = w*gScale, gh = h*gScale;
-    const peak = +(S.glow !== undefined ? S.glow : 0.325);
+    const peak = +(S.glow !== undefined ? S.glow : 0.1625);
 
     const gc = document.createElement('canvas');
     gc.width = 256;
