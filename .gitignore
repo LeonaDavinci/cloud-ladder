@@ -14,3 +14,6 @@ __pycache__/
 *.pyc
 .DS_Store
 Thumbs.db
+
+# 语法检查用的临时副本（cp x.js → .mjs 再 node --check）
+tools/_chk/
