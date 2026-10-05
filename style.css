@@ -23,8 +23,14 @@ html,body,button,input,textarea,select,a{
 /* 表单控件单独放行：真出现输入框时还得能选中、能剪贴 */
 input,textarea{-webkit-user-select:text;user-select:text;}
 
-#app{width:100%;height:100%;}
-#app canvas{display:block;touch-action:none;}
+/* ⚠ 必须 fixed + inset:0，不能用 height:100% —— 移动端（iOS Safari 横屏 /
+     standalone 全屏 / 带安全区）**布局视口 ≠ 可视视口**，100% 拿到的是布局视口，
+     结果就是画面没铺满、露出一条 body 背景色（2026-10-06 用户报「横版上面空一截」）。
+     视口尺寸交给 visualViewport / JS，这里只负责铺满。 */
+#app{position:fixed;left:0;right:0;top:0;bottom:0;width:100%;height:100%;}
+/* 尺寸由 CSS 铺满（!important 压过 three 的 setSize 写的内联 px），
+   JS 只负责 drawing buffer —— renderer.setSize(w,h,false) 的第三个参数就是这个作用。 */
+#app canvas{display:block;width:100%!important;height:100%!important;touch-action:none;}
 /* ---- 左上角标题栏（标题 + BGM，竖排一列） ----
    为什么用容器而不是各自写死 top：标题块高度不是常数 —— 「#梦核」标签
    在窄屏会换行、字号在移动断点又会变，两个 fixed 元素各写各的 top 迟早叠上。

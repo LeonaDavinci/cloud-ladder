@@ -2447,16 +2447,32 @@ export function buildProjectorScreen(cfg){
     videoEl = ve;
     useVideo = true;
 
-    const failToCanvas = (why)=>{
-      console.warn('投影仪视频加载失败，回退到程序化画布：', why || src);
-      useVideo = false;
-      videoEl = null;
+    const swapToCanvas = ()=>{
       texture = makeCanvasTexture();
       screen.material.map = texture;
       screen.material.emissiveMap = texture;
       screen.material.needsUpdate = true;
       drawFilm(0);
       texture.needsUpdate = true;
+    };
+
+    /* why: 'error' / 'no-source' / 'timeout' / 异常 message
+       soft=true 表示「可能只是慢，别判死刑」——
+       换画面兜底但**保留 videoEl 继续加载**，canplay 一到就 swapToVideo 切回。
+       2026-10-06 之前这里是 videoEl = null 一击毙命：移动网络慢一点就永远
+       停在程序化画布上，用户看到的「还是默认画面」再也回不来。 */
+    const failToCanvas = (why, soft)=>{
+      console.warn('投影仪视频加载失败，回退到程序化画布：', why || src);
+      /* 把原因抛给 UI，让它显示在提示条上 —— 定位这个问题时最有价值的一行信息。 */
+      try{ if(group.userData.onVideoFallback) group.userData.onVideoFallback(String(why || 'error')); }catch(_){}
+      if(soft){
+        swapToCanvas();
+        if(!ve.__retryBound){ ve.__retryBound = true; ve.addEventListener('canplay', swapToVideo); }
+        return;
+      }
+      useVideo = false;
+      videoEl = null;
+      swapToCanvas();
     };
 
     ve.addEventListener('error', ()=> failToCanvas('error'), { once: true });
@@ -2491,7 +2507,7 @@ export function buildProjectorScreen(cfg){
        ⚠ 2026-10-06 从 5.2s 放宽到 8s：线上是 python http.server，**对 Range 请求
        直接返回 200 全量、不给 206**，所以慢网下必须把整个文件抓完才谈得上解码，
        5.2s 在移动端很容易误判成「加载失败」⇒ 用户看到的是回退的默认画面。 */
-    setTimeout(()=>{ if(useVideo && ve.readyState < 2) failToCanvas('timeout'); }, 8000);
+    setTimeout(()=>{ if(useVideo && ve.readyState < 2) failToCanvas('timeout', true); }, 20000);
   }
 
   /* ---- 视频声音：放大 1.5 倍（screen.volumeGain） ----
@@ -2781,6 +2797,20 @@ export function buildProjectorScreen(cfg){
   group.userData.spill = spill;             // 无头探针读辐照度用
   group.userData.light = light;             // 同上：主灯（幕布正面溢光）
 
+  /* ⚠ iOS Safari 的自动播放策略：<video> 只有在 **muted** 或「用户手势的同步调用栈里」
+       调 play() 时才会动。点「看电视」时 setOn 是在手势里的，理论上够；
+       但只要中途被 unmute 过一次（tvAudioOn 就会 unmute），后续 play() 就可能被拒，
+       于是「有画面尺寸、readyState 4、currentTime 恒 0」—— 看起来完全正常却不动。
+       这里每帧重试前先把 muted 置 true 再 play()，等于走「静音起播」这条最稳的路。 */
+  const tryPlay = ()=>{
+    try{
+      if(!ve.paused) return;
+      if(!ve.muted) ve.muted = true;
+      const p = ve.play();
+      if(p && p.catch) p.catch(()=>{});
+    }catch(_){}
+  };
+
   group.userData.update = function(dt, now){
     if(fadeT !== fadeTo){                    // 淡入淡出驱动（Group 隐藏时也要跑）
       const fwd = fadeTo > fadeT;
@@ -2791,7 +2821,7 @@ export function buildProjectorScreen(cfg){
     }
     if(!group.visible) return;
     if(videoEl){
-      if(videoEl.readyState >= 2 && videoEl.paused) videoEl.play().catch(()=>{});
+      if(videoEl.readyState >= 2) tryPlay();
       return;
     }
     if(now < nextFrame) return;
@@ -2831,7 +2861,7 @@ export function buildProjectorScreen(cfg){
     if(videoEl){
       /* 关：视频立刻停（用户 2026-10-05「关闭视频播放」），停住的那一帧陪着淡出，
          不必等 fade 跑完才停 —— 淡出总共才 0.9s。 */
-      if(v){ videoEl.currentTime = 0; videoEl.play().catch(()=>{}); }
+      if(v){ videoEl.currentTime = 0; tryPlay(); }
       else { videoEl.pause(); }
     }
     tvAudioOn(v);

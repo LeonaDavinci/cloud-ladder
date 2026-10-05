@@ -1873,8 +1873,22 @@ function build(cfg){
     if(MB.cloudPuffs   !== undefined) RT.cloudQ   = MB.cloudPuffs;
     if(MB.shadowMapSize!== undefined) SHADOW_SZ = MB.shadowMapSize;
   }
+  /* 可视视口尺寸。**优先 visualViewport** —— 它给的是真实可见区域
+     （不含被地址栏 / 底部 home 指示条 / 安全区吃掉的部分），而 innerWidth/innerHeight
+     在 iOS 横屏与 standalone 全屏下会给出偏大的布局视口，
+     两者不一致时 canvas 就铺不满（2026-10-06「横版上面空一截」）。
+     CSS 那边已改成 fixed inset:0 + 100%，所以这里 setSize 的第三个参数传 false：
+     **只设 drawing buffer，不写内联 style**，免得跟 CSS 打架。 */
+  const viewportSize = ()=>{
+    const vv = window.visualViewport;
+    const w = Math.max(1, Math.round(vv ? vv.width  : innerWidth));
+    const h = Math.max(1, Math.round(vv ? vv.height : innerHeight));
+    return { w, h };
+  };
+  const _vp0 = viewportSize();
+
   const renderer = new THREE.WebGLRenderer({ antialias:true });
-  renderer.setSize(innerWidth, innerHeight);
+  renderer.setSize(_vp0.w, _vp0.h, false);
   renderer.setPixelRatio(Math.min(devicePixelRatio, useMobile ? PR_CAP : ((RM.pixelRatioMax !== undefined) ? RM.pixelRatioMax : 2)));
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = RM.toneExposure;
@@ -1888,7 +1902,7 @@ function build(cfg){
 
   /* 相机 */
   const cam = cfg.camera;
-  const camera = new THREE.PerspectiveCamera(cam.fov, innerWidth/innerHeight, cam.near, cam.far);
+  const camera = new THREE.PerspectiveCamera(cam.fov, _vp0.w/_vp0.h, cam.near, cam.far);
   camera.position.set(cam.position[0], cam.position[1], cam.position[2]);
 
   /* 控制器。
@@ -2032,6 +2046,13 @@ function build(cfg){
   /* 夜间投影幕布：默认关闭，切到夜间再由 UI/时相钩子打开 */
   const projector = buildProjectorScreen(cfg);
   if(projector) scene.add(projector);
+  /* 电视视频回退时把**原因**显示到提示条上（2026-10-06）。
+     之前 failToCanvas 只 console.warn，而 <video> 是 createElement 出来的、
+     页面里摸不到，出问题时用户只看到「还是默认画面」，谁也猜不出是加载失败、
+     超时还是解码不支持。有了这行，下次不播 —— 提示条会直接写出原因。 */
+  if(projector) projector.userData.onVideoFallback = (why)=>{
+    try{ if(window.__hintFlash) window.__hintFlash('电视视频没出来（' + why + '）· 正在重试', 3200); }catch(_){}
+  };
 
   /* 行走 rig：床的可站立矩形（含 rotationY 旋转）+ 梯子的轴向几何。
      世界坐标，必须带上床的整体缩放 —— 否则床放大了、「可站立矩形」还是旧的，
@@ -2288,10 +2309,19 @@ function build(cfg){
   /* 无头脚本用它断言「隐藏时确实停了、回来只有一条循环」 */
   window.__loop = { get running(){ return running; }, get raf(){ return rafId; }, resume };
 
-  addEventListener('resize', ()=>{
-    camera.aspect = innerWidth/innerHeight;
+  /* ⚠ iOS 从竖屏切横屏时，单靠 resize 常常不够：地址栏收起的动画会让它
+     触发好几次且时机偏早，安全区变化更是只在 orientationchange 里报。
+     三个都挂上，尺寸统一走 visualViewport。 */
+  const applyViewport = ()=>{
+    const { w, h } = viewportSize();
+    camera.aspect = w/h;
     camera.updateProjectionMatrix();
-    renderer.setSize(innerWidth, innerHeight);
-    postfx.setSize();     // composer 的 RT 与各 pass 都要跟着重建
-  });
+    renderer.setSize(w, h, false);   // false = 别写内联样式，铺满交给 CSS
+    postfx.setSize();                 // composer 的 RT 与各 pass 都要跟着重建
+  };
+  addEventListener('resize', applyViewport);
+  addEventListener('orientationchange', ()=>{ setTimeout(applyViewport, 120); setTimeout(applyViewport, 400); });
+  if(window.visualViewport) window.visualViewport.addEventListener('resize', applyViewport);
+  /* 屏幕常亮工具条/旋转时页面可能短暂失焦，回来补一次 */
+  addEventListener('pageshow', applyViewport);
 }
