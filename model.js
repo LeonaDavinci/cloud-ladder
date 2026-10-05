@@ -2516,34 +2516,56 @@ export function buildProjectorScreen(cfg){
      ⚠ 一旦 createMediaElementSource 接上，这段音频就**只**走这条图 —— 上下文要是
      suspended，整段就静音了。所以这条链只在「点看电视」那个用户手势里现建 / resume，
      并且留兜底：resume 后仍未 running 就拆掉链路退回元素直出（少赚那 50%，但不哑）。 */
-  let vaCtx = null, vaSrc = null, vaGain = null;
+  let vaCtx = null, vaSrc = null, vaGain = null, vaBuilt = false;
   const VA_GAIN = +(S.volumeGain !== undefined ? S.volumeGain : 1.5);
   function tvAudioOn(on){
     if(!videoEl) return false;
     try{
       if(on){
-        videoEl.muted = false;
         videoEl.volume = 1;
-        if(!vaCtx){
+        /* ---- ① **先直出**：这一步是「视频能不能动」的分水岭 ----
+           iOS Safari 的规则：媒体元素取消静音后，必须有**有效的音频输出路径**，
+           否则它会把视频**暂停在第一帧**（用户 2026-10-06 原话「不播放，停在第一帧」）。
+           而「有效路径」不能建在一张还没 running 的 Web Audio 图上 ——
+           旧代码正是反着做的：先 unmute、再 createMediaElementSource、然后因为
+           `resume()` 是异步的（同步读必然还是 'suspended'）把刚建的链 disconnect 掉。
+           灾难在于 `createMediaElementSource` 是**不可逆**的：调用那一刻，媒体元素的
+           音频就永久改道到那张图上，disconnect 救不回「元素直出」这条路（规范没有 undo）。
+           ⇒ 结果既没声音，视频也被掐住。
+           现在先 unmute 走**元素原生输出**（这条路径一定有效），视频先动起来。 */
+        videoEl.muted = false;
+        /* ---- ② 音量放大只是**增强**，等 Web Audio 真的 running 了再接 ----
+           接图的前提是 `AudioContext` 确实 running（异步 resume 完成）；
+           没 running 就不接，这一轮放弃 1.5 倍增益，但视频照播。
+           下次点「看电视」（又是一次用户手势）会再试一次。 */
+        if(!vaBuilt){
           const AC = window.AudioContext || window.webkitAudioContext;
           if(AC){
-            vaCtx = new AC();
-            vaSrc = vaCtx.createMediaElementSource(videoEl);
-            vaGain = vaCtx.createGain();
-            vaGain.gain.value = VA_GAIN;
-            vaSrc.connect(vaGain);
-            vaGain.connect(vaCtx.destination);
+            try{ if(!vaCtx) vaCtx = new AC(); }catch(_){ vaCtx = null; }
+            if(vaCtx){
+              const ready = (vaCtx.state === 'running') ? Promise.resolve()
+                           : (vaCtx.resume ? vaCtx.resume() : Promise.reject());
+              ready.then(()=>{
+                if(vaBuilt || !videoEl) return;
+                try{
+                  /* ⚠ 同一 media element 只能接一张 source node，第二次会抛
+                     InvalidStateError。所以建过就记账，绝不重来。 */
+                  vaSrc = vaCtx.createMediaElementSource(videoEl);
+                  vaGain = vaCtx.createGain();
+                  vaGain.gain.value = VA_GAIN;
+                  vaSrc.connect(vaGain);
+                  vaGain.connect(vaCtx.destination);
+                  vaBuilt = true;
+                }catch(_){ /* 接不上就保持直出，不影响播放 */ }
+              }).catch(()=>{});
+            }
           }
-        }
-        if(vaCtx && vaCtx.state === 'suspended') vaCtx.resume().catch(()=>{});
-        if(vaCtx && vaCtx.state !== 'running'){   // 起不来 ⇒ 增益这条路会闷掉，退回直出
-          try{ vaSrc.disconnect(); vaGain.disconnect(); }catch(_){}
-          vaCtx = vaSrc = vaGain = null;
-          return false;
         }
         return true;
       }
-      /* 关：先摘增益再静音（元素静音后，WebAudio 那条路不一定跟着停） */
+      /* 关：先摘增益再静音（元素静音后，WebAudio 那条路不一定跟着停）。
+         ⚠ 只摘下游，**不要把 vaBuilt 置回 false / vaCtx 置 null** ——
+         同一个 media element 不能再接第二张 source node，重建会抛。 */
       try{ if(vaGain) vaGain.disconnect(); }catch(_){}
       try{ if(vaSrc)  vaSrc.disconnect();  }catch(_){}
       vaGain = vaSrc = null;
@@ -2552,6 +2574,9 @@ export function buildProjectorScreen(cfg){
     return false;
   }
   group.userData.tvAudio = tvAudioOn;
+  /* 无头探针用：图有没有真的建起来（= 有没有拿到那 1.5 倍增益） */
+  Object.defineProperty(group.userData, 'vaBuilt', { get(){ return vaBuilt; } });
+  Object.defineProperty(group.userData, 'audioCtxState', { get(){ return vaCtx ? vaCtx.state : null; } });
 
   /* 屏幕总亮度 = 视频亮度 × (brightness + emissive) + 点光源打上来的那点漫反射。
      ⚠ 三个量会互相叠加，调的时候要一起看：
@@ -2802,14 +2827,41 @@ export function buildProjectorScreen(cfg){
        但只要中途被 unmute 过一次（tvAudioOn 就会 unmute），后续 play() 就可能被拒，
        于是「有画面尺寸、readyState 4、currentTime 恒 0」—— 看起来完全正常却不动。
        这里每帧重试前先把 muted 置 true 再 play()，等于走「静音起播」这条最稳的路。 */
+  /* ⚠⚠⚠ 这两个函数定义在 `if(src){ … }` 块**之外**，所以只能引用块外可见的
+     `videoEl`（函数顶部 let 声明）。早先这里写的是块内的 `const ve`
+     ⇒ 每帧抛 ReferenceError、被空 catch 吞掉 ⇒ **play() 从来没被调用过**，
+     视频永远停在第一帧（2026-10-06 用户原话「不播放，停在了第一帧」的真凶）。
+     教训与本项目里 `bgmBefore` 那次一模一样：并列/跨块的作用域 ReferenceError
+     是隐形的，`node --check` 查不出、页面照常渲染、只有那条链路默默失效。 */
+  let firstPlayFired = false, lastPlayErr = null, tryPlayN = 0;
   const tryPlay = ()=>{
+    const ve = videoEl;                 // ★ 必须用块外的 videoEl
+    if(!ve) return;
     try{
-      if(!ve.paused) return;
-      if(!ve.muted) ve.muted = true;
+      if(!ve.paused){
+        if(!firstPlayFired){ firstPlayFired = true; fireFirstPlay(); }
+        return;
+      }
+      tryPlayN++;
+      if(!ve.muted) ve.muted = true;      // 静音起播：iOS 只认「静音」或「手势内 play」
       const p = ve.play();
-      if(p && p.catch) p.catch(()=>{});
-    }catch(_){}
+      if(p && p.then) p.then(()=>{ lastPlayErr = null; if(!firstPlayFired){ firstPlayFired = true; fireFirstPlay(); } })
+                          .catch((e)=>{ lastPlayErr = (e && e.name ? e.name : 'Error') + ': ' + (e && e.message || e); });
+    }catch(e){ lastPlayErr = 'throw: ' + (e && e.message || e); }
   };
+  /* 诊断出口：play() 被拒的真实原因 + 尝试次数（无头探针与真机排查都靠它，
+     之前 play() 的 rejection 被空 catch 吃掉，症状只能靠猜）。 */
+  group.userData.tvDiag = ()=>{ const ve = videoEl;
+    if(!ve) return null;
+    try{ return { tries: tryPlayN, lastErr: lastPlayErr,
+      paused: ve.paused, muted: ve.muted, seeking: ve.seeking, t: +ve.currentTime.toFixed(2),
+      rs: ve.readyState }; }catch(_){ return null; } };
+  /* 「真的开始播了」这个信号，用来把**解锁声音**这件事延后到画面已经动起来之后。
+     iOS 上 unmute 早于 playing 有风险（见上面 tvAudioOn 的注释），
+     声音晚半秒无所谓，画面卡住才是致命的。 */
+  function fireFirstPlay(){
+    try{ if(group.userData.onFirstPlay) group.userData.onFirstPlay(); }catch(_){}
+  }
 
   group.userData.update = function(dt, now){
     if(fadeT !== fadeTo){                    // 淡入淡出驱动（Group 隐藏时也要跑）
@@ -2861,7 +2913,15 @@ export function buildProjectorScreen(cfg){
     if(videoEl){
       /* 关：视频立刻停（用户 2026-10-05「关闭视频播放」），停住的那一帧陪着淡出，
          不必等 fade 跑完才停 —— 淡出总共才 0.9s。 */
-      if(v){ videoEl.currentTime = 0; tryPlay(); }
+      if(v){
+        /* ⚠⚠ 别在起播前 seek。线上是 python http.server，**对 Range 请求一律返回 200
+           全量、不给 206**；此时设 currentTime 会让浏览器去要它给不出的字节，
+           元素卡在 seeking 状态，连带后面的 play() 也一起卡住 ——
+           症状就是「不播放，停在第一帧」（2026-10-06 用户原话）。
+           只有真的播过一段（数据已在内存缓冲里）才回到开头，那时 seek 是安全的。 */
+        try{ if(videoEl.currentTime > 0.5) videoEl.currentTime = 0; }catch(_){}
+        tryPlay();
+      }
       else { videoEl.pause(); }
     }
     tvAudioOn(v);

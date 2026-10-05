@@ -1766,7 +1766,18 @@ function createSceneUI(atmos, postfx, flashHint, projector, step, AUD){
     projectorOn = false;
     if(projector && projector.userData.setOn) projector.userData.setOn(false);
     tvAudio(false);
+    tvAudioUnlocked = false;
+    clearTimeout(tvAudioTimer);
   }
+  /* 解锁电视声音：只在视频真的 playing 之后调（见 projBtn 回调里的注释）。 */
+  let tvAudioUnlocked = false, tvAudioTimer = 0;
+  const unlockTvAudio = ()=>{
+    if(tvAudioUnlocked) return;
+    tvAudioUnlocked = true;
+    clearTimeout(tvAudioTimer);
+    tvAudio(true);
+  };
+
   const projBtn = mkBtn('看电视', () => {
     if(!projectorAvailable || !step) return;
     if(step.tvActive() && !isWatching) return;   // 飞行途中忽略点击
@@ -1790,7 +1801,13 @@ function createSceneUI(atmos, postfx, flashHint, projector, step, AUD){
         projectorOn = true;
         if(projector && projector.userData.setOn) projector.userData.setOn(true);
       }
-      tvAudio(true);
+      /* ⚠ 别在这里直接 tvAudio(true)：此刻视频还没 playing。iOS 上「先 unmute +
+         再接 Web Audio 增益链」容易把播放掐在第一帧（model.js tvAudioOn 的注释有详述）。
+         改成：先静音起播，等 projector 抛 onFirstPlay（真的动起来了）再解锁声音。
+         兜底 2.5 秒 —— 声音晚一点无所谓，画面停着才是致命的。 */
+      tvAudioUnlocked = false;
+      clearTimeout(tvAudioTimer);
+      tvAudioTimer = setTimeout(()=>{ if(!tvAudioUnlocked) unlockTvAudio(); }, 2500);
       step.tvEnter(true, ()=>{ isWatching = true; syncProj(); });
       hint('靠在床上看电视 · 拖屏转头 / WASD 走动', 1600);
     }
@@ -2050,6 +2067,8 @@ function build(cfg){
      之前 failToCanvas 只 console.warn，而 <video> 是 createElement 出来的、
      页面里摸不到，出问题时用户只看到「还是默认画面」，谁也猜不出是加载失败、
      超时还是解码不支持。有了这行，下次不播 —— 提示条会直接写出原因。 */
+  /* 视频真的开始播了 ⇒ 现在才解锁声音（iOS 上 unmute 必须晚于 playing）。 */
+  if(projector) projector.userData.onFirstPlay = ()=>{ try{ unlockTvAudio(); }catch(_){} };
   if(projector) projector.userData.onVideoFallback = (why)=>{
     try{ if(window.__hintFlash) window.__hintFlash('电视视频没出来（' + why + '）· 正在重试', 3200); }catch(_){}
   };
