@@ -208,7 +208,10 @@ function setupModes(cfg, camera, controls, renderer, rig, AUD, ladder){
 
   const dom = renderer.domElement;
   dom.addEventListener('pointerdown', e=>{
-    if(mode !== 'walk') return;
+    if(mode !== 'walk' && !(fp.on)) return;     // 看电视时同样挂双摇杆：左走 / 右转头
+    /* ⚠ 第一人称下只让**左半屏**当移动摇杆：右半屏是转头的那一路拖拽。
+       两边都挂摇杆的话，右半屏按下时会被「摇杆已占用」挡掉，转头就没反应了。 */
+    if(fp.on && e.clientX >= innerWidth*0.5) return;
     const s = (e.clientX < innerWidth*0.5) ? sMove : sLook;
     if(s.id !== null) return;
     stickStart(s, e.pointerId, e.clientX, e.clientY);
@@ -352,12 +355,13 @@ function setupModes(cfg, camera, controls, renderer, rig, AUD, ladder){
      这个函数每帧都是「已经到位、什么都不做」。 */
   const FOV0    = camera.fov;          // 原视场角（scene.json camera.fov）
   const FOV_RATE = 2.6;                // 逼近似率（1/s）。2.6 ⇒ 时间常数 0.38 秒
-  /* 看电视时的「视角 +30°」（用户 2026-10-05 从 +15° 上调）：躺床上视野明显更开，
-     像影院里广角盯住整块幕布。走 fovStep 的 boost 通道（下方自由/步行分支传
+  /* 看电视时的「视角增量」。走 fovStep 的 boost 通道（下方自由/步行分支传
      tvState ? TV_FOV_BOOST : 0），自带 FOV_RATE 指数缓动，不是落地瞬间硬切。
-     可在 scene.json / config.json 写 projector.tvFovBoost 改幅度（默认 30）。 */
+     轨迹：+15°（2026-10-05 用户上调）→ +30°（同日又嫌不够广）→ 又嫌太大，
+     2026-10-05 晚再减 8° ⇒ 默认 +22°：广角感还在，但床沿和幕布框不会顶到画面边上。
+     想改：scene.json / config.json 写 projector.tvFovBoost。 */
   const TV_FOV_BOOST = +((cfg.projector && cfg.projector.tvFovBoost !== undefined)
-                        ? cfg.projector.tvFovBoost : 30);
+                        ? cfg.projector.tvFovBoost : 22);
   let   fovNow  = FOV0;                // 当前写到相机上的值（自己记着，不读回 camera.fov）
   function fovStep(dt, boost){
     const want = FOV0 + (boost || 0);
@@ -658,9 +662,12 @@ function setupModes(cfg, camera, controls, renderer, rig, AUD, ladder){
      直接甩到幕布底下。x/z 一律取床心，只有 y 从床顶起算。
      再沿 **床尾方向（-X）** 退 1.2 米：躺姿贴在床尾一侧、脚朝床头，
      视线正好对着床尾外那块幕布（床尾 = 世界 -X，床头 = +X）。
-     eye 高度 = 躺卧视点 0.38 + 用户要求再抬 0.3 = 0.68。 */
+     eye 高度 = 躺卧视点 0.38 + 历史抬高 0.3 + 2026-10-05 用户反馈「eye 跑到床里
+     去了」再抬 0.6 ⇒ 0.68 + 0.6 = 1.28（相对床顶）。抬到 1.28 后是**半靠坐起**
+     的视高：能越过被褥看到床尾外的幕布，人也不会埋进床垫里。
+     想微调改这一个常量就行（别再往上叠硬编码，历史值都留着做注释）。 */
   const WATCH_FOOT_SHIFT = 1.2;     // 朝床尾（-X）平移
-  const WATCH_EYE_LIFT  = 0.38 + 0.3; // 躺卧视点 + 抬高 0.3
+  const WATCH_EYE_LIFT  = 0.38 + 0.3 + 0.6; // 躺卧视点 0.38 + 抬高 0.3 + 0.6
   const watchPos = new THREE.Vector3(
     cfg.bed.position[0] - WATCH_FOOT_SHIFT,
     bedTop + WATCH_EYE_LIFT,
@@ -679,6 +686,95 @@ function setupModes(cfg, camera, controls, renderer, rig, AUD, ladder){
       keepLocked: !!keepLocked, done
     };
   }
+  /* ⚠ 看电视的落位会被 OrbitControls 的轨道约束「顶回去」—— 这是个实打实的 bug：
+     `controls.minDistance = 6`，而机位到幕布（controls.target）只有 5.2m；
+     视线还略微朝上（极角 103°，而 `maxPolarAngleDeg = 99`）。两者都会在
+     controls.update() 里把相机硬拽回合法区 ⇒ 实测永远落在 (-2.36, 3.01, 2.02)，
+     比设计的 (-3.2, 2.755, 1.9) 差 0.87m、仰角被压平（三点都算得出来：
+     松开约束后按 r=6 / φ=99° 反解就是 x=-2.362, y=3.011, z=2.016）。
+     所以看电视期间**临时**放松这两个约束，飞完保持放松、飞回落地再收回
+     （复位瞬间就收会把还停在床上的相机猛推一下，必须等飞回结束）。 */
+  let tvLimits = null;
+  function applyTVLimits(on){
+    if(on){
+      if(!tvLimits) tvLimits = { min: controls.minDistance, max: controls.maxPolarAngle };
+      controls.minDistance = Math.min(controls.minDistance, 1.5);
+      controls.maxPolarAngle = Math.max(controls.maxPolarAngle, THREE.MathUtils.degToRad(115));
+    } else if(tvLimits){
+      controls.minDistance = tvLimits.min;
+      controls.maxPolarAngle = tvLimits.max;
+      tvLimits = null;
+    }
+  }
+
+  /* ---------- 看电视：第一人称操控 ----------
+     2026-10-05：看电视时不再是「绕焦点转的轨道相机」，而是站在床上的第一人称 ——
+     拖拽原地转头、WASD / 方向键 / 双摇杆走动。
+     ⚠ 这一路**完全不调 controls.update()**：OrbitControls 每帧都会按
+     minDistance / maxPolarAngle 把相机拉回合法轨道（当年「落位被顶回去」那个 bug
+     就是它干的），跟「人站定、头随便转」是死对头。于是看电视期间三件事同时成立：
+       ① controls.enabled = false（不吃轨道输入）；
+       ② step() 里直接 return，绕开 OrbitControls；
+       ③ 相机由 fp 直接写 position / rotation。
+     y 锁死在躺卧高度：这是「靠在床上看」的机位，不该再走一次地形跟随掉下床。 */
+  const fp = { on:false, yaw:0, pitch:0, x:0, y:0, z:0,
+               mdx:0, mdy:0, dragId:null, lx:0, ly:0 };
+  function fpFromCamera(){
+    fp.x = camera.position.x; fp.y = camera.position.y; fp.z = camera.position.z;
+    const e = new THREE.Euler().setFromQuaternion(camera.quaternion, 'YXZ');
+    fp.yaw = e.y; fp.pitch = e.x;
+    fp.mdx = 0; fp.mdy = 0; fp.dragId = null;
+    hideSticks();
+  }
+  function fpToCamera(){
+    camera.rotation.set(fp.pitch, fp.yaw, 0);
+    camera.position.set(fp.x, fp.y, fp.z);
+  }
+  /* 转头：把指针位移攒成「本帧要转多少」的增量、在 fpStep 里统一消费
+     （和 walk 一个路子 —— 事件里直接动相机，一帧多点 + 指针捕获乱序会明显抖）。 */
+  dom.addEventListener('pointerdown', e=>{
+    if(!fp.on || fp.dragId !== null) return;
+    if(sMove.id !== null || sLook.id !== null) return;   // 摇杆已经占了这个手势
+    fp.dragId = e.pointerId; fp.lx = e.clientX; fp.ly = e.clientY;
+    try{ dom.setPointerCapture(e.pointerId); }catch(_){}
+  });
+  dom.addEventListener('pointermove', e=>{
+    if(e.pointerId !== fp.dragId) return;
+    fp.mdx += (e.clientX - fp.lx); fp.mdy += (e.clientY - fp.ly);
+    fp.lx = e.clientX; fp.ly = e.clientY;
+  });
+  ['pointerup','pointercancel'].forEach(t => dom.addEventListener(t, e=>{
+    if(e.pointerId === fp.dragId) fp.dragId = null;
+  }));
+  function fpStep(dt){
+    const TVP = ((cfg.projector && cfg.projector.control) || {});
+    const look = (TVP.lookSpeed || 2.2), spd = (TVP.moveSpeed || 1.8);
+    fp.yaw   -= fp.mdx*0.0032*look;                 // 右拖 = 右转（与 walk 手感一致）
+    fp.pitch -= fp.mdy*0.0032*look*0.7;
+    fp.mdx = 0; fp.mdy = 0;
+    if(keys.KeyQ || keys.ArrowLeft)  fp.yaw   += look*0.8*dt;
+    if(keys.KeyE || keys.ArrowRight) fp.yaw   -= look*0.8*dt;
+    if(keys.ArrowUp)   fp.pitch += look*0.5*dt;
+    if(keys.ArrowDown) fp.pitch -= look*0.5*dt;
+    fp.pitch = THREE.MathUtils.clamp(fp.pitch, -1.2, 1.2);   // 躺着抬头，别翻过去
+
+    /* 移动沿用 walk 的约定：前 = (-sin yaw, -cos yaw)、右 = (cos yaw, -sin yaw)，
+       摇杆 my<0 = 前 ⇒ wx = cy*mx + sy*my / wz = -sy*mx + cy*my */
+    let mx = sMove.x, my = sMove.y;
+    if(keys.KeyW) my -= 1;
+    if(keys.KeyS) my += 1;
+    if(keys.KeyA) mx -= 1;
+    if(keys.KeyD) mx += 1;
+    const sy = Math.sin(fp.yaw), cy = Math.cos(fp.yaw);
+    let wx = cy*mx + sy*my, wz = -sy*mx + cy*my;
+    const m = Math.hypot(wx, wz);
+    if(m > 1){ wx /= m; wz /= m; }
+    if(m > 1e-3){ fp.x += wx*spd*dt; fp.z += wz*spd*dt; }
+    fpToCamera();
+  }
+  /* 进来看电视时 BGM 在不在放 —— 复位时照原样接回来，没在放就别自作主张起播。 */
+  let bgmBefore = false;
+
   function setTVMode(on, done){
     if(!!on === tvState){ if(done) done(); return; }
     if(on){
@@ -691,12 +787,23 @@ function setupModes(cfg, camera, controls, renderer, rig, AUD, ladder){
       /* keepLocked=false：飞到位就把控制权交还给用户 ——
          此时镜头停在床上、焦点在幕布，玩家可以自由拖拽 / 滚轮 / 右键平移微调视角，
          也可以照常点「漫游 / 步行」走开再看回来（梯子仍在藏着，直到复位）。 */
+      applyTVLimits(true);          // 先松约束，再起飞，否则飞完最后一帧就被钳回去
       startFly(watchPos.clone(), watchTarget.clone(), 4.7, false, ()=>{
         tvState = true;
-        controls.enabled = true;
-        /* 看电影期间 BGM 不许被动停：被视频/自动播放那一套带停的话，
-           这里补一次 start（AUD 为空壳时是空操作，无头脚本照样跑得通）。 */
-        try{ if(AUD && AUD.state !== 'playing') AUD.start(); }catch(_){}
+        /* 第一人称接管：轨道门先关掉（下面 fp.on 直接写相机），
+           一帧 controls.update() 都不要 —— 它会按轨道约束把人从床上拽走。 */
+        controls.enabled = false;
+        fpFromCamera(); fp.on = true;
+        /* 三个玩法按钮一并锁掉（见 setupModes 顶部 btns 那条注释）——
+           放在状态机里而不是按钮回调里，是因为「看电视」还会从别的路退出：
+           切非夜间时相、按 R 复位。锁挂在状态上，两条路都能解锁。 */
+        btns.forEach(b => { b.disabled = true; });
+        /* 看电影时 BGM 让位给视频声音（2026-10-05）：淡出暂停，复位再接回来。
+           AUD 是空壳 / 老版本没 pause() 时整段空转，无头脚本照样跑得通。 */
+        try{
+          if(AUD){ bgmBefore = (AUD.state === 'playing');
+                   if(bgmBefore && AUD.pause) AUD.pause(); }
+        }catch(_){}
         if(done) done();
       });
     } else {
@@ -704,11 +811,16 @@ function setupModes(cfg, camera, controls, renderer, rig, AUD, ladder){
          云飘的开关读的就是 tvState —— 若留到飞回结束才翻，整段返程里「还想看」
          依旧为真，云会一路飘到幕布上面去，等镜头到家才开始往回挪，看着像先跑过头再倒回。 */
       tvState = false;
+      btns.forEach(b => { b.disabled = false; });   // 交还玩法模式（对应落地时那次锁）
       if(mode !== 'free') setMode('free');
       if(ladder) ladder.visible = true;
+      fp.on = false; fp.dragId = null;          // 交还给 OrbitControls 之前先收掉第一人称
+      controls.enabled = true;
+      try{ if(AUD && bgmBefore && AUD.state !== 'playing' && AUD.resume) AUD.resume(); }catch(_){}
       startFly(tvHome.pos.clone(), tvHome.target.clone(), 4.0, false, ()=>{
         tvState = false;
         controls.enabled = true;
+        applyTVLimits(false);       // 飞回落地才收回约束，别在按复位的瞬间推相机
         if(done) done();
       });
     }
@@ -722,6 +834,7 @@ function setupModes(cfg, camera, controls, renderer, rig, AUD, ladder){
     /* 若正处在「看电视」位姿，先清掉这个状态再复位 */
     if(tvState || fly){
       tvState = false; fly = null;
+      fp.on = false; fp.dragId = null;          // 第一人称先收，否则复位后还攥着相机
       if(ladder) ladder.visible = true;
       controls.enabled = true;
     }
@@ -794,6 +907,7 @@ function setupModes(cfg, camera, controls, renderer, rig, AUD, ladder){
     tvEnter: setTVMode,                     // 夜间「看电视」飞床动画入口
     get tvActive(){ return tvState || !!fly; },
     get tvState(){ return tvState; },
+    get fpOn(){ return fp.on; },   // 看电视期间是不是第一人称（无头断言用）
     get autoWalk(){ return ROAM.autoWalk !== false; },
     /* 爬梯/上床的速度（无头脚本按它做「速率 = Δls / Δt」的实测断言） */
     get climb(){ return { speed: climbSpeed, mountSpeed }; },
@@ -839,6 +953,7 @@ function setupModes(cfg, camera, controls, renderer, rig, AUD, ladder){
        落地才收，收得平滑（fovStep 本身是指数缓动，不是硬切）。
        想改这个广角幅度：config.json 的 projector.tvFovBoost 或 scene.json 同键。 */
     fovStep(dt, tvState ? TV_FOV_BOOST : 0);   // 步行 / 自由：无看电视时回原值
+    if(tvState && fp.on){ fpStep(dt); return; }  // 看电视：第一人称，一帧都不碰 OrbitControls
     if(mode === 'walk'){
       /* 视角 */
       P.yaw   -= sLook.x*lookSpeed*dt;
@@ -1614,22 +1729,32 @@ function createSceneUI(atmos, postfx, flashHint, projector, step){
   let projectorOn = false;
   let projectorAvailable = false;
   let isWatching = false;
+  /* ⚠ 播放/复位期间**不要**去碰三个玩法按钮的 disabled ——
+     那是状态机（setupModes 的 setTVMode）在管：看电视会从三条路退出
+     （点复位、切非夜间时相、按 R 复位），锁必须挂在状态上，不该挂在这里。 */
+  function tvAudio(on){                          // 视频声音跟着幕布一起开合
+    if(projector && projector.userData.tvAudio) projector.userData.tvAudio(on);
+  }
   const projBtn = mkBtn('看电视', () => {
     if(!projectorAvailable || !step) return;
     if(step.tvActive() && !isWatching) return;   // 飞行途中忽略点击
     if(isWatching){
+      tvAudio(false);
       step.tvEnter(false, ()=>{ isWatching = false; syncProj(); });
       hint('已复位', 900);
     } else {
+      /* 声音必须在**这次点击**里开：WebAudio 增益链路要用户手势才起得来
+         （createMediaElementSource 接上后音频只走这条图，上下文不上就是静音）。 */
       if(!projectorOn){
         projectorOn = true;
         if(projector && projector.userData.setOn) projector.userData.setOn(true);
       }
+      tvAudio(true);
       step.tvEnter(true, ()=>{ isWatching = true; syncProj(); });
-      hint('靠在床上看电视', 1200);
+      hint('靠在床上看电视 · 拖屏转头 / WASD 走动', 1600);
     }
   });
-  projBtn.title = '夜间专属：靠在床上看电视 / 复位（快捷键 P）';
+  projBtn.title = '夜间专属：靠在床上看电视（第一人称：拖屏转头 · WASD/方向键走动） / 复位（快捷键 P）';
   if(rowProj) rowProj.appendChild(projBtn);
   function syncProj(){
     projBtn.textContent = isWatching ? '复位' : '看电视';
@@ -1641,6 +1766,7 @@ function createSceneUI(atmos, postfx, flashHint, projector, step){
     if(!projectorAvailable){
       isWatching = false;
       projectorOn = false;
+      tvAudio(false);
       if(projector && projector.userData.setOn) projector.userData.setOn(false);
       syncProj();
     }

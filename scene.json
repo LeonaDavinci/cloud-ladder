@@ -740,15 +740,18 @@
       "rotationY": 1.5708,
       "width": 5.25,
       "height": 2.955,
-      "emissive": 0.85,
+      "_emissive说明": "自发光强度。和 brightness、light.intensity 三者线性叠加（总亮度≈视频亮度×(brightness+emissive)+点光源漫反射）；emissive 过 0.5 就会把画面结构一起糊掉。2026-10-05 从 0.85 降到 0.35。",
+      "brightness": 0.75,
+      "emissive": 0.35,
       "falloff": 0.38,
       "frameColor": "#2a2a40",
       "frameThickness": 0.06
     },
     "light": {
-      "position": [-7.68, 4.35, 1.2],
+      "_position说明": "离幕布要 ≥1 米：幕布在 x=-8.23，这里 -7.15 是 1.08m。原先贴到 -7.68（0.55m）时衰减 1/d^1.7≈2.8，辐照度把幕布自己照爆成白墙。",
+      "position": [-7.15, 4.3, 1.2],
       "color": "#ffd9b8",
-      "intensity": 1.1,
+      "intensity": 0.55,
       "distance": 13,
       "decay": 1.7
     },

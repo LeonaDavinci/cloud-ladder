@@ -170,6 +170,21 @@ export function createAudio(A){
     }
   }
 
+  /* pause / resume：给「另有声源要占这个耳朵」的场合用（目前只有一处 —— 看电视时
+     BGM 让位给视频原声）。和 toggle 的差别在**不带切换语义**：toggle 是「点一下换状态」，
+     pause/resume 是「按我说的这个状态来」，调用方不必先读 state 再猜自己点下去会成什么样。
+     淡出照旧走 cfg.fadeOut，别「啪」一下断掉。 */
+  function pause(){
+    if(state === 'proc'){ if(proc) proc.setMuted(true); return; }
+    if(state === 'playing') rampTo(0, cfg.fadeOut, () => { el.pause(); setState('paused'); });
+  }
+  function resume(){
+    if(state === 'paused' || state === 'blocked' || state === 'error' || state === 'idle'){
+      if(!el.src) return start();
+      setState('loading'); play();
+    }
+  }
+
   /* ---------------- 自动播放解锁 ----------------
      浏览器策略：没有用户手势就不给出声。这里挂一组一次性监听，
      手势一出现立刻重试；同时把按钮状态切成「点击播放」提示用户。 */
@@ -459,7 +474,7 @@ export function createAudio(A){
   /* ---------------- 启动 ---------------- */
   buildUI();
   const api = {
-    ok:true, el, tracks, chime, poof, start, next, toggle,
+    ok:true, el, tracks, chime, poof, start, next, toggle, pause, resume,
     get poofs(){ return sfx.poofs; },        // 「噗」实际发声次数（无头验证用）
     get state(){ return state; },
     get index(){ return index; },

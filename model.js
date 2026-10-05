@@ -2487,11 +2487,66 @@ export function buildProjectorScreen(cfg){
     setTimeout(()=>{ if(useVideo && ve.readyState < 2) failToCanvas('timeout'); }, 5200);
   }
 
+  /* ---- 视频声音：放大 1.5 倍（screen.volumeGain） ----
+     2026-10-05 用户要求「直接放视频的声音 + 声音放大 50%」。<video>.volume 上限就是 1，
+     想真的放大只能过一路 WebAudio 增益节点。
+     ⚠ 一旦 createMediaElementSource 接上，这段音频就**只**走这条图 —— 上下文要是
+     suspended，整段就静音了。所以这条链只在「点看电视」那个用户手势里现建 / resume，
+     并且留兜底：resume 后仍未 running 就拆掉链路退回元素直出（少赚那 50%，但不哑）。 */
+  let vaCtx = null, vaSrc = null, vaGain = null;
+  const VA_GAIN = +(S.volumeGain !== undefined ? S.volumeGain : 1.5);
+  function tvAudioOn(on){
+    if(!videoEl) return false;
+    try{
+      if(on){
+        videoEl.muted = false;
+        videoEl.volume = 1;
+        if(!vaCtx){
+          const AC = window.AudioContext || window.webkitAudioContext;
+          if(AC){
+            vaCtx = new AC();
+            vaSrc = vaCtx.createMediaElementSource(videoEl);
+            vaGain = vaCtx.createGain();
+            vaGain.gain.value = VA_GAIN;
+            vaSrc.connect(vaGain);
+            vaGain.connect(vaCtx.destination);
+          }
+        }
+        if(vaCtx && vaCtx.state === 'suspended') vaCtx.resume().catch(()=>{});
+        if(vaCtx && vaCtx.state !== 'running'){   // 起不来 ⇒ 增益这条路会闷掉，退回直出
+          try{ vaSrc.disconnect(); vaGain.disconnect(); }catch(_){}
+          vaCtx = vaSrc = vaGain = null;
+          return false;
+        }
+        return true;
+      }
+      /* 关：先摘增益再静音（元素静音后，WebAudio 那条路不一定跟着停） */
+      try{ if(vaGain) vaGain.disconnect(); }catch(_){}
+      try{ if(vaSrc)  vaSrc.disconnect();  }catch(_){}
+      vaGain = vaSrc = null;
+      videoEl.muted = true;
+    }catch(e){ /* 建不出来也别掀构建：元素保持未静音，浏览器自己直出 */ }
+    return false;
+  }
+  group.userData.tvAudio = tvAudioOn;
+
+  /* 屏幕总亮度 = 视频亮度 × (brightness + emissive) + 点光源打上来的那点漫反射。
+     ⚠ 三个量会互相叠加，调的时候要一起看：
+       · brightness —— 材质 color 对 map 的乘子，等于「把视频本身压暗」，
+         换任何视频都不会过曝，是首选旋钮；
+       · emissive   —— 自发光，让屏幕在夜里「会亮」，但它吃的是线性亮度，
+         一旦过 0.5 就会连画面结构一起糊掉；
+       · light.intensity —— 点光源离幕布越近，衰减 1/d^decay 涨得越猛
+         （实测 0.55m 处辐照度 ≈ 3.0，高光像素直接打满成白墙），
+         所以光源要离幕布 1 米以上，别贴着布走。
+     用户 2026-10-05 反馈「电视屏幕曝光过度、看不清」就是这个叠加爆的。 */
+  const brightness = +(S.brightness !== undefined ? S.brightness : 0.75);
   const mat = new THREE.MeshStandardMaterial({
     map: texture,
+    color: new THREE.Color(brightness, brightness, brightness),
     emissive: new THREE.Color(S.lightColor || '#ffffff'),
     emissiveMap: texture,
-    emissiveIntensity: +(S.emissive !== undefined ? S.emissive : 0.85),
+    emissiveIntensity: +(S.emissive !== undefined ? S.emissive : 0.35),
     roughness: 0.78,
     metalness: 0.0,
     side: THREE.DoubleSide
@@ -2618,6 +2673,7 @@ export function buildProjectorScreen(cfg){
       if(v){ videoEl.currentTime = 0; videoEl.play().catch(()=>{}); }
       else { videoEl.pause(); }
     }
+    tvAudioOn(v);
   };
 
   group.userData.setOn(false);

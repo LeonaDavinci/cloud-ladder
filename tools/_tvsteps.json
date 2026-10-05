@@ -1,0 +1,9 @@
+[
+  {"op": "wait", "ms": 3000},
+  {"op": "eval", "js": "dispatchEvent(new KeyboardEvent('keydown',{key:'4',keyCode:52,which:52,bubbles:true}))"},
+  {"op": "wait", "ms": 5000},
+  {"op": "clickSel", "sel": "#ui-projector button", "timeout": 8000},
+  {"op": "waitFor", "js": "window.__rig.tvState === true", "timeout": 400000, "poll": 800},
+  {"op": "wait", "ms": 6000},
+  {"op": "shot", "file": "tv.png"}
+]
