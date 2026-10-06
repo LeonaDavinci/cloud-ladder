@@ -364,10 +364,10 @@ function setupModes(cfg, camera, controls, renderer, rig, AUD, ladder, tvHooks){
   /* 看电视时的「视角增量」。走 fovStep 的 boost 通道（下方自由/步行分支传
      tvState ? TV_FOV_BOOST : 0），自带 FOV_RATE 指数缓动，不是落地瞬间硬切。
      轨迹：+15°（2026-10-05 用户上调）→ +30°（同日又嫌不够广）→ 又嫌太大，
-     2026-10-05 晚再减 8° ⇒ 默认 +22°：广角感还在，但床沿和幕布框不会顶到画面边上。
-     想改：scene.json / config.json 写 projector.tvFovBoost。 */
+     2026-10-05 晚再减 8° ⇒ +22°；2026-10-06 用户「fov 减少 10°」⇒ **+12°**。
+     想改：scene.json / config.json 写 projector.tvFovBoost（当前没写，用这个默认值）。 */
   const TV_FOV_BOOST = +((cfg.projector && cfg.projector.tvFovBoost !== undefined)
-                        ? cfg.projector.tvFovBoost : 22);
+                        ? cfg.projector.tvFovBoost : 12);
   let   fovNow  = FOV0;                // 当前写到相机上的值（自己记着，不读回 camera.fov）
   function fovStep(dt, boost){
     const want = FOV0 + (boost || 0);
@@ -669,11 +669,12 @@ function setupModes(cfg, camera, controls, renderer, rig, AUD, ladder, tvHooks){
      再沿 **床尾方向（-X）** 退 1.2 米：躺姿贴在床尾一侧、脚朝床头，
      视线正好对着床尾外那块幕布（床尾 = 世界 -X，床头 = +X）。
      eye 高度 = 躺卧视点 0.38 + 历史抬高 0.3 + 2026-10-05 用户反馈「eye 跑到床里
-     去了」再抬 0.6 ⇒ 0.68 + 0.6 = 1.28（相对床顶）。抬到 1.28 后是**半靠坐起**
-     的视高：能越过被褥看到床尾外的幕布，人也不会埋进床垫里。
+     去了」再抬 0.6 + 2026-10-06 用户「再调高 0.4 米」
+     ⇒ 0.38+0.3+0.6+0.4 = **1.68**（相对床顶）。1.28 时是半靠坐起的视高，
+     1.68 更接近站着俯看幕布 —— 床沿和被褥基本退出画面下缘。
      想微调改这一个常量就行（别再往上叠硬编码，历史值都留着做注释）。 */
   const WATCH_FOOT_SHIFT = 1.2;     // 朝床尾（-X）平移
-  const WATCH_EYE_LIFT  = 0.38 + 0.3 + 0.6; // 躺卧视点 0.38 + 抬高 0.3 + 0.6
+  const WATCH_EYE_LIFT  = 0.38 + 0.3 + 0.6 + 0.4; // 躺卧视点 0.38 + 抬高 0.3 + 0.6 + 2026-10-06 再抬 0.4
   const watchPos = new THREE.Vector3(
     cfg.bed.position[0] - WATCH_FOOT_SHIFT,
     bedTop + WATCH_EYE_LIFT,
