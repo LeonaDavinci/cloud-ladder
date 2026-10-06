@@ -2925,6 +2925,10 @@ export function buildProjectorScreen(cfg){
       else { videoEl.pause(); }
     }
     tvAudioOn(v);
+    /* 通知外部「电视开/关」了。放在 setOn 里而不是按钮回调里，是因为 setOn 是
+       **所有**开关路径的收口：点按钮、closeProjector、按 R 复位、切到非夜间时相，
+       全都走它 —— 挂在按钮上会漏掉后面三条。 */
+    try{ if(group.userData.onSetOn) group.userData.onSetOn(!!v); }catch(_){}
   };
 
   /* ⚠ 初始隐藏**不能**只靠 `setOn(false)`：那时 fadeTo 已经是 0，setOn 会

@@ -765,6 +765,8 @@
       "distance": 13,
       "decay": 1.7
     },
+    "_bloomGain说明": "电视亮着时 bloom 强度的乘数（2026-10-06 用户要求 +30% ⇒ 1.3）。实现成与「时相覆盖」正交的乘数而不是直接改夜间档的 strength：atmosphere 每次切时相都会用 setBloomOverride 把该档 strength 覆盖掉，写死会在切档后失效。挂在 projector 的 setOn 上，1 = 关闭增强。只乘 strength、不动 threshold —— 降 threshold 会让整个夜空都发亮而不是只让电视更亮。",
+    "bloomGain": 1.3,
     "spill": {
       "_说明": "第二盏灯，专门把床照亮（2026-10-06 用户「要给电视的位置加点光源，要有照亮床附近的感觉」）。上面那盏其实照不到床：decay 1.7/intensity 0.55 传到 5.15m 外的床心只剩 0.55/5.15^1.7 ≈ 0.03 辐照度。three 里 distance 只是软截止，真正决定能照多远的是 decay。位置取床尾上方而非紧贴幕布：床面各处受光更均匀，也少打一点幕布正面。intensity 2.2 配 decay 1.35 ⇒ 床尾约 0.63、床心约 0.47 辐照度（夜间环境总面光 ≈1.8，即局部 +26~35%）。",
       "_position说明": "**屏幕中心再往背面挪 12cm**：屏幕在 x=-8.23、法线朝 +X（朝向床）。灯挪到 x=-8.35 之后，屏幕正面法线 (+X) 与光方向 (−X) 反向，N·L<0 ⇒ 正面一点光都收不到，而光照样往 +X 铺出去照亮床。three 的 WebGLRenderer 没有 per-object 排除光源的机制（那是 WebGPU NodeMaterial 的 light filtering），所以「排除照亮电视机」只能靠位置。y/z 与屏幕中心对齐 ⇒ 视觉上就是「电视机中间的那盏灯」。",

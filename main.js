@@ -2067,6 +2067,15 @@ function build(cfg){
      之前 failToCanvas 只 console.warn，而 <video> 是 createElement 出来的、
      页面里摸不到，出问题时用户只看到「还是默认画面」，谁也猜不出是加载失败、
      超时还是解码不支持。有了这行，下次不播 —— 提示条会直接写出原因。 */
+  /* 「看电视时 bloom 提高 30%」（2026-10-06 用户要求）。挂在 projector 的 setOn 上
+     ⇒ 点按钮 / 复位 / 切时相三条路径都自动跟上；增益值走 setBloomGain（乘数）而不是
+     改夜间档的 strength，因为时相覆盖每次切档都会把 strength 写死。 */
+  const TV_BLOOM_GAIN = (cfg.projector && cfg.projector.bloomGain !== undefined)
+                     ? +(cfg.projector.bloomGain) : 1.3;
+  if(projector) projector.userData.onSetOn = (on)=>{
+    try{ postfx.setBloomGain(on ? TV_BLOOM_GAIN : 1); }catch(_){}
+  };
+
   /* 视频真的开始播了 ⇒ 现在才解锁声音（iOS 上 unmute 必须晚于 playing）。 */
   if(projector) projector.userData.onFirstPlay = ()=>{ try{ unlockTvAudio(); }catch(_){} };
   if(projector) projector.userData.onVideoFallback = (why)=>{

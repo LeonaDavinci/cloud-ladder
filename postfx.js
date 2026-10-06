@@ -245,11 +245,18 @@ export function createPostFX(renderer, scene, camera, cfg){
      涨到 [231,229,235]，连脚下的草地都变白）。
      所以亮雾时相要把阈值顶到 0.95 左右、把强度压下来；夜间反过来可以放宽。
      覆盖只写在 overlay 里，不动预设本身 —— 同一档滤镜在四个时相下可以各自合适。 */
+  /* 「看电视时」这类**条件性**的 bloom 增强（2026-10-06）。
+     为什么不能直接改预设/时相里的 strength：atmosphere.apply() 每次切时相都会调
+     setBloomOverride 把该档的值直接覆盖过来，写死会在下一次切时相时失效。
+     所以拆成与「时相覆盖」正交的一层乘数：最终 = 时相/预设算出的 strength × bloomGain。
+     只乘 strength（不乘 threshold）：threshold 决定「哪些像素参与辉光」，
+     拉低它会让整个夜空都发亮而不是只让电视更亮。 */
+  let bloomGain = 1;
   function applyBloom(b){
     const o = bloomOverride || {};
     const pick = (k, d) => num((o[k] !== undefined ? o[k] : b[k]), d);
     bloomPass.enabled   = !bloomOff;
-    bloomPass.strength  = pick('strength', 0.8);
+    bloomPass.strength  = pick('strength', 0.8) * bloomGain;
     /* ⚠ radius 必须夹在 [0,1]（2026-10-06 加的保护）。它在 UnrealBloomPass 里是
        `mix(factor, 1.2 − factor, radius)` 的插值权重：bloomFactors = [1,.8,.6,.4,.2]、
        mirror = [.2,.4,.6,.8,1]，所以 radius>1 时最近那级会算成**负权重**
@@ -325,6 +332,14 @@ export function createPostFX(renderer, scene, camera, cfg){
        实测返回每级实际半径，无头对照直接读它。 */
     setBloomKernel,
     get bloomKernel(){ return bloomKernelRadii.slice(); },
+    /* 条件性 bloom 增强（看电视时 +30%）。传 1 复原。
+       立刻重算当前档，这样切时相也不会把它冲掉。 */
+    setBloomGain(g){
+      bloomGain = Math.max(0, num(g, 1));
+      if(state.name !== OFF && presets[state.name]) applyBloom(presets[state.name].bloom);
+      return bloomGain;
+    },
+    get bloomGain(){ return bloomGain; },
     /* 时相覆盖 bloom（见 applyBloom 的说明）。传 null 恢复「只用预设值」 */
     setBloomOverride,
     get bloomOverride(){ return bloomOverride ? Object.assign({}, bloomOverride) : null; },
