@@ -39,7 +39,13 @@ const _QS = new URLSearchParams(location.search);
 
 const _FORCE_MOBILE = _QS.get('mobile') === '1' || _QS.get('mobile') === 'true';
 
-const IS_TOUCH = ((navigator.maxTouchPoints || 0) > 1) || _FORCE_MOBILE;
+/* ⚠ 2026-10-08：原来只有 `maxTouchPoints > 1` 一路，实测在**无头 Chrome 的手机
+     竖屏下读到 0**，微信 / 小红书 WebView 也常见 0 或 1 ⇒ 手机上直接没进「触摸」分支，
+     于是横屏一层都没转（用户反馈「没有横屏」）。改成三路或，任一命中即算触摸设备。 */
+const IS_TOUCH = ((navigator.maxTouchPoints || 0) > 0)
+              || (window.matchMedia && matchMedia('(pointer:coarse)').matches)
+              || ('ontouchstart' in window)
+              || _FORCE_MOBILE;
 
 /* ============================================================
    0b. 强制横屏（2026-10-08）
@@ -53,11 +59,13 @@ const ORIENT = { locked:false, ack:false, force:false, tries:0 };
 /* 逻辑舞台：rot 时 w/h 是**旋转之后**的宽高（w > h 恒成立）；rawW/rawH 是物理视口。 */
 const STAGE  = { w:0, h:0, rawW:0, rawH:0, rot:0, flip:false, onChange:null };
 
-/* 桌面预览窗不该被掀 sideways —— 只有触摸设备才旋转。
-   ⚠ 窄的桌面窗口 / 预览面板也会触发「竖着」，不加这个门它会被转 90° 看起来像坏了。 */
+/* 「视口是竖着的就转」—— 不再按设备类型分叉。
+   ⚠ 原来这里有 `if(!IS_TOUCH) return false`，意思是**桌面竖窗一律不转**；
+     用户要的是「画面横版」，桌面竖着的窗口同样该转，于是去掉这道门。
+     逃生口：URL 加 ?norot=1（不动旋转，按原样竖着显示）。 */
 function shouldRotate(){
   if(ORIENT.force) return false;
-  if(!IS_TOUCH) return false;
+  if(_QS.get('norot') === '1') return false;
   return STAGE.rawH > STAGE.rawW;
 }
 /* 旋转方向：默认顺时针；?flip=1 强制逆时针（个别用户习惯反着拿）。 */
@@ -174,7 +182,7 @@ function refreshStage(){
 function bindLandscapeGesture(){
   const tryLock = ()=>{
     if(ORIENT.locked){ unbump(); return; }
-    if(!IS_TOUCH || !shouldRotate()) return;     /* 已经横着了 / 桌面：不用锁 */
+    if(!shouldRotate()) return;                  /* 已经横着了 / 显式关掉：不用锁 */
     ORIENT.tries++;
     lockLandscape();
     if(ORIENT.tries >= 4) unbump();               /* 前 3~4 次手势都留着机会 */
@@ -2514,6 +2522,30 @@ function build(cfg){
     renderer.setSize(w, h, false);   // false = 别写内联样式，铺满交给 CSS
     postfx.setSize();                 // composer 的 RT 与各 pass 都要跟着重建
   };
+  /* ⚠ OrbitControls 的轴向修正（2026-10-08）：舞台被旋转 90° 之后，物理视口的
+     x 轴就是舞台的 y 轴，而 OrbitControls 直接读 e.clientX/clientY ⇒ 桌面鼠标
+     「横拖」会变成「竖转」。
+     修法：在**捕获阶段**（:true）把事件对象上的 clientX/clientY 覆写成舞台坐标，
+     OrbitControls 自己的监听器在冒泡阶段才跑，读到的就已经是舞台坐标了。
+     事件属性本来只读，用 defineProperty 在这个事件对象上盖一层是可以的
+     （只影响这一个事件，不会污染全局原型）。 */
+  if(window.innerWidth || true){
+    const fixEventCoords = (e)=>{
+      if(STAGE.rot === 0 || e.__stageFixed) return;
+      const p = screenToStage(e.clientX, e.clientY);
+      try{
+        Object.defineProperty(e, 'clientX', { value:p.x, configurable:true });
+        Object.defineProperty(e, 'clientY', { value:p.y, configurable:true });
+        e.__stageFixed = true;
+      }catch(_){}
+    };
+    const stageEl = renderer.domElement;
+    stageEl.addEventListener('pointerdown', fixEventCoords, true);
+    stageEl.addEventListener('pointermove', fixEventCoords, true);
+    stageEl.addEventListener('pointerup',   fixEventCoords, true);
+    stageEl.addEventListener('wheel',       fixEventCoords, true);
+  }
+
   /* 屏幕尺寸变化统一走 refreshStage()：它会重测 STAGE、落 DOM、切 .ls-rot，
      再回调 applyViewport 重建 drawing buffer 与 camera.aspect。 */
   STAGE.onChange = applyViewport;

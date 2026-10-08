@@ -417,6 +417,64 @@ body.ui-hidden #hud-tl .overlay p{ display:none !important; }
      算出来是「舞台宽度的 10%」，完全不是想要的东西。
    ================================================================ */
 
+/* ================================================================
+   UI 微调（2026-10-08 用户指定）
+   ------------------------------------------------------------
+   ① 雾档提到时相**上面** —— 用 flex 的 order，不动 HTML。
+      DOM 顺序仍按「快捷键提示 → 时相 → 滤镜 → 雾 → 看电视」写着（可读性），
+      视觉顺序由 order 重排，以后再插一行也不会打乱这三条相对位置。
+   ② 「隐藏 UI」挪到右下角：原来在左下，和时相/滤镜面板挤在同一列。
+   ③ 「看电视」从面板里拿出来，用 position:fixed 放到**底部正中** ——
+      它是模式之外的一个大动作，压在画面中轴上更好按，也不占侧栏的竖向空间。
+   ================================================================ */
+
+/* ① 视觉顺序：雾 → 时相 → 滤镜
+   ⚠ 原本用 flex `order` 重排，但 `#scene-ui #ui-time{order:2}` 这条会被浏览器的
+     CSS 解析器**整条丢弃**（前后两条同样的写法都正常，CSSOM 里查不到这一条，
+     computed order 停在 0）—— 与其跟解析器较劲，不如**直接改 DOM 顺序**
+     （index.html 里三行的先后），`order` 这条路已弃用。 */
+
+/* ③ 看电视（#ui-projector）：**独立的固定元素**，钉在底部正中（2026-10-08）。
+   ⚠ 它已经从 #scene-ui 面板里搬出来放在 body 下了（见 index.html 的注释）：
+     留在面板里时它是 flex item，position:fixed 实测没生效（computed 停在 static），
+     按钮会一直挂在左列。搬出来后才是个普通的 fixed 元素。
+   ⚠ 搬出来的代价：丢掉 `.ui-row` 与 `#scene-ui button` 的样式，所以下面**复制**一份
+     （只复制视觉，不改行为）。以后改按钮样式记得两边一起改，或者把这几条
+     改成 `#scene-ui button, #ui-projector button` 共享选择器。 */
+/* ⚠ 这里只放**视觉**样式。定位（position/left/bottom/transform/z-index）写在
+   index.html 的内联 style 里 —— 实测这段定位规则被浏览器的 CSS 解析器整条丢弃
+   （CSSOM 查不到、computed position 停在 static，而相邻规则都正常），
+   内联样式优先级最高，不受解析层影响。以后要调位置改 index.html 那一行。 */
+#ui-projector{
+  display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif;
+  font-size:12px;font-weight:500;line-height:1;letter-spacing:.5px;
+}
+#ui-projector .ui-lab{
+  width:26px;flex:0 0 26px;text-align:right;
+  font-size:11px;letter-spacing:1px;color:rgba(255,255,255,.82);
+  text-shadow:0 1px 8px rgba(60,30,90,.6);
+}
+#ui-projector button{
+  pointer-events:auto;cursor:pointer;
+  color:#fff;font:inherit;
+  background:rgba(40,25,70,.28);border:1px solid rgba(255,255,255,.28);
+  padding:7px 12px;border-radius:999px;
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  box-shadow:0 6px 18px rgba(40,20,70,.22);
+  transition:background .18s, transform .18s, box-shadow .18s;
+  white-space:nowrap;
+}
+#ui-projector button:hover{background:rgba(255,255,255,.2);transform:translateY(-1px);}
+#ui-projector button.active{
+  background:linear-gradient(135deg,rgba(255,158,203,.85) 0%,rgba(150,140,230,.85) 100%);
+  border-color:rgba(255,255,255,.55);
+  box-shadow:0 8px 22px rgba(120,60,170,.35);
+}
+html.ls-rot #ui-projector{
+  bottom:calc(12px + var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)));
+}
+
 /* 路径 A：舞台被旋转过（逻辑舞台必是横的） */
 html.ls-rot #hud-tl{
   left:calc(16px + var(--safe-area-inset-left, env(safe-area-inset-left, 0px)));
@@ -490,4 +548,26 @@ html.ls-rot.ls-ack #rotateGate{ display:none; }
 #rotateGate .rg-skip{
   display:block;margin:14px auto 0;background:none;color:rgba(255,255,255,.6);
   font-size:12px;padding:8px 16px;box-shadow:none;text-decoration:underline;
+}
+
+/* ================================================================
+   UI 微调 · ② 「隐藏 UI」挪到右下角（2026-10-08）
+   ------------------------------------------------------------
+   ⚠ 必须放在**文件最末**：本文件里已有 `html.ls-rot #ui-toggle`（路径 A 分栏那组）
+     与 `#ui-toggle{bottom:…}`（含各 max-width 断点里的覆盖），它们与下面这条
+     **特异度相同**（1 个 id + 1 个 class + 1 个元素）⇒ 同特异度下**后写的赢**。
+     第一次把这条放在文件中间，就被后面的 `html.ls-rot #ui-toggle{left:…;right:auto}`
+     覆盖掉了，按钮又回到左下。left 用 !important 是为了压掉后面断点里的 left 声明。
+   ================================================================ */
+html.ls-rot #ui-toggle,
+html:not(.ls-rot) #ui-toggle{
+  left:auto !important;
+  right:calc(16px + var(--safe-area-inset-right, env(safe-area-inset-right, 0px)));
+  bottom:10px;
+  transform:none;
+}
+@media (min-aspect-ratio: 1/1){
+  html:not(.ls-rot) #ui-toggle{
+    left:auto !important;right:16px;bottom:10px;transform:none;
+  }
 }

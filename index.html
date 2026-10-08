@@ -21,7 +21,7 @@
 
   <title>云端之梯 · #梦核 · Ladder to the Cloud</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css?v=75">
+  <link rel="stylesheet" href="style.css?v=76">
   <script type="importmap">
   {
     "imports": {
@@ -118,10 +118,30 @@
        也把最下面那一行的位置让出来给按钮。 -->
   <div id="scene-ui">
     <div class="ui-tip">1–4 时相 · 5–9 滤镜 · F 雾档 · 0 原片 · P 看电视/复位 · 看电视时：拖屏转头 · WASD 走动</div>
+    <div class="ui-row" id="ui-fog"><span class="ui-lab">雾</span></div>
     <div class="ui-row" id="ui-time"><span class="ui-lab">时相</span></div>
     <div class="ui-row" id="ui-filter"><span class="ui-lab">滤镜</span></div>
-    <div class="ui-row" id="ui-fog"><span class="ui-lab">雾</span></div>
-    <div class="ui-row" id="ui-projector" style="display:none"><span class="ui-lab">夜</span></div>
+  </div>
+
+  <!-- 「看电视」独立于 scene-ui 面板（2026-10-08 用户指定放「底部中间」）。
+       为什么移出来：留在 #scene-ui 里它是 flex item，position:fixed 在实测里
+       没把它拉出竖向流（computed position 停在 static），按钮就一直挂在左列。
+       移出来之后它就是个普通的 fixed 元素，位置完全由 CSS 说了算。
+       ⚠ main.js 用 getElementById('ui-projector') 取它、再 appendChild 按钮，
+         按 id 找与父节点无关 ⇒ 移动位置不影响接线（main.js:1858/1990/1997）。
+       ⚠ 移出来会丢掉 .ui-row / #scene-ui button 的样式，style.css 里已按
+         #ui-projector 复制了一份。 -->
+  <!-- 定位用**内联样式**（position/left/bottom/transform），不写在 style.css：
+       实测那条 CSS 规则被浏览器的 CSS 解析器**整条丢弃**（CSSOM 里查不到、
+       computed position 停在 static；前后相邻的规则都正常），而同样的
+       `position:fixed` 写在别处却生效。内联样式优先级最高，不受解析层影响。
+       ⚠ main.js 只改它的 style.display（显示/隐藏夜间档），不碰其余内联属性。 -->
+  <div class="ui-row" id="ui-projector"
+       style="display:none;position:fixed;left:50%;bottom:12px;transform:translateX(-50%);z-index:25;
+              align-items:center;gap:6px;flex-wrap:wrap;
+              font-family:'PingFang SC','Microsoft YaHei',sans-serif;
+              font-size:12px;font-weight:500;line-height:1;letter-spacing:.5px">
+    <span class="ui-lab" style="width:26px;flex:0 0 26px;text-align:right;font-size:11px;letter-spacing:1px;color:rgba(255,255,255,.82);text-shadow:0 1px 8px rgba(60,30,90,.6)">夜</span>
   </div>
 
   <!-- 底部居中：切换 UI（隐藏 / 显示其余全部按钮）。
@@ -181,6 +201,6 @@
   </div>
 
   <!-- ?v= 用于绕过浏览器旧缓存 -->
-  <script type="module" src="main.js?v=77"></script>
+  <script type="module" src="main.js?v=78"></script>
 </body>
 </html>
