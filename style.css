@@ -380,3 +380,114 @@ body.ui-hidden #hud-tl .overlay p{ display:none !important; }
   #jump-btn{bottom:20px;}
   #jump-btn{bottom:calc(20px + var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)));}
 }
+
+/* ================================================================
+   横屏时的 UI 分栏：左边一列、右边一列（2026-10-08 用户要求）
+   ------------------------------------------------------------
+   原来的散布：标题+BGM 在**左上**、时相/滤镜/雾/看电视面板在**左下**、
+   模式按钮在**右上**、跳跃在**右下**、UI 开关在**底部居中**。
+   横屏（舞台宽 ≫ 高）下这个布局的问题很直接：屏幕两侧本该是空的，
+   按钮却全挤在四角、中间那条横带（也就是画面主体）反而空着；
+   而且「左上」和「左下」隔着大半个屏幕高，根本不算一列。
+
+   改成分栏后：
+     左列 = 标题+BGM（顶） … 时相/滤镜/雾/看电视（底）
+     右列 = 模式（顶） … 跳跃（底）
+     UI 开关从底部居中挪进左列底端（原来压在画面正中，挡视线）。
+
+   为什么用 `@media (min-aspect-ratio:1/1)` 而不是直接改：
+   窄视窗（桌面预览窗、竖着拿手机）分两列会把每列压到不足以放下胶囊按钮，
+   那种情况下原来的四角分布反而清楚。横屏才分栏。
+
+   ⚠ 全部用 px，**不用 vh/vw**：舞台可能被 CSS transform 旋转过（强制横屏那套），
+     `vw/vh` 解析的是**物理视口**，不是旋转后的逻辑舞台 —— 旋转后 `bottom:10vh`
+     算出来是「舞台宽度的 10%」，完全不是想要的东西。
+   ================================================================ */
+   ⚠⚠ **这里必须同时挂 `html.ls-rot`，不能只靠媒体查询** ——
+     媒体查询的 `aspect-ratio` 匹配的是**物理视口**，而「物理竖着 + CSS 把舞台旋转 90°」
+     这种状态物理视口是 390×844（0.46），**不满足 min-aspect-ratio:1/1** ⇒
+     分栏规则不会生效（实测过：竖屏被旋转的设备上，两栏全部没应用）。
+     `html.ls-rot` 才是「逻辑舞台一定是横的」那个可靠信号。
+     两条路径都要覆盖：
+       · `html.ls-rot`            —— 设备竖着、被我们旋转过
+       · `@media (min-aspect-ratio:1/1)` —— 设备本来就横拿着（没有旋转）
+
+   ⚠ 全部用 px，**不用 vh/vw**：舞台可能被 CSS transform 旋转过（强制横屏那套），
+     `vw/vh` 解析的是**物理视口**，不是旋转后的逻辑舞台 —— 旋转后 `bottom:10vh`
+     算出来是「舞台宽度的 10%」，完全不是想要的东西。
+   ================================================================ */
+
+/* 路径 A：舞台被旋转过（逻辑舞台必是横的） */
+html.ls-rot #hud-tl{
+  left:calc(16px + var(--safe-area-inset-left, env(safe-area-inset-left, 0px)));
+  top:12px;
+}
+html.ls-rot #scene-ui{
+  left:calc(16px + var(--safe-area-inset-left, env(safe-area-inset-left, 0px)));
+  top:auto; bottom:42px; max-width:min(52%, 440px);
+}
+html.ls-rot #ui-toggle{
+  left:calc(16px + var(--safe-area-inset-left, env(safe-area-inset-left, 0px)));
+  right:auto; bottom:10px; transform:none;
+}
+html.ls-rot #modes{
+  right:calc(16px + var(--safe-area-inset-right, env(safe-area-inset-right, 0px)));
+  top:12px;
+}
+html.ls-rot #jump-btn{
+  right:calc(16px + var(--safe-area-inset-right, env(safe-area-inset-right, 0px)));
+  bottom:42px;
+}
+
+/* 路径 B：设备本来就横着（没有旋转，媒体查询能命中） */
+@media (min-aspect-ratio: 1/1){
+  html:not(.ls-rot) #hud-tl   { left:16px; top:12px; }
+  html:not(.ls-rot) #scene-ui{ left:16px; top:auto; bottom:42px; max-width:min(52%, 440px); }
+  html:not(.ls-rot) #ui-toggle{ left:16px; right:auto; bottom:10px; transform:none; }
+  html:not(.ls-rot) #modes   { right:16px; top:12px; }
+  html:not(.ls-rot) #jump-btn{ right:16px; bottom:42px; }
+}
+
+/* ---------- 强制横屏：竖屏时把整个舞台旋转 90° ----------
+   为什么要这层兜底：iOS Safari 不支持 screen.orientation.lock()，
+   WebView 里也没法可靠地锁。只有把 body 自己转 90°，逻辑舞台才永远是宽的。
+   旋转后 body 成了 position:fixed 子元素的包含块 ⇒ 所有 overlay 自动跟着转，
+   这正是我们要的（不用逐个元素改）。
+   ⚠ body 的 width/height 必须用 px 写死（见 main.js 的 applyStage），
+     绝不能用 100vh/100vw —— 移动端 100vh 含地址栏，会在旋转后的舞台边留一条缝。 */
+html.ls-rot body{
+  position:fixed;top:0;left:0;margin:0;
+  transform-origin:0 0;
+  transform:rotate(90deg) translateY(-100%);   /* 顺时针 */
+  overflow:hidden;
+}
+html.ls-rot.ls-flip body{ transform:rotate(-90deg) translateX(-100%); }   /* 逆时针 */
+
+/* 旋转时的 safe-area：横屏刘海在左右，底部指示条也在下方，两列都已单独内缩过 */
+html.ls-rot{ --ls-safe-b: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)); }
+
+/* ---------- 竖屏门：提示「请横过来」 ---------- */
+#rotateGate{
+  position:fixed;left:0;right:0;top:0;bottom:0;z-index:9000;
+  display:none;                       /* 默认隐藏，只在旋转态且未确认时出现 */
+  align-items:center;justify-content:center;
+  background:linear-gradient(160deg,#2a1a44 0%,#17102b 100%);
+  color:#fff;font:500 15px/1.7 "PingFang SC","Microsoft YaHei",sans-serif;
+  text-align:center;padding:24px;cursor:pointer;
+}
+html.ls-rot #rotateGate{ display:flex; }
+html.ls-rot.ls-ack #rotateGate{ display:none; }
+#rotateGate .rg-ico{ font-size:40px;line-height:1;margin-bottom:14px; }
+#rotateGate .rg-t{ font-weight:700;font-size:17px;letter-spacing:1px;margin-bottom:8px; }
+#rotateGate .rg-d{ opacity:.75;font-size:13px;max-width:19em;margin:0 auto 22px; }
+#rotateGate button{
+  font:600 14px/1 inherit;color:#2a1a44;cursor:pointer;
+  background:linear-gradient(135deg,#ffd0e4,#b9a4f0);
+  border:0;border-radius:999px;padding:13px 26px;
+  box-shadow:0 8px 22px rgba(0,0,0,.35);
+}
+#rotateGate button:active{ transform:scale(.96); }
+#rotateGate .rg-skip{
+  display:block;margin:14px auto 0;background:none;color:rgba(255,255,255,.6);
+  font-size:12px;padding:8px 16px;box-shadow:none;text-decoration:underline;
+}

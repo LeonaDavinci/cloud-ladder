@@ -7,9 +7,21 @@
        viewport-fit=cover 让画面铺到刘海/圆角之外，配合 safe-area 内边距用（见 style.css）。 -->
   <meta name="viewport"
         content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <!-- 强制横屏用的 per-kernel meta（2026-10-08）。每个内核只认自己那几个：
+         screen-orientation = UC/QQ，x5-orientation = 微信/QQ X5，
+         full-screen / x5-fullscreen 是 X5 锁定前的必要条件（它要先全屏才肯锁），
+         后两个是「加到主屏后按独立应用运行」。真正的锁定在 main.js 里做，
+         这些 meta 只是给内核一个意向；iOS Safari 不认它们，靠 CSS 旋转兜底。 -->
+  <meta name="screen-orientation" content="landscape">
+  <meta name="x5-orientation" content="landscape">
+  <meta name="full-screen" content="yes">
+  <meta name="x5-fullscreen" content="true">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
   <title>云端之梯 · #梦核 · Ladder to the Cloud</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css?v=74">
+  <link rel="stylesheet" href="style.css?v=75">
   <script type="importmap">
   {
     "imports": {
@@ -152,7 +164,23 @@
   })();
   </script>
 
+  <!-- 竖屏门（2026-10-08）：只在「舞台已被 CSS 旋转过」且用户还没点「好」时显示。
+       两个出口是必须的：设备锁了方向旋转时，门会变成死路；而且页面自己的 90° 旋转
+       会抵消用户的物理旋转 —— 侧着拿手机恰好是画面看起来是正的姿势，
+       但 innerWidth/innerHeight 与 screen.orientation 都不会变，
+       **任何 orientation 事件都测不出来**，只能让用户自己确认。
+       所以主按钮必须**保留旋转**（绝不能在那儿调反向旋转函数）。 -->
+  <div id="rotateGate">
+    <div>
+      <div class="rg-ico">📱↻</div>
+      <div class="rg-t">请横过来玩</div>
+      <div class="rg-d">把手机横过来 —— 这个场景是横向构图，竖屏会又窄又挤。</div>
+      <button id="rotateOk" type="button">好 · 开始</button>
+      <button id="rotateSkip" class="rg-skip" type="button">仍要竖屏继续</button>
+    </div>
+  </div>
+
   <!-- ?v= 用于绕过浏览器旧缓存 -->
-  <script type="module" src="main.js?v=76"></script>
+  <script type="module" src="main.js?v=77"></script>
 </body>
 </html>
