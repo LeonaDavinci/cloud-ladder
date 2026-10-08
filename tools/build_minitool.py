@@ -594,8 +594,18 @@ def patch_model():
         "window.__loadBedGLB(M.url, new GLTFLoader(), window.BED_GLB_B64, ",
     )
     must(src, "window.__loadBedGLB(M.url,", "model.js 的兜底加载替换")
+    # 电视 <video> 的 crossOrigin：与 audio.js 同理剥掉。
+    # 构建时 projector.video.src 被置空 ⇒ 那段 `if(src){…}` 是死代码、运行时压根不执行，
+    # 但产物里留着 (a) 静态检查会命中 (b) 将来谁把 src 填回来就会踩「容器自定义 scheme
+    # 下设 crossOrigin 被拒」的坑。剥掉是一行注释，零成本。
+    must(src, "ve.crossOrigin = 'anonymous';", "model.js 的 video crossOrigin")
+    src = src.replace(
+        "ve.crossOrigin = 'anonymous';",
+        "/* crossOrigin 去掉：容器自定义 scheme 下设它反而可能被拒（与 audio.js 同理） */",
+    )
     open(p, "w", encoding="utf-8", newline="\n").write(src)
     print("  ~ model.js   load(包内文件) → 失败/卡住时退回内联 base64")
+    print("  ~ model.js   video 的 crossOrigin=anonymous 移除")
 
 
 def patch_audio():
