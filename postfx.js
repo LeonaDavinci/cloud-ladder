@@ -292,8 +292,14 @@ export function createPostFX(renderer, scene, camera, cfg){
      —— 这才是多尺度辉光该有的样子。
      ⚠ 能量会重新集中（峰值更高），所以夜间 strength 可能要往下调一点，实拍看着定。 */
   const BLOOM_KERNEL_BASE = [3, 5, 7, 9, 11];
-  /* 递减序列：绝对值直接给（不做比例缩放）。奇数避免高斯中心半像素偏移。 */
-  const BLOOM_KERNEL_FIXED = [11, 9, 7, 5, 3];
+  /* ⚠ 2026-10-09 按用户要求「取消这种 bloom 效果，恢复五天前版本」：
+     **scene.json 里已删掉 bloomKernel 配置** ⇒ 现在走的是 three 原生基线
+     [3,5,7,9,11]，配 `radius: 0.80 / strength: 0.90 / threshold: 0.45`（夜间），
+     也就是用户说「像白天下午那样」的那一版。
+     递减序列 [11,9,7,5,3] 仍然**支持**（下面 normalizeKernel 认数组），留作备用：
+     若以后 threshold 调低到让暗星也参与 bloom，就得配上它，否则低分辨率 mip 上
+     会欠采样出方块。但**现在不要启用** —— 用户明确要那个朴素版本。 */
+  const BLOOM_KERNEL_FIXED = [11, 9, 7, 5, 3];   // 备用，默认不生效
 
   function normalizeKernel(k){
     if (Array.isArray(k) && k.length === BLOOM_KERNEL_BASE.length)

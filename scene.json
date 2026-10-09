@@ -229,10 +229,7 @@
     "default": "dream",
     "samples": 4,
     "bloom": true,
-    "bloomScale": 1,
-    "_bloomKernel说明": "bloom 高斯 kernel 缩放 = 真正的 bloom 半径（2026-10-06 加）。three 的 bloomPass.radius 只是 0→1 的 mip 权重插值，radius>1 还会让近处权重变负（高光反相成黑核），所以「半径放大」改这里。基线 [3,5,7,9,11]，1.9 ⇒ 最外级 11→21、半径约翻倍；夜间 strength 已从 0.90 补到 1.15 抵消能量摊开。",
-    "_bloomKernel说明2": "2026-10-09 改成**递减**数组 [11,9,7,5,3]（原先是比例缩放 2.1 ⇒ [6,11,15,19,23]）。原因：kernel 是作用在**每一级 mip 自己的分辨率**上的，而 mip 越往后分辨率越低（mip4 只有 1/32）。递增序列会让最大 kernel 落在最小 RT 上 —— 以手机 DPR3（buffer 1200×2700）算，mip4 只有 37px 宽，23px 的 kernel 覆盖 62% = 严重欠采样 ⇒ 星点糊不开变成一个个方块；同时 mip0 只有 6px，电视屏幕边缘几乎还是硬的 ⇒ 方框。递减后：mip0 11px/600px=1.8%（硬边彻底柔化）、mip4 3px/37px=8.1%（平滑无块状），有效半径 22/36/56/80/96px 递增且都平滑 ⇒ 这才是多尺度辉光。现在支持写数组（绝对值、奇数、递减）；写数字则是按基线 [3,5,7,9,11] 等比缩放（旧行为，向后兼容）。",
-    "bloomKernel": [11, 9, 7, 5, 3]
+    "bloomScale": 1
   },
   "atmosphere": {
     "_说明": "时相（下午 / 清晨 / 日落 / 夜间）+ 月亮星空 + 雾档切换。四档的具体数值同样写死在 atmosphere.js 的 DEFAULTS 里（含注释）。要在面板里微调：config.json 的 atmosphere.states.<档名> 下写 sun / hemi / ambient / fog / fogDense / sky / tint / bloom / orb / stars 的任意子集。「下午」是空覆盖 = scene.json 原样，所以它只给 fogDense（让「超大雾」按钮在任何时相下都有反应）。",
@@ -744,10 +741,9 @@
       "rotationY": 1.5708,
       "width": 5.25,
       "height": 2.955,
-      "_emissive说明": "自发光强度。和 brightness、light.intensity 三者线性叠加（总亮度≈视频亮度×(brightness+emissive)+点光源漫反射）；emissive 过 0.5 就会把画面结构一起糊掉。2026-10-05 从 0.85 降到 0.35。",
       "brightness": 0.75,
-      "_emissive说明": "2026-10-09 从 0.35 提到 0.55：屏幕本身更亮 ⇒ 超过 bloom 阈值的像素更多 ⇒ 电视光晕的「种子」更大，看起来才真的在发光而不是贴了张图。⚠ 它吃的是线性亮度，过 0.5 会连画面结构一起糊掉，所以配合 threshold 0.32 一起调。",
-    "emissive": 0.28,
+      "_emissive说明": "自发光强度。和 brightness、light.intensity 三者线性叠加（总亮度≈视频亮度×(brightness+emissive)+点光源漫反射）。⚠ emissive 过 0.5 就会把画面结构一起糊掉。2026-10-05 从 0.85 降到 0.35；2026-10-09 短暂试过 0.55（过曝）、0.28，随即按用户要求回退到 0.35。",
+      "emissive": 0.35,
       "falloff": 0.38,
       "fadeIn": 1.4,
       "fadeOut": 0.9,
@@ -767,8 +763,8 @@
       "distance": 13,
       "decay": 1.7
     },
-    "_bloomGain说明": "电视亮着时 bloom 强度的乘数（2026-10-06 用户要求 +30% ⇒ 1.3）。实现成与「时相覆盖」正交的乘数而不是直接改夜间档的 strength：atmosphere 每次切时相都会用 setBloomOverride 把该档 strength 覆盖掉，写死会在切档后失效。挂在 projector 的 setOn 上，1 = 关闭增强。只乘 strength、不动 threshold —— 降 threshold 会让整个夜空都发亮而不是只让电视更亮。",
-    "bloomGain": 1.4,
+    "_bloomGain说明": "电视亮着时 bloom 强度的乘数。实现成与「时相覆盖」正交的乘数（atmosphere 每次切时相都会 setBloomOverride 覆盖 strength，写死会在切档后失效）。⚠ 2026-10-09 按用户要求「取消这种 bloom」置为 **1.0 = 不做增强**（10-06 曾是 1.3、短暂到过 1.4）；想开回来改这一个数即可。",
+    "bloomGain": 1.0,
     "spill": {
       "_说明": "第二盏灯，专门把床照亮（2026-10-06 用户「要给电视的位置加点光源，要有照亮床附近的感觉」）。上面那盏其实照不到床：decay 1.7/intensity 0.55 传到 5.15m 外的床心只剩 0.55/5.15^1.7 ≈ 0.03 辐照度。three 里 distance 只是软截止，真正决定能照多远的是 decay。位置取床尾上方而非紧贴幕布：床面各处受光更均匀，也少打一点幕布正面。intensity 2.2 配 decay 1.35 ⇒ 床尾约 0.63、床心约 0.47 辐照度（夜间环境总面光 ≈1.8，即局部 +26~35%）。",
       "_position说明": "**屏幕中心再往背面挪 12cm**：屏幕在 x=-8.23、法线朝 +X（朝向床）。灯挪到 x=-8.35 之后，屏幕正面法线 (+X) 与光方向 (−X) 反向，N·L<0 ⇒ 正面一点光都收不到，而光照样往 +X 铺出去照亮床。three 的 WebGLRenderer 没有 per-object 排除光源的机制（那是 WebGPU NodeMaterial 的 light filtering），所以「排除照亮电视机」只能靠位置。y/z 与屏幕中心对齐 ⇒ 视觉上就是「电视机中间的那盏灯」。",
