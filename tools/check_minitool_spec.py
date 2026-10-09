@@ -174,10 +174,37 @@ for f in LIB_FILES:
 if lib_co:
     print('  INFO  库内 loader 的 crossOrigin API 参数（未传值，不计违规）: %s' % ', '.join(lib_co))
 
-# ---- 产物里不该有 video/（web 专属资源，占体积且容器放不了） ----
-has_video = os.path.isdir(os.path.join(DIST, 'video'))
-check('产物不含 web 专属的 video/（由程序化画布回退代替）', not has_video,
-      '存在 video/' if has_video else '无 video/，视频走程序化画布回退')
+# ---- 电视视频（2026-10-09 起默认打进包里）----
+# ⚠ 之前这里断言的是「产物不含 video/」：那时构建脚本把 projector.video.src 置空、
+#   也不打包视频，用户在小红书里看到的永远是程序化画布兜底（报「视频播放不了」）。
+#   现在默认带视频（`--no-video` 可退回旧行为），断言反过来：**要么干净地带，
+#   要么干净地没有** —— src 与文件必须一致，绝不能出现「src 指向一个不存在的文件」。
+has_video_dir = os.path.isdir(os.path.join(DIST, 'video'))
+video_files = sorted(os.listdir(os.path.join(DIST, 'video'))) if has_video_dir else []
+
+vsrc = ''
+m = re.search(r'window\.SCENE_JSON\s*=\s*JSON\.parse\((.*?)\);', data_js, re.S)
+if m:
+    try:
+        vscene = json.loads(json.loads(m.group(1).strip()))
+        vsrc = (vscene.get('projector') or {}).get('video', {}).get('src') or ''
+    except Exception:
+        vsrc = ''
+
+if vsrc:
+    want = os.path.basename(vsrc)
+    check('电视视频：src 指向的文件确实在包里',
+          has_video_dir and want in video_files,
+          'src=%r, video/=%s' % (vsrc, video_files))
+    if has_video_dir and want in video_files:
+        sz = os.path.getsize(os.path.join(DIST, 'video', want))
+        check('电视视频：单文件 < 5.5 MiB（zip 10 MiB 上限的主要占用方）',
+              sz < 5.5 * 1024 * 1024, '%.2f MiB' % (sz / 1048576))
+else:
+    check('电视视频：未启用（src 为空 ⇒ 走程序化画布回退，体积更小）',
+          not has_video_dir,
+          'src 为空却存在 video/（不一致）' if has_video_dir else 'src 为空且无 video/')
+    print('  INFO  未打包视频：等价于 --no-video')
 
 # ---- 汇总 ----
 fails = [r for r in results if not r[0]]

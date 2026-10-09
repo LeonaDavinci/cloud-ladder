@@ -54,6 +54,7 @@ DIST = os.path.join(ROOT, "dist-minitool")
 ZIP_PATH = os.path.join(ROOT, "cloud-ladder-minitool.zip")
 
 NO_BED_FALLBACK = False        # main() 里按命令行开关置位
+NO_VIDEO = False               # --no-video：包不带视频（默认带，见 copy_assets 的说明）
 FAILED = []
 
 
@@ -251,8 +252,13 @@ def build_data():
     proj = scene.get("projector")
     if proj and proj.get("video") and proj["video"].get("src"):
         vsrc = proj["video"]["src"]
-        proj["video"]["src"] = ""
-        print("     （mini-tool 去掉视频文件引用 %s，使用程序化画布回退）" % vsrc)
+        if NO_VIDEO:
+            proj["video"]["src"] = ""
+            print("     （--no-video：去掉视频引用 %s，用程序化画布回退）" % vsrc)
+        else:
+            # 2026-10-09：默认**保留**视频。之前这里把 src 置空 + 不打包 video/，
+            # 于是小红书里看到的永远是程序化画布兜底（用户报「视频播放不了」）。
+            print("     （保留视频：%s 原样进包，走相对路径加载）" % vsrc)
 
     js = [
         "/* 由 tools/build_minitool.py 生成：把 fetch 换成内联常量（容器禁用 fetch） */",
@@ -623,6 +629,30 @@ def patch_audio():
 # ----------------------------------------------------------------------------
 # 5. 静态资源
 # ----------------------------------------------------------------------------
+def patch_landscape_lock():
+    """小工具容器里**禁用 fullscreen / orientation.lock** —— 禁用能力扫描会命中
+    `requestFullscreen`（2026-10-09 首次命中：强制横屏那套用了它）。
+
+    这里的处理是把它降级成 `null`：`lockLandscape()` 里是
+    `const req = el.requestFullscreen || …; if(req){…}else after();`
+    ⇒ req 变 null 后走 else 分支，只剩 orientation.lock 的尝试（也包在 try/catch 里，
+    失败无副作用）。**横屏本身不受影响** —— 真正干活的是 CSS 旋转（`.ls-rot`），
+    真锁只是「锦上添花」，容器里能省则省。
+
+    ⚠ 与「先落地再修」的取舍：不要整段删掉 lockLandscape()，删了会让
+       bindRotateGate / bindLandscapeGesture 的调用变成 undefined 引用。
+       只摘掉那一个禁用 API 字符串，最小改动。"""
+    p2 = os.path.join(DIST, "main.js")
+    src = open(p2, encoding="utf-8").read()
+    must(src, "el.requestFullscreen || el.webkitRequestFullscreen", "main.js 的 requestFullscreen")
+    src = src.replace(
+        "el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen",
+        "null /* 小工具容器禁用 fullscreen；横屏靠 CSS 旋转，不需要它 */",
+    )
+    open(p2, "w", encoding="utf-8", newline="\n").write(src)
+    print("  ~ main.js   requestFullscreen → null（容器禁用；横屏靠 .ls-rot）")
+
+
 def copy_assets():
     """资源原样进包 —— 文件名一个字符都不改（用户的 `.xml` 后缀是刻意的）。"""
     adir = os.path.join(DIST, "audio")
@@ -639,6 +669,22 @@ def copy_assets():
     shutil.copyfile(os.path.join(ROOT, "style.css"), os.path.join(DIST, "style.css"))
     WRITTEN.update(("favicon.svg", "style.css"))
     print("  + favicon.svg / style.css")
+    # 电视视频原样进包（文件名一个字符不改），<video src="./video/night.mp4"> 才能加载。
+    # ⚠ 体积是硬约束：zip 上限 10 MiB，视频约 5 MiB ⇒ 构建末尾必须断言体积。
+    if not NO_VIDEO:
+        # copy_assets 拿不到 main() 里的 scene（它在别的作用域），直接读磁盘
+        _scene = json.load(open(os.path.join(ROOT, "scene.json"), encoding="utf-8-sig"))
+        vsrc = (_scene.get("projector") or {}).get("video", {}).get("src") or ""
+        if vsrc:
+            vpath = os.path.join(ROOT, vsrc[2:] if vsrc.startswith("./") else vsrc)
+            if not os.path.isfile(vpath):
+                die("scene.json 引用的视频不存在：%s" % vsrc)
+            vdir = os.path.join(DIST, "video")
+            os.makedirs(vdir, exist_ok=True)
+            vname = os.path.basename(vpath)
+            shutil.copyfile(vpath, os.path.join(vdir, vname))
+            WRITTEN.add("video/" + vname)
+            print("  + video/%-32s %8d B" % (vname, os.path.getsize(os.path.join(vdir, vname))))
     # 产物里的 CSS 不再带 ?v=，但 style.css 里没有任何 URL 依赖，直接复制即可
     css = open(os.path.join(DIST, "style.css"), encoding="utf-8").read()
     if re.search(r"url\(\s*['\"]?https?:", css):
@@ -799,6 +845,8 @@ def scan_forbidden():
 def main():
     global NO_BED_FALLBACK
     NO_BED_FALLBACK = "--no-bed-fallback" in sys.argv
+    global NO_VIDEO
+    NO_VIDEO = "--no-video" in sys.argv
     print("=== 构建 dist-minitool/ ===")
     os.makedirs(DIST, exist_ok=True)
     print("\n[1/7] three 本体")
@@ -816,6 +864,7 @@ def main():
     patch_model()
     patch_audio()
     print("[7/7] 静态资源（audio/ + models/ + favicon + css）")
+    patch_landscape_lock()
     copy_assets()
     copy_models()
     prune_dist()

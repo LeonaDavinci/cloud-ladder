@@ -169,7 +169,15 @@ const DEFAULTS = {
        这里从 0.80 提到 **1.0**（用满，再大就过界了：radius>1 会让最近那级
        权重变成负数 ⇒ 高光被反相成黑核），strength 同步提一点补偿
        kernel 变宽带来的能量摊开。 */
-    bloom:   { strength: 1.15, radius: 1.0, threshold: 0.45 },
+    /* 2026-10-09 用户「bloom 太弱、没有氛围感，要增加整体的 bloom」：
+         strength 1.15 → **1.7**（更亮）
+         threshold 0.45 → **0.32**（让**暗部也参与**辉光 —— 氛围的真正来源；
+             夜空雾色 #131b34 的线性亮度只有 0.02–0.05，远低于 0.32，**不会被点亮**；
+             之前踩过的坑是降到 0.16 把整个雾一起点亮、糊成白纸，别再降到那么低）
+         radius 1.0（已用满；再大权重会出负数 ⇒ 高光反相成黑核）
+       配套：bloomKernel 1.9 → 2.3（更宽更柔）、屏幕自发光 0.35 → 0.55、
+       电视 bloomGain 1.3 → 1.6。 */
+    bloom:   { strength: 1.35, radius: 1.0, threshold: 0.30 },
     orb:     { show: true, kind: 'moon', color: '#eef3ff', size: 150, haloSize: 780,
                haloColor: '#b9caff', opacity: 1, radius: 2600 },    stars:   { show: true, count: 460, radius: 3300, size: 2.0, opacity: 0.95 }
   }
