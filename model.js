@@ -2645,7 +2645,9 @@ export function buildProjectorScreen(cfg){
      一个数量级。所以把 emissive 往上调根本没用（要调到 4 才跨得过阈值），
      屏幕上**一个 bloom 像素都吃不到**，看着就是一块不发光、缺光感的布。
      这里补一层**加性**辉光面片：贴着幕布边缘向外画一圈递减的矩形环，峰值
-     取在阈值上下（线性）。2026-10-06 用户验收连降两次：0.65 → 0.325 → 0.1625。
+     取在阈值上下（线性）。历史：初始 0.65 → 2026-10-06 用户验收连降两次
+     （0.325 → 0.1625）→ **2026-10-09 用户改回 0.32**（当时夜间 bloom 已回到
+     strength 0.90 的朴素版，辉光的相对比重与当初不同）。
      ⚠ 现值 0.1625 **已经低于 night 档的 0.45 阈值** —— 纯 bloom 光晕基本不再出现，
      看到的是辉光面片本身的加性微光（这正是用户要的「再弱一半」）。
      若之后还想留一点 bloom：把 night 档 `bloom.threshold` 一起降到 0.20 左右即可。
@@ -2655,10 +2657,10 @@ export function buildProjectorScreen(cfg){
      三个旋钮：glow（峰值亮度，0 = 关）、glowScale（面片 = 幕布 × 这个）、
      glowColor（辉光颜色，默认跟着点光源的暖白）。 */
   let glowMat = null;
-  if(+(S.glow !== undefined ? S.glow : 0.1625) > 0){
+  if(+(S.glow !== undefined ? S.glow : 0.32) > 0){
     const gScale = +(S.glowScale !== undefined ? S.glowScale : 1.55);
     const gw = w*gScale, gh = h*gScale;
-    const peak = +(S.glow !== undefined ? S.glow : 0.1625);
+    const peak = +(S.glow !== undefined ? S.glow : 0.32);
 
     const gc = document.createElement('canvas');
     gc.width = 256;

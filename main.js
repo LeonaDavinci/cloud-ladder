@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { createAudio } from './audio.js?v=62';
-import { createPostFX } from './postfx.js?v=82';
+import { createPostFX } from './postfx.js?v=83';
 import { createAtmosphere } from './atmosphere.js';
 import {
   RT, terrainHeight, TINT_CLOUD, TINT_BG,
@@ -1986,6 +1986,15 @@ function createSceneUI(atmos, postfx, flashHint, projector, step, AUD){
       hint('靠在床上看电视 · 拖屏转头 / WASD 走动', 1600);
     }
   });
+  /* ⚠ 2026-10-09：用户要求「看电视」并进 #modes、放在「自由」正下方 ⇒ 它的外观必须
+     与复位/漫游/步行/自由**同一套胶囊**（视觉上属于同一组）。
+     mkBtn() 只建了一个裸 button（不带 class），之前靠 style.css 里单独一份
+     `#ui-projector button{…}` 提供外观；那份已随「不再需要独立定位」一起删掉，
+     所以这里补 class="mode-btn" 复用现成样式 —— 两处样式不会漂。
+     ⚠ 安全：main.js 用 `document.querySelectorAll('.mode-btn').filter(b => b.dataset.mode)`
+        挑模式开关，projBtn 没有 data-mode ⇒ 不会被当成模式按钮（加了它会走
+        setMode(undefined) 把镜头锁死）。这与同样没有 data-mode 的复位按钮同例。 */
+  projBtn.className = 'mode-btn';
   projBtn.title = '夜间专属：靠在床上看电视（第一人称：拖屏转头 · WASD/方向键走动） / 退出看电视（快捷键 P）';
   if(rowProj) rowProj.appendChild(projBtn);
   function syncProj(){

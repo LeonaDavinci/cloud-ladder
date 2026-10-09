@@ -247,10 +247,27 @@ input,textarea{-webkit-user-select:text;user-select:text;}
 #scene-ui button.flash{background:rgba(255,255,255,.55);color:#3a2560;}
 /* 快捷键图例：挂在三排按钮**上面**（DOM 顺序也是），所以是 margin-bottom
    而不是 margin-top —— 它是「下面这几排各自对应哪几个键」的说明。 */
-#scene-ui .ui-tip{
-  margin:0 0 1px;font-size:10.5px;letter-spacing:.8px;
-  color:rgba(255,255,255,.62);text-shadow:0 1px 8px rgba(60,30,90,.6);
+/* 操作说明：横跨界面**最底下**一条（2026-10-09 用户要求「放在界面最底下，不挡住画面」）。
+   原来它挂在 #scene-ui 面板顶部，横屏下正好压在电视画面上方挡视线。
+   ⚠ 选择器不再带 "#scene-ui " 前缀 —— 它已经移出那块面板，是独立的固定元素。
+   贴底居中 + nowrap 只占一行；窄屏由下面 max-width 的媒体查询降级成隐藏。
+   半透明底衬：这行字现在压在画面最底边，不给底衬的话草地/月亮会把它吃掉。 */
+.ui-tip{
+  position:fixed;left:0;right:0;bottom:0;z-index:18;
+  padding:5px 16px calc(5px + var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)));
+  text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  margin:0;font-size:10.5px;letter-spacing:.8px;line-height:1.4;
+  color:rgba(255,255,255,.66);text-shadow:0 1px 8px rgba(60,30,90,.6);
+  pointer-events:none;
+  background:linear-gradient(180deg,rgba(20,10,38,0) 0%,rgba(20,10,38,.42) 100%);
 }
+/* 矮横屏（手机横放）：字号收小一点，别和左下/右下的按钮挤在一起 */
+@media (max-height:470px){
+  .ui-tip{ font-size:9.5px; letter-spacing:.3px;
+           padding-top:3px;
+           padding-bottom:calc(3px + var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px))); }
+}
+html.ls-rot .ui-tip{ bottom:calc(0px + var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px))); }
 @media (max-width:520px){
   /* 手机上 bottom 仍是 104，**不能跟着桌面一起压到底**：右下 #jump-btn
      （bottom:20、72px 见方）在漫游/步行时会出现，窄屏（≤390pt）下它的左沿
@@ -259,7 +276,7 @@ input,textarea{-webkit-user-select:text;user-select:text;}
   #scene-ui{left:10px;bottom:104px;gap:5px;font-size:11px;}
   #scene-ui .ui-lab{width:22px;flex-basis:22px;font-size:10px;}
   #scene-ui button{padding:6px 10px;}
-  #scene-ui .ui-tip{display:none;}     /* 手机上键盘提示没意义，省点地方 */
+  .ui-tip{display:none;}              /* 手机上键盘提示没意义，省点地方 */
 }
 @media (prefers-reduced-motion:reduce){
   #scene-ui button{transition:none;}
@@ -434,46 +451,20 @@ body.ui-hidden #hud-tl .overlay p{ display:none !important; }
      computed order 停在 0）—— 与其跟解析器较劲，不如**直接改 DOM 顺序**
      （index.html 里三行的先后），`order` 这条路已弃用。 */
 
-/* ③ 看电视（#ui-projector）：**独立的固定元素**，钉在底部正中（2026-10-08）。
-   ⚠ 它已经从 #scene-ui 面板里搬出来放在 body 下了（见 index.html 的注释）：
-     留在面板里时它是 flex item，position:fixed 实测没生效（computed 停在 static），
-     按钮会一直挂在左列。搬出来后才是个普通的 fixed 元素。
-   ⚠ 搬出来的代价：丢掉 `.ui-row` 与 `#scene-ui button` 的样式，所以下面**复制**一份
-     （只复制视觉，不改行为）。以后改按钮样式记得两边一起改，或者把这几条
-     改成 `#scene-ui button, #ui-projector button` 共享选择器。 */
-/* ⚠ 这里只放**视觉**样式。定位（position/left/bottom/transform/z-index）写在
-   index.html 的内联 style 里 —— 实测这段定位规则被浏览器的 CSS 解析器整条丢弃
-   （CSSOM 查不到、computed position 停在 static，而相邻规则都正常），
-   内联样式优先级最高，不受解析层影响。以后要调位置改 index.html 那一行。 */
-#ui-projector{
-  display:flex;align-items:center;gap:6px;flex-wrap:wrap;
-  font-family:"PingFang SC","Microsoft YaHei",sans-serif;
-  font-size:12px;font-weight:500;line-height:1;letter-spacing:.5px;
-}
-#ui-projector .ui-lab{
-  width:26px;flex:0 0 26px;text-align:right;
-  font-size:11px;letter-spacing:1px;color:rgba(255,255,255,.82);
-  text-shadow:0 1px 8px rgba(60,30,90,.6);
-}
-#ui-projector button{
-  pointer-events:auto;cursor:pointer;
-  color:#fff;font:inherit;
-  background:rgba(40,25,70,.28);border:1px solid rgba(255,255,255,.28);
-  padding:7px 12px;border-radius:999px;
-  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-  box-shadow:0 6px 18px rgba(40,20,70,.22);
-  transition:background .18s, transform .18s, box-shadow .18s;
-  white-space:nowrap;
-}
-#ui-projector button:hover{background:rgba(255,255,255,.2);transform:translateY(-1px);}
-#ui-projector button.active{
-  background:linear-gradient(135deg,rgba(255,158,203,.85) 0%,rgba(150,140,230,.85) 100%);
-  border-color:rgba(255,255,255,.55);
-  box-shadow:0 8px 22px rgba(120,60,170,.35);
-}
-html.ls-rot #ui-projector{
-  bottom:calc(12px + var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px)));
-}
+/* ③ 看电视（#ui-projector）：现在是 **#modes 那一列的最后一格**（2026-10-09 用户
+   要求「放在自由下面」），所以**不再需要任何定位** —— 跟着 #modes 的 flex column +
+   align-items:flex-end 排就行，右对齐与上面四个模式按钮一致。
+   ⚠ 按钮外观复用 .mode-btn（main.js 里 appendChild 进去的），所以这里**不要**再写
+     一份 button 样式，否则两处会漂。
+   ⚠ 旧定位残留已删：它 2026-10-08 曾被做成「底部正中」的独立固定元素。这里记一笔坑：
+     `#scene-ui #ui-projector` 与 `#ui-projector{position:fixed…}` 这两条 CSS 规则
+     **曾被浏览器的 CSS 解析器整条丢弃**（CSSOM 里查不到、computed position 停在
+     static，而相邻规则都正常），当时只能用内联 style 硬压位置。现在回到 flex 列里、
+     不需要定位，问题自然绕开。 */
+#ui-projector{ display:flex; align-items:center; justify-content:flex-end; }
+#ui-projector:empty{ display:none; }
+/* 它的按钮是 .mode-btn（main.js 里 className='mode-btn'），外观与上面四个一致，
+   这里只保证右对齐（#modes 的 align-items:flex-end 已经管了外层，内层再收一次保险）。 */
 
 /* 路径 A：舞台被旋转过（逻辑舞台必是横的） */
 html.ls-rot #hud-tl{
