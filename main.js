@@ -14,7 +14,7 @@ import {
   buildGlints, snapGlintsToBed, buildCloud, buildProjectorScreen,
   shadeCloud, cloudShadeStats,
   setupCloudPoke, updateCloudFlow, updateCloudFade
-} from './model.js';
+} from './model.js?v=84';
 
 /* ============================================================
    主入口：配置 → 组装 → 交互 → 渲染循环
@@ -201,6 +201,22 @@ function bindLandscapeGesture(){
 /* 启动时量一次（IS_SMALL 等要在建渲染器之前就有数） */
 measureStage();
 
+/* ---- 把舞台信息挂到 window，供 model.js 的戳云拾取用（2026-10-09）----
+   ⚠ 背景：`model.js` 里的 `hitAt(cx, cy)` 用 `dom.getBoundingClientRect()` 把
+   **屏幕坐标**转成 NDC 做射线拾取（点云朵）。但强制横屏的兜底方案是把 body
+   旋转 90°，此时：
+     · `getBoundingClientRect()` 返回的是**物理视口**的包围盒（不是 canvas 自己的
+       未旋转布局盒），拿它算 NDC 得到的是「屏幕 NDC」；
+     · 而相机渲染的是**舞台**（宽高已交换）。
+   两者差 90° ⇒ 旋转后射线方向整个错掉，「点击云朵戳一下」必然点不中。
+   ⇒ 把 `screenToStage` 与舞台尺寸交给 model.js，让它在**舞台坐标系**里算 NDC。
+   ⚠ 为什么挂 window 而不是 import 注入：ES module 的 import 会提升，先执行
+     model.js 的顶层代码；这里赋值虽然也在模块顶层，但 `hitAt` 只在**事件回调**
+     （运行时）里被调用，那时 window 上早已就位 ⇒ 安全。
+   ⚠ 未旋转时 screenToStage 是恒等映射、__stageSize 就等于 rect ⇒ 桌面端行为不变。 */
+window.__screenToStage = screenToStage;
+window.__stageSize = { get w(){ return STAGE.w; }, get h(){ return STAGE.h; } };
+
 const IS_SMALL = Math.min(STAGE.rawW, STAGE.rawH) <= 900;
 
 const AUTO_MOBILE = IS_TOUCH && IS_SMALL;
@@ -379,17 +395,31 @@ function setupModes(cfg, camera, controls, renderer, rig, AUD, ladder, tvHooks){
        两边都挂摇杆的话，右半屏按下时会被「摇杆已占用」挡掉，转头就没反应了。 */
     /* ⚠ 必须用**舞台**坐标判左右半屏：舞台被旋转 90° 之后，物理视口的左边
        对应的是舞台的上边 —— 直接用 clientX 会让左右两个摇杆对调。 */
-    const sp = screenToStage(e.clientX, e.clientY);
+    /* ⚠ fixEventCoords（canvas 捕获阶段）已把 e.clientX/clientY 改写成**舞台坐标**；
+       这里若再 screenToStage 一次就是二次变换 ⇒ 摇杆偏到屏幕外。
+       用 e.__stageFixed 判定：已被转换就直接拿，否则自己转（桌面未旋转走恒等映射）。 */
+    const sp = e.__stageFixed ? { x: e.clientX, y: e.clientY } : screenToStage(e.clientX, e.clientY);
     if(fp.on && sp.x >= STAGE.w*0.5) return;
     const s = (sp.x < STAGE.w*0.5) ? sMove : sLook;
     if(s.id !== null) return;
-    stickStart(s, e.pointerId, e.clientX, e.clientY);
+    /* ⚠⚠ 2026-10-09 用户指出「强制横屏后左右两个漫游操作没适配」。
+       这里原先只把**半屏判定**换成舞台坐标，却把物理坐标原样传给了 stickStart ——
+       而 stickStart 会拿它做两件事：存成 s.cx/s.cy（偏移基准）、写
+       `el.style.left/top`（摇杆底座的定位）。
+       ⚠ 摇杆底座是 `#sticks` 的子节点、`#sticks` 是 body 的子节点，而旋转时
+       **body 就是舞台** ⇒ left/top 必须是**舞台坐标**，塞物理坐标会让摇杆
+       直接偏到屏幕外。偏移基准同理：物理系与舞台系差 90°，轴向整个错掉。
+       参考项目 E:\\workbuddy\\2026-09-07-21-32-43 的 game.js 也是这么做的
+       （注释原话：「★ 摇杆偏移必须在舞台坐标系里算」）。 */
+    stickStart(s, e.pointerId, sp.x, sp.y);
     try{ dom.setPointerCapture(e.pointerId); }catch(_){}
     e.preventDefault();
   });
   dom.addEventListener('pointermove', e=>{
     const s = stickById(e.pointerId);
-    if(s) stickDrag(s, e.clientX, e.clientY);
+    /* ⚠ 同样要舞台坐标：s.cx/s.cy 存的是 stickStart 传进来的舞台坐标，
+       用物理坐标去减会得到完全错误的偏移（旋转 90° 时等于把轴换了个方向）。 */
+    if(s){ const sp = e.__stageFixed ? { x: e.clientX, y: e.clientY } : screenToStage(e.clientX, e.clientY); stickDrag(s, sp.x, sp.y); }
   });
   ['pointerup','pointercancel'].forEach(t => dom.addEventListener(t, e=>{
     const s = stickById(e.pointerId); if(s) stickEnd(s);
@@ -913,13 +943,13 @@ function setupModes(cfg, camera, controls, renderer, rig, AUD, ladder, tvHooks){
     if(sMove.id !== null || sLook.id !== null) return;   // 摇杆已经占了这个手势
     /* 位移同样要走舞台坐标：旋转 90° 后物理 x 轴就是舞台 y 轴，
        直接用 clientX/clientY 算增量会让拖动轴向整个错掉（横拖变竖摇）。 */
-    const sp0 = screenToStage(e.clientX, e.clientY);
+    const sp0 = e.__stageFixed ? { x: e.clientX, y: e.clientY } : screenToStage(e.clientX, e.clientY);
     fp.dragId = e.pointerId; fp.lx = sp0.x; fp.ly = sp0.y;
     try{ dom.setPointerCapture(e.pointerId); }catch(_){}
   });
   dom.addEventListener('pointermove', e=>{
     if(e.pointerId !== fp.dragId) return;
-    const sp1 = screenToStage(e.clientX, e.clientY);
+    const sp1 = e.__stageFixed ? { x: e.clientX, y: e.clientY } : screenToStage(e.clientX, e.clientY);
     fp.mdx += (sp1.x - fp.lx); fp.mdy += (sp1.y - fp.ly);
     fp.lx = sp1.x; fp.ly = sp1.y;
   });

@@ -2286,7 +2286,24 @@ export function setupCloudPoke(scene, grp, camera, dom, cfg, AUD){
   function hitAt(cx, cy){
     const r = dom.getBoundingClientRect();
     if(!r.width || !r.height) return null;
-    ndc.set(((cx - r.left)/r.width)*2 - 1, -((cy - r.top)/r.height)*2 + 1);
+    /* ⚠⚠ 2026-10-09 用户指出「强制横屏后左右两个漫游操作没适配」时一起查出来的：
+       强制横屏的兜底方案是把 body 旋转 90°，此时 `getBoundingClientRect()` 返回的
+       是**物理视口**的包围盒，而相机渲染的是**舞台**（宽高已交换）——
+       拿前者算 NDC 得到的是「屏幕 NDC」，射线在 3D 空间里的方向整个错掉，
+       「点击云朵戳一下」必然点不中。
+       ⇒ 先把屏幕坐标转成舞台坐标，再用**舞台尺寸**算 NDC。
+       两者由 main.js 在模块顶层挂上（window.__screenToStage / __stageSize）；
+       未旋转时前者是恒等映射、后者等于 rect ⇒ **桌面端行为完全不变**。 */
+    /* ⚠ e.clientX/clientY 在进入本回调前，已被 main.js 的 fixEventCoords（canvas 捕获
+       阶段监听）改写成**舞台坐标**；这里若再 screenToStage 一次就是二次变换，
+       点云必然点不中。故直接用传进来的 (cx, cy) 当舞台坐标（未旋转时它等于物理坐标，
+       与原来恒等映射的结果一致）。唯一调用方是 model.js 的 pointerup：传的就是 e.clientX。 */
+    const sp = { x: cx, y: cy };
+    const SS = (typeof window !== 'undefined') ? window.__stageSize : null;
+    const vw = SS ? SS.w : r.width;
+    const vh = SS ? SS.h : r.height;
+    if(!vw || !vh) return null;
+    ndc.set((sp.x / vw)*2 - 1, -(sp.y / vh)*2 + 1);
     ray.setFromCamera(ndc, camera);
     const hits = ray.intersectObject(pick, false);
     return hits.length ? hits[0] : null;
