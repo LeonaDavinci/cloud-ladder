@@ -2443,6 +2443,15 @@ export function buildProjectorScreen(cfg){
     ve.muted = true;
     ve.playsInline = true;
     ve.preload = 'auto';
+    /* ⚠ 用 <source> 而不是只设 ve.src —— 资源是**假扩展名**（night.video.json），
+       静态服务器按扩展名会把它报成 application/json（实测平台就是这样：
+       audio/*.mp3.json 和 models/bed2.glb.json 都拿到 application/json），
+       而 media element 的 canPlayType 要靠 MIME 决定能否走硬件解码。
+       HTML 标准做法是由文档显式声明真实类型：<source src="…" type="video/mp4">，
+       这样服务器给什么 MIME 都不影响，对真 .mp4 也同样无害。
+       ⚠ <source> 一旦 appendChild 就会**覆盖** ve.src 属性（规范如此），
+         所以下面仍保留 ve.src 赋值 —— 它在 source 之后，被覆盖也无妨。 */
+    ve.appendChild(Object.assign(document.createElement('source'), { src:src, type:'video/mp4' }));
     ve.src = src;
     videoEl = ve;
     useVideo = true;

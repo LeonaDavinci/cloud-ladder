@@ -17,10 +17,11 @@
   4. 按依赖顺序拼出 index.html 的 <script src>（经典脚本共享全局词法环境，
      所以顺序必须与原来的 import 图一致）。
   5. 资源**原样**搬进产物：`audio/` 整个目录 + scene.json 指到的那个模型，
-     文件名一个字符都不改（含 `.mp3.xml` / `.glb.xml` 后缀）。
+     文件名一个字符都不改（含 `.mp3.json` / `.glb.json` 后缀 ——
+     ⚠ 2026-10-09 用户实测：小红书小工具**不允许 .xml 后缀**，一律用 .json）。
 
 关于模型的两种取法（都要，缺一不可）：
-  · `models/<名字>.glb.xml` 原样进包，`GLTFLoader.load(M.url)` 直接读它 —— 这是
+  · `models/<名字>.glb.json` 原样进包，`GLTFLoader.load(M.url)` 直接读它 —— 这是
     规范期望的形态（zip-artifact-spec.md §3：资源相对路径引用即可）；
   · 同时把同一份 GLB base64 内联进 data.js 当**兜底**：device-capabilities.md §4
     写着容器不可用 `fetch`/`XMLHttpRequest`，而 GLTFLoader.load() 内部就是 FileLoader
@@ -222,7 +223,7 @@ def build_data():
     r["pixelRatioMax"] = 1.5
     print("     （renderer.pixelRatioMax %s → 1.5，按 perf 预算的初始档）" % old_pr)
 
-    # 曲目文件名**原样保留**（含 `.mp3.xml` 后缀）。
+    # 曲目文件名**原样保留**（含 `.mp3.json` 后缀）。
     # 这里以前会把 `.xml` 去掉，理由是「容器按扩展名识别资源类型」——那是我自己
     # 推的，规范里并没有这一条（zip-artifact-spec.md §3：文件/目录自由组织、相对
     # 路径引用即可）。而这套 `.xml` 后缀是用户**刻意**的约定（躲开本机 Windows

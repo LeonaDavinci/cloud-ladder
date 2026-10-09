@@ -780,7 +780,8 @@
       "decay": 1.05
     },
     "video": {
-      "src": "./video/night.mp4",
+      "_src说明": "2026-10-09 用户要求：mp4 也要改成 json 后缀（仓库里原名是 night.mp4）。**不用 .xml —— 小红书小工具不允许 xml 后缀**（用户实测）。与 audio/*.mp3.json、models/bed2.glb.json 同一套伪装思路。⚠ 平台按扩展名把 .json 报成 application/json（错的 MIME），media element 的类型检查可能因此拒绝 ⇒ model.js 里已改用 <source src=… type=\"video/mp4\"> 显式声明真实类型兜底。",
+      "src": "./video/night.video.json",
       "canvasWidth": 512,
       "canvasHeight": 288,
       "fps": 16
