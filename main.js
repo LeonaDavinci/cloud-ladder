@@ -14,7 +14,7 @@ import {
   buildGlints, snapGlintsToBed, buildCloud, buildProjectorScreen,
   shadeCloud, cloudShadeStats,
   setupCloudPoke, updateCloudFlow, updateCloudFade
-} from './model.js?v=85';
+} from './model.js?v=86';
 
 /* ============================================================
    主入口：配置 → 组装 → 交互 → 渲染循环
@@ -2570,10 +2570,10 @@ function build(cfg){
      （只影响这一个事件，不会污染全局原型）。 */
   if(window.innerWidth || true){
     const fixEventCoords = (e)=>{
-      /* 自由模式（OrbitControls 启用）下不转换：OrbitControls 原生把 clientX/clientY
-         当成「屏幕拖拽」来映射 —— 横拖 = 绕相机 up 的水平环绕、竖拖 = 俯仰，
-         与竖屏完全一致；把坐标转成舞台坐标（旋转 90°）再喂给它，横拖会变竖转、
-         方向还会反掉 —— 正是用户报的「左右上下滑动调整视角结果反了」。
+      /* 自由模式（OrbitControls 启用）下跳过舞台坐标转换：用【视觉帧】实测确认，
+         raw 坐标下 clientX(左右滑动)→画面水平转动(左右旋转)、clientY(上下滑动)→
+         画面垂直转动(上下旋转)，与直觉一致（见 tools/verify_free_drag.mjs）。
+         一旦转成舞台坐标反而会轴交换（左右→上下、上下→左右），正是用户报的 bug。
          walk / fp / 点云在自由模式不活跃（各有 mode / fp.on 守卫），跳过转换不影响它们。 */
       if(STAGE.rot === 0 || e.__stageFixed || controls.enabled) return;
       const p = screenToStage(e.clientX, e.clientY);
