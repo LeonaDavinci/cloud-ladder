@@ -2283,7 +2283,7 @@ export function setupCloudPoke(scene, grp, camera, dom, cfg, AUD){
      （__dbg.cloudStat().trace，或 __dbg.pokeTrace）。 */
   function trace(s){ stat.trace.push(s); if(stat.trace.length > 12) stat.trace.shift(); }
 
-  function hitAt(cx, cy){
+  function hitAt(cx, cy, alreadyStage){
     const r = dom.getBoundingClientRect();
     if(!r.width || !r.height) return null;
     /* ⚠⚠ 2026-10-09 用户指出「强制横屏后左右两个漫游操作没适配」时一起查出来的：
@@ -2298,7 +2298,11 @@ export function setupCloudPoke(scene, grp, camera, dom, cfg, AUD){
        阶段监听）改写成**舞台坐标**；这里若再 screenToStage 一次就是二次变换，
        点云必然点不中。故直接用传进来的 (cx, cy) 当舞台坐标（未旋转时它等于物理坐标，
        与原来恒等映射的结果一致）。唯一调用方是 model.js 的 pointerup：传的就是 e.clientX。 */
-    const sp = { x: cx, y: cy };
+    /* cx,cy 在「自由模式」下是原始物理坐标（fixEventCoords 被跳过），
+       在 walk/tv 下则是已被转成舞台坐标的（e.__stageFixed）。
+       alreadyStage 为真时直接当舞台用；否则先 screenToStage 转回舞台坐标再算 NDC。 */
+    const toStage = (typeof window !== 'undefined') ? window.__screenToStage : null;
+    const sp = (alreadyStage || !toStage) ? { x: cx, y: cy } : toStage(cx, cy);
     const SS = (typeof window !== 'undefined') ? window.__stageSize : null;
     const vw = SS ? SS.w : r.width;
     const vh = SS ? SS.h : r.height;
@@ -2360,7 +2364,7 @@ export function setupCloudPoke(scene, grp, camera, dom, cfg, AUD){
       trace('up 拖拽/转视角 moved=' + moved.toFixed(1) + ' turned=' + turned.toFixed(4));
       return;
     }
-    const hit = hitAt(e.clientX, e.clientY);
+    const hit = hitAt(e.clientX, e.clientY, e.__stageFixed);
     if(!hit){ trace('up 未命中云 (' + Math.round(e.clientX) + ',' + Math.round(e.clientY) + ')'); return; }
     /* dir 是「从接触点指向镜头」的方向（把 ray 的方向反过来）——
        也就是玩家视角的「往前」。puffPoke 会拿它和径向散开做混合：

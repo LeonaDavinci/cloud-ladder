@@ -14,7 +14,7 @@ import {
   buildGlints, snapGlintsToBed, buildCloud, buildProjectorScreen,
   shadeCloud, cloudShadeStats,
   setupCloudPoke, updateCloudFlow, updateCloudFade
-} from './model.js?v=84';
+} from './model.js?v=85';
 
 /* ============================================================
    主入口：配置 → 组装 → 交互 → 渲染循环
@@ -2570,7 +2570,12 @@ function build(cfg){
      （只影响这一个事件，不会污染全局原型）。 */
   if(window.innerWidth || true){
     const fixEventCoords = (e)=>{
-      if(STAGE.rot === 0 || e.__stageFixed) return;
+      /* 自由模式（OrbitControls 启用）下不转换：OrbitControls 原生把 clientX/clientY
+         当成「屏幕拖拽」来映射 —— 横拖 = 绕相机 up 的水平环绕、竖拖 = 俯仰，
+         与竖屏完全一致；把坐标转成舞台坐标（旋转 90°）再喂给它，横拖会变竖转、
+         方向还会反掉 —— 正是用户报的「左右上下滑动调整视角结果反了」。
+         walk / fp / 点云在自由模式不活跃（各有 mode / fp.on 守卫），跳过转换不影响它们。 */
+      if(STAGE.rot === 0 || e.__stageFixed || controls.enabled) return;
       const p = screenToStage(e.clientX, e.clientY);
       try{
         Object.defineProperty(e, 'clientX', { value:p.x, configurable:true });
