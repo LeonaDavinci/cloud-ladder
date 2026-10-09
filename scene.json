@@ -231,8 +231,8 @@
     "bloom": true,
     "bloomScale": 1,
     "_bloomKernel说明": "bloom 高斯 kernel 缩放 = 真正的 bloom 半径（2026-10-06 加）。three 的 bloomPass.radius 只是 0→1 的 mip 权重插值，radius>1 还会让近处权重变负（高光反相成黑核），所以「半径放大」改这里。基线 [3,5,7,9,11]，1.9 ⇒ 最外级 11→21、半径约翻倍；夜间 strength 已从 0.90 补到 1.15 抵消能量摊开。",
-    "_bloomKernel说明2": "2026-10-09 从 1.9 提到 2.3（配合夜间 strength 1.15→1.7）。范围更宽更柔，是「氛围感」的一半来源；另一半是 threshold 降到 0.32 让暗部参与。kernel 变宽会摊薄峰值，所以 strength 必须同步加。",
-    "bloomKernel": 2.1
+    "_bloomKernel说明2": "2026-10-09 改成**递减**数组 [11,9,7,5,3]（原先是比例缩放 2.1 ⇒ [6,11,15,19,23]）。原因：kernel 是作用在**每一级 mip 自己的分辨率**上的，而 mip 越往后分辨率越低（mip4 只有 1/32）。递增序列会让最大 kernel 落在最小 RT 上 —— 以手机 DPR3（buffer 1200×2700）算，mip4 只有 37px 宽，23px 的 kernel 覆盖 62% = 严重欠采样 ⇒ 星点糊不开变成一个个方块；同时 mip0 只有 6px，电视屏幕边缘几乎还是硬的 ⇒ 方框。递减后：mip0 11px/600px=1.8%（硬边彻底柔化）、mip4 3px/37px=8.1%（平滑无块状），有效半径 22/36/56/80/96px 递增且都平滑 ⇒ 这才是多尺度辉光。现在支持写数组（绝对值、奇数、递减）；写数字则是按基线 [3,5,7,9,11] 等比缩放（旧行为，向后兼容）。",
+    "bloomKernel": [11, 9, 7, 5, 3]
   },
   "atmosphere": {
     "_说明": "时相（下午 / 清晨 / 日落 / 夜间）+ 月亮星空 + 雾档切换。四档的具体数值同样写死在 atmosphere.js 的 DEFAULTS 里（含注释）。要在面板里微调：config.json 的 atmosphere.states.<档名> 下写 sun / hemi / ambient / fog / fogDense / sky / tint / bloom / orb / stars 的任意子集。「下午」是空覆盖 = scene.json 原样，所以它只给 fogDense（让「超大雾」按钮在任何时相下都有反应）。",

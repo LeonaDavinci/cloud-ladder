@@ -273,20 +273,46 @@ export function createPostFX(renderer, scene, camera, cfg){
      所以「把 bloom 半径放大一倍」要动的是这里。
      kernel 长度 = `defines.KERNEL_RADIUS`，数组长度由它决定 ⇒ 改数值必须
      同时改 define 与系数数组，并置 `needsUpdate` 让 three 重编译 shader。
-     最外一级是 1/32 分辨率，11 → 21 差不多就是「半径翻倍」。
-     ⚠ 能量守恒上 kernel 变宽会把峰值摊低，夜间 strength 已同步从 0.90 提到 1.15。 */
+
+     ⚠⚠⚠ **2026-10-09 修正：kernel 必须「高分辨率大、低分辨率小」，而 three 的基线
+        是**递增**的 [3,5,7,9,11] —— 那在低分辨率级上等于严重欠采样。**
+
+     量化一下（以手机 DPR3、drawing buffer 1200×2700 为例）：
+        mip0 = 1/2 分辨率 = 600px 宽   mip4 = 1/32 分辨率 = **37px 宽**
+     当时配的是 `2.1 × 基线 = [6,11,15,19,23]`：
+        · mip0 的 6px 只柔化全屏 12px ⇒ 电视屏幕的边缘几乎还是硬的 → **方框**
+        · mip4 的 23px 用在 **37px 宽**的 RT 上 = 覆盖 62% → 采样点严重不足
+          → **星点糊不开就是一个个方块**（用户实机截图正是这个现象）
+     ⇒ 规律：**kernel 占比（kernel / 该级 RT 宽度）必须远小于 1**，否则 undersampling。
+
+     现在用**递减**序列 `[11, 9, 7, 5, 3]`：
+        · mip0 = 11px/600px = 1.8%  → 硬边被彻底柔化
+        · mip4 =  3px/ 37px = 8.1%  → 平滑，没有块状
+     各级「有效半径（kernel × 2^(i+1)）」= 22 / 36 / 56 / 80 / 96 px，**递增且都平滑**
+     —— 这才是多尺度辉光该有的样子。
+     ⚠ 能量会重新集中（峰值更高），所以夜间 strength 可能要往下调一点，实拍看着定。 */
   const BLOOM_KERNEL_BASE = [3, 5, 7, 9, 11];
+  /* 递减序列：绝对值直接给（不做比例缩放）。奇数避免高斯中心半像素偏移。 */
+  const BLOOM_KERNEL_FIXED = [11, 9, 7, 5, 3];
+
+  function normalizeKernel(k){
+    if (Array.isArray(k) && k.length === BLOOM_KERNEL_BASE.length)
+      return k.map(v => Math.max(1, Math.round(Math.abs(+v) || 1)));
+    const s = Math.max(0.25, num(k, 1));
+    return BLOOM_KERNEL_BASE.map(r => Math.max(1, Math.round(r * s)));
+  }
+
   function setBloomKernel(scale){
-    const k = Math.max(0.25, num(scale, 1));
+    const ks = normalizeKernel(scale);
     bloomPass.separableBlurMaterials.forEach((m, i) => {
-      const R = Math.max(1, Math.round(BLOOM_KERNEL_BASE[i]*k));
+      const R = Math.max(1, ks[i] | 0);
       const c = [];
       for(let j = 0; j < R; j++) c.push(0.39894*Math.exp(-0.5*j*j/(R*R))/R);
       m.defines.KERNEL_RADIUS = R;
       m.uniforms.gaussianCoefficients.value = c;
       m.needsUpdate = true;
     });
-    return BLOOM_KERNEL_BASE.map((r, i) => Math.max(1, Math.round(r*k)));
+    return ks.slice();
   }
   function setBloomOverride(o){
     bloomOverride = (o && typeof o === 'object') ? o : null;

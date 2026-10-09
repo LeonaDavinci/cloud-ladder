@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { createAudio } from './audio.js?v=62';
-import { createPostFX } from './postfx.js';
+import { createPostFX } from './postfx.js?v=81';
 import { createAtmosphere } from './atmosphere.js';
 import {
   RT, terrainHeight, TINT_CLOUD, TINT_BG,
