@@ -14,7 +14,7 @@ import {
   buildGlints, snapGlintsToBed, buildCloud, buildProjectorScreen,
   shadeCloud, cloudShadeStats,
   setupCloudPoke, updateCloudFlow, updateCloudFade
-} from './model.js?v=86';
+} from './model.js?v=87';
 
 /* ============================================================
    主入口：配置 → 组装 → 交互 → 渲染循环
@@ -2570,12 +2570,15 @@ function build(cfg){
      （只影响这一个事件，不会污染全局原型）。 */
   if(window.innerWidth || true){
     const fixEventCoords = (e)=>{
-      /* 自由模式（OrbitControls 启用）下跳过舞台坐标转换：用【视觉帧】实测确认，
-         raw 坐标下 clientX(左右滑动)→画面水平转动(左右旋转)、clientY(上下滑动)→
-         画面垂直转动(上下旋转)，与直觉一致（见 tools/verify_free_drag.mjs）。
-         一旦转成舞台坐标反而会轴交换（左右→上下、上下→左右），正是用户报的 bug。
-         walk / fp / 点云在自由模式不活跃（各有 mode / fp.on 守卫），跳过转换不影响它们。 */
-      if(STAGE.rot === 0 || e.__stageFixed || controls.enabled) return;
+      /* 自由模式（OrbitControls 启用）下【也】必须转换：舞台被 CSS 旋转了 90°，
+         导致 world-up 在屏幕上看起来是「水平」的。若喂 raw 坐标，clientX(左右滑动)
+         会落到 OrbitControls 的 azimuth(绕 world-up) → 经 90° 显示旋转后表现为
+         「上下旋转」；clientY(上下滑动) 落到 polar → 表现为「左右旋转」——
+         即用户报的「左右滑动→上下旋转、上下滑动→左右旋转」轴交换。
+         转成舞台坐标后：左右滑动→画面水平转动(左右旋转)、上下滑动→画面垂直转动(上下旋转)，
+         与直觉一致。已用 tools/verify_free_drag.mjs【屏幕空间实测】确认（见下方）。
+         walk / fp / 点云在自由模式不活跃（各有 mode / fp.on 守卫），此处转换不影响它们。 */
+      if(STAGE.rot === 0 || e.__stageFixed) return;
       const p = screenToStage(e.clientX, e.clientY);
       try{
         Object.defineProperty(e, 'clientX', { value:p.x, configurable:true });
